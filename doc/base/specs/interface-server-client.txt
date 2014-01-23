@@ -1,0 +1,256 @@
+Top level specification, major groups::
+
+<wsgi root>/                           ## Interface information service / Page generation
+<wsgi root>/event                      ## Event related stuff
+<wsgi root>/metadata                   ## Metadata related stuff
+<wsgi root>/request                    ## Request submission and status stuff
+
+Application level
+~~~~~~~~~~~~~~~~~
+::
+
+ <wsgi root>/configuration             ## Get configuration
+   Parameters: None
+   Response: JSON structure
+
+ <wsgi root>/loader                    ## JavaScript code to load the interface
+   Parameters: None
+   Response: JavaScript method
+
+Event level
+~~~~~~~~~~~
+::
+
+ <wsgi root>/event/catalogs            ## List of catalogs available
+   Parameters: None
+   Response: JSON - a list of catalogs and the features they offer
+
+ <wsgi root>/event/<catalog><?parameters> ## Events query for preparing request 
+   Parameters: start={datetimestring}
+               end={datetimestring}
+               minlat={float}
+               maxlat={float}
+               minlon={float}
+               maxlon={float}
+               minmag={float}
+               maxmag={float}
+               mindepth={float}
+               maxdepth={float}
+               limit={int}
+               format={string}
+   Response: JSON, CSV, raw, or text lists of events
+
+ <wsgi root>/event/parse<?parameters>    ## Parse a user-supplied catalog. 
+   Parameters: informat={string}         ## The INPUT format. So far CSV, later can be QML, GeoJSON
+               columns={string}          ## Comma-separated list of columns
+                                         ## in the supplied CSV file, from: 
+                             ('latitude', 'longitude', 'depth', 'time', 'ignore')
+               input=<user supplied catalog sent as POST>
+	       format={string}           ## The OUTPUT format.
+   Response: JSON, CSV - a list of events.
+
+Metadata level
+~~~~~~~~~~~~~~
+::
+
+ <wsgi root>/metadata/networktypes     ## List of network types
+   Parameters: None
+   Response: JSON - a list of network types that the system knows.
+             Every row contains two columns: ID and DESCRIPTION.
+
+
+ <wsgi root>/metadata/sensortypes      ## List of sensor types
+   Parameters: None
+   Response: JSON - a list of sensor types that the system knows.
+             Every row contains two columns: ID and DESCRIPTION.
+
+
+ <wsgi root>/metadata/networks<?parameters>  ## List of networks for menus
+   Parameters: start={int}
+               end={int}
+               [networktype={string}]
+   Response: JSON - list of networks after filtering based on the parameters.
+             Every row contains two columns: ID and DESCRIPTION. The ID is a
+             combination of network code and start/end year.
+
+
+ <wsgi root>/metadata/stations<?parameters>  ## List of stations for menus
+   Parameters:
+               start={int}
+               end={int}
+               networktype={string}
+               [network={string}]
+   Response: JSON - list of stations after filtering based on the parameters.
+             Every row contains two columns: ID and DESCRIPTION. The ID is a
+             combination of network code, start/end year of the networks and
+             the station code.
+             If the optional network parameter is passed, networktype is not
+             used and the time to return the information is improved.
+
+
+ <wsgi root>/metadata/streams<?parameters>   ## List of streams for menus
+   Parameters:
+               start={int}
+               end={int}
+               networktype={string}
+               [network={string}]
+               [station={string}]
+   Response: JSON - list of streams after filtering based on the parameters.
+             Every row contains only one column: DESCRIPTION. The DESCRIPTION
+             is only the first two letters of the stream code.
+             For example, 'BH'.
+             If the optional network and/or station parameters are passed, the
+             time to return the information is improved.
+
+
+ <wsgi root>/metadata/query<?parameters>     ## Metadata query for preparing
+                                             ## request
+   Parameters: start={int}
+               end={int}
+               [network={string}]
+               [networktype={string}]
+               [streams={list of streams}] ## two-char codes separated by commas
+               [station={string}] ||       ## selection "by Code"
+               [minlat={float}             ## selection "by Region"
+                maxlat={float}
+                minlon={float}
+                maxlon={float}] ||
+               [minradius={float}          ## selection "by Event"
+                maxradius={float}          ## Radius and azimuth are
+                minazimuth={float}         ## relative to event location(s)
+                maxazimuth={float}
+                events=<event data sent as POST>]
+               sensortype={string}
+               preferredsps={float}
+   Response:   JSON list [ key table, attribute list]
+               Keys are (network code, network starting year, station code,
+                         station starting DATE)
+               Attributes are {'netcode', 'statcode', 'latitude', 'longitude',
+                               'restricted', 'netclass', 'archive',
+                               'netoperator', 'streams' e.g. ["BH","HH","LN"]}
+
+NOTE: Coordinates for region-based constraints are taken from
+``<station>``-level attributes in inventory.
+This is not perfect (they are stream-level attributes), but is simple and adequate.
+::
+
+ <wsgi root>/metadata/phases          ## List the phases supported by the timewindows method.
+   Parameters: None
+   Response: JSON - a list of phases that the system knows.
+             Every row contains two columns: ID and DESCRIPTION.
+
+
+ <wsgi root>/metadata/export<?parameters>          ## Downloads a CSV file with the selected streams
+   Parameters: streams={data}         # JSON [list of [net, sta, chan, loc]]
+   Response: CSV - a list of streams that are currently selected in the stations list.
+
+
+ <wsgi root>/metadata/timewindows<?parameters>     ## Prepare time window for each (event, stream)
+   Parameters: streams={data}         # JSON [list of [net, sta, chan, loc]]
+               [ start={time}
+                 end={time} ] ||
+               [ events={data}       # JSON [list of [lan, lon, depth, time]]
+                 startphase={string}
+                 startoffset={int}
+                 endphase={string}
+                 endoffset={int} ]
+
+   Response: JSON object, suitable to be passed as "timewindows" to /request/submit
+
+
+Request level
+~~~~~~~~~~~~~
+
+(Magic free, all parameters are mandatory unless it is
+explicitly stated that they are optional.) 
+::
+
+ <wsgi root>/request/types                    ## List of possible request types 
+   Parameters: (none)
+   Response: JSON [list of [requesttype, description]]
+
+ <wsgi root>/request/nodes                    ## List of nodes from network XML
+   Parameters: (none)
+   Response: JSON [list of [DCID, name]]
+
+ <wsgi root>/request/submit<?parameters>      ## Submit one request
+   Parameters: user={string}
+               requesttype={string}
+               compressed=<boolean>
+               responsedictionary=<boolean>
+               timewindows=<data>             ## JSON list of time windows
+               eventinfo=<data>       ## Event info, e.g. for SEED headers.
+                                      ## JSON dict: [latitude, longitude, depth, description, ...]
+                                      ## (Not currently used.)
+               [server={DCID}]
+
+   Response: JSON dict {"uuid": "<uuid>",
+                        "success": [list of successfully routed requests],
+                        "failure": [list of requests that could not be routed]}
+
+Time windows structure example (might use Arclink time format instead of ISO)::
+
+ [
+    [
+        "2013-07-01T12:00:00.0000Z", 
+        "2013-07-01T12:10:00.0000Z", 
+        "RO", 
+        "MLR", 
+        "BHZ", 
+        "",
+	1024                               # estimated size
+    ], 
+    [
+        "2023-07-01T12:00:00.0000Z", 
+        "2023-07-01T12:10:00.0000Z", 
+        "RO", 
+        "MLR", 
+        "BHZ", 
+        "",
+	1024                               # estimated size
+    ] 
+ ]
+
+::
+
+ <wsgi root>/request/download?{parameters}    ## Get the data!
+   Parameters: request={int}    ## Arclink Request id number
+               user={string}    ## Valid e-mail address
+               server={string}  ## Arclink network DCID
+               [volume={string}]## Optional volume to download
+   Response: (data: seed, mseed, dseed, inv-xml, routing-xml, ...?)
+
+ <wsgi root>/request/status<?parameters>     ## Check status of one user request
+                                             ## at a server.
+   Parameters: user={string}                  
+               server={string}
+              [ request={int} ] ## OPTIONAL, if omitted: all request ids for 
+                                   that user and server should be returned
+   Response: JSON list of objects generated from Arclink status XML file for each request
+
+ <wsgi root>/request/resubmit<?parameters>
+   Parameters: user={string}
+               uuid={request UUID}
+               mode={reroute|retry|resend}
+               idlist                  ## JSON [list of [server, request]]
+               [server=DCID]           ## if omitted, use DEFAULT_SERVER
+               
+   Modes: reroute: try to send NODATA/RETRY lines to next server;
+          retry:   try to send NODATA lines to next server,
+                   retry RETRY lines on the same server;
+          resend:  resend the whole request under a new UUID.
+
+   Response: JSON dict, same as /submit
+
+ <wsgi root>/request/purge{?parameters}      ## Delete one user request
+                                             ## at a given server.
+   Parameters: user={string}                 ## User is an e-mail address
+               server={string}               ## Arclink network DCID
+               request={int}
+   Response: true (or HTTP error)
+
+As for FDSN web services, ``{datetimestring}`` is *always* an ISO-style date-time string,
+e.g. ``2010-01-01T12:34:56``.
+Note that there is a 'T' between date and time
+and there is no time zone indication.
+All times are UTC.

@@ -1,0 +1,187 @@
+Problems
+~~~~~~~~
+
+station.js menu - null item for replace().  [Helle P, 2013-09-09]
+
+doesn't work in Opera [PLE, August 2013]
+
+Things that need fixing in the short term
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Adjust time span for stations if events are given and 'search by events'.
+
+* Event pull-downs should be 1980 to current year.
+
+* Events: maximum magnitude option on the web page [JC]
+
+* Events: display the type of magnitude, if one is available [JC]
+
+* Install procedure wasn't smooth, if the final URL is other than /webinterface
+
+* Documentation:
+   - all tutorial items need to work.
+   - developer notes clean-up.
+   - configuration parameter documentation.
+
+* Dependency on seiscomp/manager.py - what can we do to ease that?
+
+* beta testing on some users. (In progress, Aug-Sep 2013)
+
+* The shrink/reduce/refine/delete feature:
+	request.js - Pack._event_list
+
+* Logging needs to be turned down. DONE
+
+* :event: Implement ISC catalog - example URL is
+http://www.isc.ac.uk/cgi-bin/web-db-v4?request=COMPREHENSIVE&out_format=CATCSV&searchshape=RECT&bot_lat=0&top_lat=50&left_lon=-30&right_lon=30&ctr_lat=&ctr_lon=&radius=&max_dist_units=deg&srn=&grn=&start_year=2013&start_month=2&start_day=28&start_time=00%3A00%3A00&end_year=2013&end_month=3&end_day=01&end_time=00%3A00%3A00&min_dep=&max_dep=&min_mag=&max_mag=&req_mag_type=Any&req_mag_agcy=Any&include_links=on
+
+* :event: Implement fdsnws handler (assuming CSV output?)
+
+* :event: Read QuakeML
+
+* :event: Using parse for event catalog - depths are lost again.
+	- also show a pop-up/console warning if NOTHING was readable.
+
+* Add webdc.html DONE and basic.html examples.
+	- ln -s generic.html index.html
+	- can we move webdc.html and basic.html to examples?
+	- can we use current openlayers with the webdc.html example?
+
+* Advanced stream filter - what???
+
+* Download button for the stations list.
+
+* Upload method for a stations list.
+
+* :event/station: Add/trim/filter already-chosen events/stations
+
+* :event: Don't create temp files!
+
+* :event: GFZ service - don't allow before 1 August 2007.
+
+* :event: Still a limit problem - 2x nmax=... on parameters
+
+* :event: Upload - popup should report accepted, nnn events loaded, separator was, or zero, see console.
+
+* :view: Should be viewable with JavaScript disabled
+
+* :event: Circular regions
+
+* :metadata: Check parameters or raise WIError.
+
+* :metadata: add JQ's test cases
+
+* :metadata: query doesn't respect targetsps parameter.
+
+* Better treatment of static content, 'favicon.ico' etc.
+
+* Mapping/station list: show start and end dates, for temporary stations,
+  on the list and/or on their map pop-ups.
+
+* :mapping: Colour code events by magnitude/depth
+
+* :python: Log to [wsgi.error] or whatever it's called. DONE?
+
+Hinted-at features (2013-09-06)
+~~~~~~~~~~~~~~~~~~
+
+* Including support for different waveform parameters
+   e.g. qc, ground motion parameters.
+
+* Providing download of the station/stream lists, and
+  supporting selection by uploading such a list.
+  WH: "Making station/stream lists extendable and providing a download/upload option for these lists to make them re-usable and modifiable."
+
+* "Circular" region selection as well as "rectangular"
+   (latitude/longitude boxes).
+
+* Flexible system of colouring schemes for events.
+  (depth and magnitude dependent)
+
+* "Full screen" mode where the map is larger for
+   better browsing.
+
+* Warn if the 800 event limit is hit.
+
+Important in the medium term
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :event: Save/download an event list
+
+* :metadata: Upload and Save/download a station list
+
+* Filter station-event pairs by azimuth/backazimuth/distance [FT, Dec 2013]
+  and/or "station-first" selection: first a station, then appropriate events.
+
+"Requirements" that are still not implemented
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Look up by strong motion data or QC parameters.
+
+
+Nice to have features
+~~~~~~~~~~~~~~~~~~~~~
+
+* Produce KML files for station and event lists. [JC, 24 Sept.]
+
+* DONE? Break up big requests (1000s of lines) into chunks and manage them.
+
+* Relate present webdc.eu web server stats to user actions:
+ - are user requests typically event-based or station-based?
+
+* Richer list of symbols for different event magnitudes/depths,
+  and use subimages from a symbol sheet.
+
+* Time window computation: specifying a constant speed/slowness to be
+used with the source-receiver distance, or use OT.
+
+
+
+Known Problems
+~~~~~~~~~~~~~~
+
+Doesn't run over nx?
+
+Doesn't work on Internet Explorer x.x properly.
+
+Doesn't work on Opera/Konqueror properly??
+
+Isn't properly relocatable? URL should be independent of location in the file system.
+
+SERVER_FOLDER to server.dir
+
+
+------------
+-*- org -*-
+
+Some event-related things that still need doing:
+
+* TODO Jul 2 - clipping by radius
+* TODO Jul 2 - clipping by azimuth
+
+* TODO July 4 - start on implementing parse POST method for CSV file input
+* Reopen/no temp files - partly done, could be better.
+* TODO Jul 10 - Filtering for params unimplemented in target service
+	e.g. circular regions
+	e.g. depth (for eqinfo)
+* TODO Jul 10 - missing data test case can be in EventData class
+* DONE Dateline crossing tests.
+* Clean up EventServices code
+  ...in progress, uses WI_Module class.
+* TODO Name space - Event* classes to WI_Event*
+
+* June  - where is the 404 page for URLs below /event now?
+* TODO Review add event service procedure - use FDSNWS case as test
+* DONE :important: EMSC catalog
+* NOT NEEDED Build lite JavaScript reader/displayer for presentation side.
+
+* TODO Get configuration sorted out 				  :important:
+  event.services.catalog
+  event.service.[which].descriptions, capabilities ??
+
+* DONE Filter by depth and magnitude in eqinfo
+* Accept QuakeML input 				:useful:
+* Produce QuakeML output 				:unimportant: 
+
+* Oops: QUERY_STRING parameters get re-ordered from original request!  :unimportant:
+* :NOTE: obspy.neries and obspy.(iris fdsn ws) exist !

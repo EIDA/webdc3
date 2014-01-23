@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<seiscomp>
+        <!-- Start of the webinterface module definition -->
+        <module name="webinterface" category="Modules/Arclink" standalone="true">
+                <description>
+                        The webinterface module is an Arclink client for retrieving waveforms based on events or inventory.
+                </description>
+                <!-- Configuration section to describe configuration file parameters -->
+                <configuration>
+                        <!--
+                        Describe one parameter. The parameter name must not include a dot.
+                        Namespaces of parameters are defined as groups as the dot is used to
+                        group parameters, eg a.b1 and a.b2 forms group "a" with parameters
+                        "b1" and "b2".
+
+                        -attributes-
+                          name:
+                            name of the parameter
+                          type:
+                            type of the parameter: string, int, boolean, double or list:string, list:int, ...
+                          default:
+                            optional default value
+                        -->
+                        <group name="arclink">
+                                <description>Parameters relating to connections to the Arclink server(s) supporting webinterface.</description>
+                                <parameter name="address" type="string" default="eida.gfz-potsdam.de:18002">
+                                        <description>The server to connect to, given as hostname:port</description>
+                                </parameter>
+                                <group name="timeout">
+                                        <parameter name="request" type="int" default="300">
+                                                <description>Timeout, in
+seconds, for XXX requests?</description>
+                                        </parameter>
+					<parameter name="status" type="int" default="300">
+                                        </parameter>
+					<parameter name="download" type="int" default="300">
+                                        </parameter>
+					<parameter name="networkXML" type="string" default="eida.xml">
+                                        </parameter>
+                                </group>
+                        </group>
+                        <group name="event">
+                                <description>Parameters relating to event look-up services.</description>
+                                <parameter name="defaultLimit" type="int" default="800">
+                                                <description>Maximum number of events which are returned if no other limit is set.</description>
+                                </parameter>
+                                <parameter name="verbosity" type="int" default="2">
+                                                <description>Verbosity level a la SeisComP logging.level. How chatty should event service be? This specifies logging on the server. 0:quiet, 1:error, 2:warning, 3:info, 4:debug.</description>
+                                </parameter>
+                                <group name="catalogs">
+				        <parameter name="ids" type="list" default="geofon, comcat, emsc, parser">
+                                             <description>List of all event services which will be enabled. Include 'parser' here to support file upload. For each service, there must be an EventService object with a handler method suitable for the service. There may be more than one instance of each EventService with different configuration parameters (e.g. different baseURL), in which case they are distinguished by the names here.</description>
+                                        </parameter>
+					<parameter name="preferred" type="string" default="geofon">
+                                                <description>The preferred service appears first in the pull-down menu of event services.</description>
+					</parameter>
+					<parameter name="registeredOnly" type="boolean" default="True">
+                                                <description>*NOT NEEDED??* If this parameter is 'true', any service, e.g. {id}, with no description will be *hidden*. That is, it will be registered, so requests to "/event/{id}" will be handled, but it will not be listed in the "Events Services" dialog box. Only those services with a non-empty "description" attribute will be displayed.</description>
+					</parameter>
+
+                                </group>
+                                <group name="names">
+				        <parameter name="lookupIfEmpty" type="boolean" default="True">
+                                             <description>If an event service does not provide a region name (e.g. an F.-E. region) should we look it up?</description>
+                                        </parameter>
+					<parameter name="lookupIfGiven" type="boolean" default="False">
+                                             <description>If an event service *does* provide a region name (e.g. an F.-E. region) should we look it up anyway, and override what was supplied up?</description>
+                                        </parameter>
+                                </group>
+                                <group name="service">
+				        <parameter name="description" type="string" default="">
+                                             <description>Short description for this target event service. This is provided in the catalog (/event/catalogs). It is displayed in the presentation layer under XXX.</description>
+                                        </parameter>
+					<parameter name="baseURL" type="string" default="">
+                                             <description>URL of the target event service. In forming queries of service {name}, baseURL is followed by '?' and any parameters, followed by event.service.{name}.extraParams</description>
+                                        </parameter>
+					<parameter name="extraParams" type="string" default="">
+                                             <description>Any additional string which needs appending to URLs for queries of the target event service. In forming queries of service {name}, extraParams is added to form the URL ``event.service{name}.baseURL?{request parameters}&amp;{extraParams}``</description>
+                                        </parameter>
+
+
+                                        
+                                
+                                        
+                                </group>
+
+                       </group>
+                        <group name="js">
+                                <description>Parameters relating to
+JavaScript. These are read in by the Python WSGI and served to the browser when
+...</description>
+                                <parameter name="maptype" type="string" default="wms">
+                                        <description>Type of OpenLayers
+map to produce. Can be one of: wms, google, osm.</description>
+                                </parameter>
+                                <group name="google">
+                                        <description>Type of Google map</description>
+                                        <parameter name="layer" type="string" default="Google Physical">
+                                                <description>Parameter for Google</description>
+                                        </parameter>
+                                </group>
+                                <group name="wms">
+                                        <description>Type of WMS map</description>
+                                        <parameter name="server" type="string" default="">
+                                                <description>URL, location of the WMS map server</description>
+                                        </parameter>
+                                        <parameter name="layer" type="string" default="">
+                                                <description>Parameter for WMS</description>
+                                        </parameter>
+                                </group>
+                                <group name="events">
+				        <description>These parameters are used in forming the Event Search Control.</description>
+                                         <parameter name="date_startoffset" type="string" default="-7d">
+                                                <description>Relative time for setting the default 'start' field in the Event Search Control. Use `d`, `w`, `m`, `y` for days, weeks, months or years; this value is interpreted by the jQueryUI datepicker .</description>
+                                        </parameter>                                        <parameter name="magnitudes_minimum" type="float" default="3.0">
+                                                <description>Default lower magnitude limit for events</description>
+                                        </parameter>
+                                         <parameter name="depth_minimum" type="float" default="0">
+                                                <description>Default smallest depth limit (in kilometres) for events.</description>
+                                        </parameter>
+                                         <parameter name="depth_maximum" type="float" default="1000">
+                                                <description>Default largest depth limit (in kilometres) for events.</description>
+                                        </parameter>
+                                        <parameter name="coordinates_north" type="float" default="90">
+                                                <description>Default northern latitude limit (in degrees) for rectangular region search.</description>
+                                        </parameter>
+                                        <parameter name="coordinates_south" type="float" default="-90">
+                                                <description>Default southern latitude limit (in degrees) for rectangular region search.</description>
+                                        </parameter>
+                                        <parameter name="coordinates_west" type="float" default="-180">
+                                                <description>Default western longitude limit (in degrees) for rectangular region search.</description>
+                                        </parameter>
+                                        <parameter name="coordinates_east" type="float" default="180">
+                                                <description>Default eastern longitude limit (in degrees) for rectangular region search.</description>
+                                        </parameter>
+                              </group>
+                        </group>
+                </configuration>
+                <!-- command-line section to describe command-line options -->
+                <command-line>
+                </command-line>
+        </module>
+</seiscomp>

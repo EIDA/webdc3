@@ -1,0 +1,33 @@
+<html>
+<body>
+<h2>Parse some input text for events</h2>
+<p>Enter your event info as CSV:</p>
+URL: action="http://localhost:8005/event/parse"
+URL: action="http://localhost:8008/event/parse"
+URL: action="http://localhost/testwi/webinterface/event/parse"
+<form name="formp" method="post" enctype="multipart/form-data" action="http://localhost:8008/event/parse">  <table>
+	  <tr><td>Event data:</td>
+		  <!-- <td><input name="input" type="text"/></td> -->
+		  <td><textarea name="input" rows="5" cols="60"/>
+58,11,"2013-01-01T00:00:00",15
+48,0,"2000-01-01T00:00:00",150
+		  </textarea></td>
+  </tr>
+  <tr><td>Columns:</td>
+     <td><select name="columns"/>
+		     <option value="latitude,longitude,time">Lat,Long,Date-Time</option>
+		     <option value="latitude,longitude,time,depth">Lat,Long,Date-Time,Depth</option>
+		     <option value="latitude,longitude,depth,ignore,ignore,ignore,time">Lat,Long,Depth,x,y,z,Date-Time</option>
+     	</select></td>
+  </tr>
+  <tr><td>Output Format:</td><td>
+		  <input name="format" value="csv" type="radio" />CSV</br>
+	<input name="format" value="json" type="radio" />JSON</td>
+  </tr>
+    </table>
+    <input type="submit" value="Send" />
+
+</form>
+<p>A header row is allowed, and may be succesfully ignored. You may need to quote strings for auto-detection to work properly. YMMV.</p>
+</body>
+</html>

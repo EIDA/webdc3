@@ -1,0 +1,379 @@
+@keyframes blink {
+    to {
+        color: rgba(0,0,0,0);
+    }
+}
+
+.wi-warn {
+	border: 2px Solid #d22;
+}
+
+.wi-request-pack-div {
+	margin: 0 0 20px 0;
+}
+
+.wi-table-header {
+	background: #4682B4;
+	color: white;
+}
+
+.wi-table-header-cell {
+	padding: 2px 2px 5px 2px;
+}
+
+.wi-odd {
+	background: #E7EFF2;
+}
+
+.wi-even {
+	background: #F8FAFB;
+}
+
+.wi-arrow-up:hover {
+	cursor: pointer;
+}
+
+.wi-arrow-up {
+	font-size: 0em;
+	position: relative;
+	margin: 0 2px 0 5px;
+	bottom: 8px;
+	border-top:    0px Solid transparent;
+	border-bottom: 5px Solid white;
+	border-left:   5px Solid transparent;
+	border-right:  5px Solid transparent;
+}
+
+.wi-arrow-down:hover {
+	cursor: pointer;
+}
+
+.wi-arrow-down {
+	font-size: 0em;
+	position: relative;
+	margin: 0 5px 0 2px;
+	top: -3px;
+	border-top:    5px Solid white;
+	border-bottom: 0px Solid transparent;
+	border-left:   5px Solid transparent;
+	border-right:  5px Solid transparent;
+}
+
+.wi-control-item-first {
+	padding: 0 0 8px 0;
+	position: relative;
+}
+
+.wi-control-item {
+	padding: 8px 0 8px 0;
+	position: relative;
+}
+
+.wi-control-item-last {
+	padding: 12px 0 0 0;
+	position: relative;
+	text-align: right;
+}
+
+/* wi controls use this as a header before a control e.g. a full-width slider. */
+.wi-spacer {
+	margin: 0 0 0.5em 0;
+	width: 100%;
+}
+
+/* wi controls use class="wi-short-spacer" as an introducer before
+ * a short selector e.g. a pull-down menu.
+ * Embed it in a "wi-short-div" and use absolute positioning for
+ * the object on the right. The "wi-short-spacer" has normal
+ * positioning so it sets the height of the "wi-short-div".
+ */
+.wi-short-div {
+    position: relative;
+}
+
+.wi-short-spacer {
+	margin: 0 0 0.5em 0;
+	width: 48%;
+}
+
+.wi-short-right {
+	position: absolute;
+	width: 48%;
+	top: 0px;
+	right: 0px;
+}
+
+.wi-inline-full {
+	padding: 0.2em 0.5em;
+	margin: 0em 0.5em 0em 0.5em;
+}
+
+.wi-inline {
+	/* padding: 0.2em 0.5em; */
+	margin: 0em 0.5em 0em 0.5em;
+	width: 85px;
+}
+
+.wi-inline-small {
+	/* padding: 0.2em 0.5em; */
+	margin: 0 0.5em 0em 0.5em;
+	width: 35px;
+}
+
+.wi-clear {
+	font-size: 0em;
+	clear: both;
+}
+
+/* Console log */
+
+.wi-console-debug {
+	color: grey;
+	padding: 2px 0 0 0;
+}
+
+.wi-console-info {
+	padding: 2px 0 0 0;
+}
+
+.wi-console-notice {
+	color: orange;
+	padding: 2px 0 0 0;
+}
+
+.wi-console-warning {
+	color: red;
+	padding: 2px 0 2px 0;
+}
+
+.wi-console-error {
+	color: red;
+	padding: 2px 0 2px 0;
+}
+
+.wi-console-stacktrace {
+	padding: 2px 0 2px 20px;
+}
+
+.wi-console-warning-tab {
+	color: red;
+	animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-khtml-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-moz-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-ms-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-o-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-webkit-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+}
+
+.wi-console-error-tab {
+	color: red;
+	animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-khtml-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-moz-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-ms-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-o-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-webkit-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+}
+
+/* Request status - full page */
+
+.wi-status-full-msgs {
+	/* no style */
+}
+
+.wi-status-full-groups {
+	/* no style */
+}
+
+.wi-status-full-group {
+	border: 1px solid black;
+	border-radius: 20px;
+	padding: 20px;
+	background-color: #ffffff;
+	color: #000;
+	width: auto;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.wi-status-full-group-buttons {
+	margin-bottom: 10px;
+}
+
+.wi-status-full-group-body {
+	/* no style */
+}
+
+/* Request status - list/popup */
+
+.wi-status-list-buttons {
+	margin-bottom: 10px;
+}
+
+.wi-status-list-body {
+	/* no style */
+}
+
+.wi-status-item-description {
+	/* no style */
+}
+
+.wi-status-item-progress {
+	/* no style */
+}
+
+.wi-status-popup {
+	/* no style */
+}
+
+.wi-status-popup-display {
+	/* no style */
+}
+
+.wi-status-popup-msgs {
+	/* no style */
+}
+
+.wi-status-popup-groups {
+	/* no style */
+}
+
+.wi-status-popup-group {
+	/* no style */
+}
+
+.wi-status-popup-group-buttons {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.wi-status-popup-group-body {
+	margin-top: 20px;
+	margin-bottom: 20px;
+	max-height: 800px;
+	overflow-y: auto;
+}
+
+/* Request warnings */
+
+.wi-warning-encryption {
+	width: auto;
+	border: 2px Solid red;
+	padding: 5px 5px 5px 5px;
+	margin: 10px 0px 10px 0px;
+}
+
+.wi-warning-routing {
+	color: red;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	max-height: 100px;
+	overflow-y: auto;
+}
+
+/* Request rendering */
+
+.wi-request {
+	padding: 0px 0px 0px 5px;
+	margin: 0px 0px 20px 0px;
+	border-left: 2px Solid black;
+}
+
+.wi-request-datacenter {
+	font-size: 1.2em;
+	padding: 0;
+	margin: 0;
+}
+
+.wi-request-header {
+	margin: 0px;
+	background: #dddddd;
+}
+
+.wi-request-download {
+	font-weight: bold !important;
+	color: green !important;
+}
+
+.wi-request-info {
+	margin: 0px;
+}
+
+.wi-request-volume {
+	background: #ffffff;
+ 	padding: 0px 0px 0px 5px;
+	margin: 5px 0px 5px 25px;
+	border-left: 2px Solid black;
+}
+
+.wi-request-volume-header {
+	margin: 0px;
+	background: #dddddd;
+}
+
+.wi-request-volume-download {
+	font-weight: bold !important;
+	color: green !important;
+}
+
+.wi-request-volume-info {
+	margin: 0px;
+}
+
+.wi-request-volume-content {
+	margin: 0px;
+}
+
+.wi-request-line {
+	/* no style */
+}
+
+.wi-request-encrypted {
+	color: red;
+}
+
+.wi-request-status-ok {
+	color: green;
+}
+
+.wi-request-status-warn {
+	color: #d9d600;
+}
+
+.wi-request-status-other {
+	color: red;
+}
+
+/* Request review */
+
+.wi-review-popup {
+	/* no style */
+}
+
+.wi-review-display {
+	max-height: 800px;
+	overflow-y: auto;
+}
+
+.wi-station-filter {
+	padding: 0px 6px 12px 6px;
+/*	background: #CD5C5C; */
+	color: #000;
+}
+
+.wi-disabled {
+	color: grey;
+}
+
+.wi-download-alert-tab {
+	color: red;
+	animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-khtml-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-moz-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-ms-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-o-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+	-webkit-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+}
+

@@ -1,0 +1,31 @@
+
+README file for webinterface
+
+GUI tool for event- and time-based waveform selection.
+
+GFZ Potsdam 2013
+
+
+To make the documentation:
+ cd doc ; make all ; acroread webinterface.pdf
+
+To install:
+ see doc/
+
+
+
+IDEAS for version 2.0
+=====================
+
+* Cookie to come back to a half-built search.
+ (e.g. save a station set, update the events associated with it)
+
+* GFZ event pages have a link to go straight to waveform selection
+
+* Add search by QC parameters, etc.
+
+* :event: *important* Filter by station distance
+
+* :event: Circular filter of the catalog.
+
+* und viel mehr... see TODO

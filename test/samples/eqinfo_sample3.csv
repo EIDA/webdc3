@@ -1,0 +1,6 @@
+"Event ID";"F-E Region";Magnitude;Status;"Origin time";Latitude;Longitude;"Depth (km)";Flags
+gfz2013lquu;"Near Coast of Nicaragua";6.4;M;"2013-06-15 17:34:31";11.87;-86.98;49;"big"
+gfz2013lqsb;"Crete, Greece";6;M;"2013-06-15 16:11:02";34.41;25.04;13;"big"
+gfz2013lqil;"South of Kermadec Islands";6;M;"2013-06-15 11:20:38";-33.94;179.28;210;"big"
+gfz2013lncg;"South of Java, Indonesia";6.7;M;"2013-06-13 16:47:25";-9.94;107.28;17;"xxl"
+

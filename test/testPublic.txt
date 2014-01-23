@@ -1,0 +1,34 @@
+
+# replace with python urllib2.open()
+pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=perm" -O eida-perm.json
+pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permo" -O eida-permo.json
+pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permr" -O eida-permr.json
+pevans@sec24c106:test> python <<EOF
+a = json.load(open('eida-perm.json', 'r'));
+b = json.load(open('eida-permo.json', 'r'));
+r = json.load(open('eida-permr.json', 'r'));
+print len(a)
+2479
+print a[0]
+['key', 'netcode', 'statcode', 'latitude', 'longitude', 'restricted', 'netclass', 'archive', 'netoperator', 'streams']
+
+# Just look at the keys>
+ka = [x[0] for x in a];
+kb = [x[0] for x in b];
+kr = [x[0] for x in r];
+sa = set(ka)
+sb = set(kb)
+sr = set(kr)
+len(sa)
+2478
+len(sb)
+2318
+len(sr)
+167
+sb.intersection(sr)
+set(['IQ-1980-HUAR-2009123', 'IQ-1980-TIRA-2009125', 'IQ-1980-PICL-2009121', 'IQ-1980-NEUQ-2009517', 'IQ-1980-POZO-2009124', 'IQ-1980-PINT-2009125', 'IQ-1980-UNAP-2009514'])
+assert( len(sb.intersection(sr) == 0 )
+# Should be empty, but for virtual networks which  are open.
+
+EOF
+

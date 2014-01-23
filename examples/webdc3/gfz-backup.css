@@ -1,0 +1,22 @@
+/* gfz-backup.css
+ * Load this before GFZ template.css to prevent serious problems
+ * if the latter is absent.
+ * Keep this file as small as possible to provide a *workable* site.
+ * If template.css is present, it should override any settings here.
+ */
+
+#logoGFZ {
+  position: absolute;
+  left: -20px;
+  bottom: 0;
+}
+
+#wordmarkGFZ {
+  position: absolute;
+  right: -8px;
+  bottom: 0;
+}
+
+.boxRight { /* einzelne Box */
+  background: #E0EFF6;
+}

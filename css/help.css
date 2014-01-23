@@ -1,0 +1,29 @@
+/* Additional style for help.html */
+dl {
+  margin: 2em 0;
+  padding: 0;
+  width: 60em;
+}
+
+dt {
+  font-weight: bold;
+  border: 1px Solid black;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver;
+  border-top: 1px solid silver;
+  border-top-left-radius: .5em;
+  border-top-right-radius: .5em;
+  color:black;
+  background: #00899F;
+  padding: 5px 5px 5px 5px;
+}
+
+dd {
+  color:black;
+  background-color:lightyellow;
+  padding: 8px 8px 32px 8px;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver;
+  border-bottom: 1px solid silver;
+  margin: 0 0 1em 0;
+}

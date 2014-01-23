@@ -1,0 +1,119 @@
+<html>
+<head>
+<style>
+table {
+  border: 1px Solid green;
+}
+td {
+  padding: 2px 15px;
+}
+</style>
+</head>
+	<body>
+		<h1>Event service test page</h1>
+		<h2>Visiting the following URLs should work</h2>
+		<ul>
+			<li><a href="http://localhost:8005/event/geofon?maxlat=-20">Events below 20 deg S</a></li>
+			<li><a href="http://localhost:8005/event/geofon?maxlat=-20&limit=5">5 Events below 20 deg S</a> <a href="http://localhost:8005/event/geofon?maxlat=-20&limit=5&format=json">[JSON]</a></li>
+			<li><a href="http://localhost:8005/event/catalogs">Catalog of events services</a></li>
+			<li><a href="http://localhost:8005/event/meteor">"Meteor" service shows one event only</a></li>
+			<li><a href="http://localhost:8005/event/comcat">"Comcat" service</a> from USGS.</li>
+		</ul>
+
+		<h2>The following should look similar - 5 events each:</h2>
+		<table border="3">
+			<tr>
+<th>GEOFON</th>
+<td>eqinfo, M&gt;7, June 2013</td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-04-01&end=2013-07-01&minmag=7.0&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-04-01&end=2013-07-01&minmag=7.0&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-04-01&end=2013-07-01&minmag=7.0&format=raw">RAW</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-04-01&end=2013-07-01&minmag=7.0&format=xoop">XOOP</a></td>
+</tr>
+			<tr>
+<th>COMCAT</th>
+<td>Comcat, M&gt;7, June 2013</td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-04-01&end=2013-07-01&minmag=7.0&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-04-01&end=2013-07-01&minmag=7.0&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-04-01&end=2013-07-01&minmag=7.0&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-04-01&end=2013-07-01&minmag=7.0&format=xoop">xoop</a></td>
+</tr>
+			<tr>
+<th>EMSC</th>
+<td>EMSC, M&gt;7, June 2013</td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-04-01&end=2013-07-01&minmag=7.0&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-04-01&end=2013-07-01&minmag=7.0&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-04-01&end=2013-07-01&minmag=7.0&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-04-01&end=2013-07-01&minmag=7.0&format=xoop">xoop</a></td>
+</tr>
+		</table>
+
+
+		<h2>The following should give errors</h2>
+		<ol>
+			<li><a href="http://localhost:8005/event/catalog">/event/catalog</a> (no 's')</li>
+			<li><a href="http://localhost:8005/events/catalog">/events/catalog</a> ('events')</li>
+			<li><a href="http://localhost:8005/events/XXX">/events/XXX</a> ('events/XXX')</li>
+			<li><a href="http://localhost:8005/event/YYY">/event/YYY</a> (no such service)</li>
+			<li><a href="http://localhost:8005/YYY">/YYY</a> (no handler)</li>
+		</ol>
+
+		<h2>The following should look similar - a few events each:</h2>
+		<table border="3">
+			<tr>
+<th>GEOFON</th>
+<td>eqinfo, SW Asia, June 2013 - expect 9 events</td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=raw">RAW</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=xoop">XOOP</a></td>
+</tr>
+			<tr>
+<th>COMCAT</th>
+<td>Comcat, SW Asia, June 2013 - expect 12 events</td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=xoop">xoop</a></td>
+</tr>
+			<tr>
+<th>EMSC</th>
+<td>EMSC, SW Asia, June 2013 - expect 48 with M&ge;3.6; many small events</td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&minlat=0.0&maxlat=50&minlon=38&maxlon=65&minmag=3.6&format=xoop">xoop</a></td>
+</tr>
+		</table>
+
+
+		<h2>The following should look similar - a few deep events each, in June 2013:</h2>
+		<table border="3">
+			<tr>
+<th>GEOFON</th>
+<td>eqinfo, 200-400km, 15 events </td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=raw">RAW</a></td>
+<td><a href="http://localhost:8005/event/geofon?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=xoop">XOOP</a></td>
+</tr>
+			<tr>
+<th>COMCAT</th>
+<td>Comcat, 200-400km - expect 14 events</td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/comcat?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=xoop">xoop</a></td>
+</tr>
+			<tr>
+<th>EMSC</th>
+<td>EMSC 200-400km - expect 31 events with M&ge;3.6</td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=json">JSON</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=csv">CSV</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=raw">raw</a></td>
+<td><a href="http://localhost:8005/event/emsc?start=2013-06-01&end=2013-07-01&mindepth=200&maxdepth=400&minmag=3.6&format=xoop">xoop</a></td>
+</tr>
+		</table>
+
+	</body>
+</html>

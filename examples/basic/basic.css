@@ -1,0 +1,150 @@
+/* * HTML tags customization ************************************************ */
+/* Demonstration of a very simple webinterface.
+ * You are free to customise this and basic.html
+ */
+html {
+	overflow-y: scroll;
+}
+
+body { 
+	font-size: 10pt;
+	margin: 5px;
+	padding: 0;
+}
+
+h1 {
+	font-size: 1.6em;
+	padding: 0;
+	margin: 0;
+}
+
+h2 {
+	font-size: 1.2em;
+	padding: 0;
+	margin: 0;
+	font-weight: normal;
+}
+
+h3 {
+	font-size: 1.0em;
+	padding: 0;
+	margin: 0 0 5px 0;
+	font-weight: bold;
+}
+
+p {
+	margin: 0px;
+	padding: 0;
+}
+
+/* ************************************************************************** */
+
+/* * Top page elements ****************************************************** */
+#header {
+	width: 980px; /* was 1024 */
+	clear: both;
+}
+
+#menu {
+	width: 980px; /* was 1024 */
+	clear: both;
+}
+
+#contents {
+	width: 980px;  /* was 1024 */
+	border: 0px Solid black;
+	clear: both;
+}
+
+#footer {
+	width: 980px;  /* was 1024 */
+	clear: both;
+}
+/* ************************************************************************** */
+
+/* * Main Boxes on contents section ***************************************** */
+#menu ul {
+	list-style:none;
+}
+
+#menu ul li {
+	display: inline;
+}
+
+#menu ul li a {
+	display: inline-block;
+}
+
+#menu ul li.last {
+	float: right;
+}
+
+#contents .right {
+	width: 680px; /* was 744 */
+	float: right;
+	clear: right;
+}
+
+#contents .left { 
+	width: 280px;
+	float: left ;
+	clear: left;
+}
+
+#contents .right .box {
+	margin: 0 0 5px 5px;
+}
+
+#contents .left .box { 
+	margin: 0 5px 5px 0;
+}
+/* ************************************************************************** */
+
+/* * Modules customization ************************************************** */
+
+#contents .right .titlebox {
+	border: 1px Solid black;
+	padding: 5px 10px 5px 10px;
+	background: #FFA;
+}
+
+#contents .left .titlebox {
+	border: 1px Solid black;
+	padding: 5px 10px 5px 10px;
+	background: #FFA;
+}
+
+#contents .frame {
+	border-left: 1px Solid black;
+	border-right: 1px Solid black;
+	border-bottom: 1px Solid black;
+	min-height: 80px; /* 100px */
+	padding: 10px;
+}
+
+.scrollframe {
+	border-left: 1px Solid gray;
+	border-right: 1px Solid gray;
+	border-bottom: 1px Solid gray;
+	height: 100px;
+	overflow-y: auto;
+	padding: 10px;
+	margin-bottom: 10px;
+	text-align: left;
+}
+
+.statusframe {
+        background-color: pink;
+	border-left: 1px Solid black;
+	border-right: 1px Solid black;
+	border-bottom: 1px Solid black;
+	min-height: 100px;
+	padding: 1px 10px 0px 10px;
+	display: inline;
+}
+
+.clear {
+	clear: both;
+}
+
+/* ************************************************************************** */

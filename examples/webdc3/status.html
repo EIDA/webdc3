@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Request status at EIDA</title>
+	<meta charset="UTF-8">
+
+	<!-- Those should be loaded from the page -->
+	<script src="tools/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+
+	<link rel="stylesheet" href="css/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="css/smoothness/jquery.ui.theme.css" />
+
+	<script src="tools/jquery/jquery-ui.js" type="text/javascript"></script>
+	<script src="tools/jquery/jquery.cookie.js" type="text/javascript"></script>
+	<!-- Done -->
+
+	<link rel="stylesheet" type="text/css" href="css/basic.css" />
+	<script src="wsgi/loader" type="text/javascript"></script>
+</head>
+
+<body>
+	<div id="header">
+		<h1>Web Interface to EIDA network @ GEOFON</h1>
+		<hr/>
+	</div>
+
+	<div id="contents">
+		<div class="all">
+			<div class="box">
+				<div class="titlebox">
+					<h2>Request Status</h2>
+					<div class="help">Use this to check status of your requests.</div>
+				</div>
+				<div id="wi-StatusQueryControl" class="frame"></div>
+			</div>
+
+			<div class="box">
+				<div class="titlebox">
+					<h2>Console</h2>
+					<div class="help">Warnings and other messages appear here</div>
+				</div>
+				<div id="wi-Console" class="scrollframe"></div>
+			</div>
+
+			<div class="box">
+				<div class="titlebox">
+					<h2>Manage Requests</h2>
+					<div class="help">Use this to reroute, download and delete your requests.</div>
+				</div>
+				<div id="wi-StatusFullControl" class="statusframe boxRight"></div>
+				<div id="wi-StatusQueryControl" class="frame boxRight" style="margin-bottom: 0"></div>
+			</div>
+		</div>
+		<br class="clear"/>
+	</div>
+
+	<div id="footer">
+		<hr/>
+		<p>Arclink Web Interface developed by GFZ for EIDA @ 2013</p>
+	</div>
+
+	<!-- Add hidden download frame, so clicking on download links will not cancel AJAX requests -->
+	<iframe name="downloadFrame" style="display: none;"/>
+
+</body>
+</html>

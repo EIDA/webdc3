@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="../examples/webdc3/geofon.css"  rel="stylesheet" type="text/css" />
+    <link href="../examples/webdc3/wi-geofon.css"  rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Webinterface web service test page</h1>
+    <p>Derived from interface-server-client.txt</p>
+
+    <h2>Visiting the following URLs should work</h2>
+    <ol>
+      <li><a href="http://localhost:8005/configuration">Configuration</a>
+Response:JSON structure </li>
+      <li><a href="http://localhost:8005/loader">Javascript
+loader</a>
+Response: JavaScript method</li>
+    </ol>
+
+    <h2>Others</h2>
+    <ol>
+	  <li><a href="testMetadata.html">Metadata</a></li>
+	  <li><a href="testEvents.html">Event services</a></li>
+	  <li><a href="testRequests.html">Request services</a></li>
+    </ol>
+
+    <h2>Positioning</h2>
+    <div style="width:700px; background-color:lightyellow; border: 1px Solid red; text-align: center;">
+	    <div style="width: 400px; text-align: center; background-color: lightblue; border: 1px Solid green; display:inline;">
+		    Words words words.
+	    </div>
+    </div>
+
+    <h2>More Positioning</h2>
+    <div style="width:700px; background-color:lightyellow; position: relative; border: 1px Solid red;">
+	    <div style="width: 250px;
+			background-color: pink; 
+			display: inline;
+			border: 1px Solid red; left: 0px; top: auto;">
+		    Left left left
+	    </div>
+	    <div style="width: 200px; background-color: lightgreen; 
+			display: inline;
+			border: 1px Solid green; position: absolute; right: 0px; top: auto;">
+		    Right right right
+	    </div>
+    </div>
+
+    <h2>Positioning with class</h2>
+	<div id="contents" style="display: inline; border: 1px Solid red;">
+		<div class="left">
+			<div class="box"><!--don't include "tab" class -->
+				<div class="titlebox boxRight" style="position: relative;">
+					<h2 style="display:inline;">F.left heading</h2>
+					<div style="border: 1px Solid green;
+						    width: 0em;
+						    position: absolute; right: 70px; top: 1em;">
+					<div class="help"><a href="help.html">?<span>Use this to add channels to your request. The selection can be made based on the currently selected events or by network/station codes.</span></a></div>
+				</div></div>
+			</div>
+			MORE ON THE LEFT
+		</div> <!-- left -->
+		MORE CONTENTS
+	</div> <!-- contents -->
+
+  </body>
+</html>
+
+

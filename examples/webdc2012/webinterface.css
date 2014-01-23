@@ -1,0 +1,379 @@
+@charset "ISO-8859-1";
+
+html, body {
+ width: auto;
+ height: auto;
+}
+
+body { 
+ font-family: Helvetica, Arial, sans-serif;
+ font-size: .9em; 
+ font-style: normal; 
+ font-weight: normal; 
+ background-color: #ffffff;
+ color: #000000;
+}
+
+a:hover {
+ text-decoration: underline;
+}
+
+a:visited {
+ color: #0000ff;
+ text-decoration: none;
+}
+
+a{
+ text-decoration: none;
+ color: #0000ff;
+}
+
+hr { 
+ width: 100%; 
+ height: .1em;
+}
+
+table.fullwidth {
+ width: 100%;
+}
+
+table.auto {
+ margin-left: auto;
+ margin-right: auto;
+ width: auto;
+}
+
+tr.evnrow { 
+ background: #f8fafb none;
+}
+	
+tr.oddrow {
+ background: #e7eff2 none;
+}
+	
+tr.bigevt {
+ background: #f8e4e4 none;
+}
+
+tr.bigevt td.mag {
+ font-weight: bold;
+}
+	
+tr.xxlevt {
+ background: #f8c8c8 none;
+}
+
+tr.xxlevt td.mag {
+ font-weight: bold;
+ color: red;
+}
+
+th {
+ font-weight: bold; 
+ text-align: center;
+ background-color: #e7eff2;
+}
+
+td {
+ empty-cells: show; 
+ text-align: left;
+ font-weight: normal;
+}
+
+td.typeA  {
+ text-align: center; 
+ color: red;
+}
+	
+td.typeM  {
+ text-align: center; 
+ color: green;
+}
+	
+td.depth  {
+ text-align: right; 
+ padding-right: 0.6em;
+}
+	
+td.mag {
+ text-align: center;
+}
+
+div.olControlMousePosition { font-family: inherit !important;
+                             font-size: inherit !important; }
+
+span.to {
+ padding-left: .3em;
+ padding-right: .3em;
+}
+
+div.head {
+ position: relative;
+ background-color: #4382b5;
+ color: #fff6f4;
+ margin: 0 0 15px 0;
+ min-height: 20px;
+ padding: 1px;
+}
+
+#timestamp {
+ font-weight: bold;
+}
+
+#left {
+ width: 33%;
+ position: relative;
+ float: left;
+}
+
+#right {
+ width: 66%;
+ position: relative;
+ float: left;
+}
+
+#content {
+ text-align: center;
+ margin: auto;
+ display: table;
+}
+
+#legend {
+ font-size: .8em;
+ margin-top: .5em;
+}
+
+.toggle {
+ display: none;
+}
+
+.formelem {
+ margin: .15em;
+}
+
+.bold {
+ font-weight: bold;
+}
+
+.module {
+ position: relative;
+ font-weight: bold; 
+ padding: .5em;
+ margin: .5em;
+ background-color: #fff6f4;
+}
+
+.module #stalist {
+ overflow: auto;
+}
+
+.minmax {
+ float: right;
+}
+
+.minmaxclearbutton {
+ width: 20px;
+ height: 20px;
+ margin:0;
+ padding: 0;
+ border: 0;
+ background: url(../images/buttonbg.gif);
+ color: black;
+}
+
+.tiny {
+ font-weight: normal;
+ font-size: .7em;
+}
+
+.button {
+ text-align: center;
+}
+
+.button > input {
+ font-weight: bold;
+}
+
+.strong, .strong > input {
+ color: #ff0000;
+ font-weight: bold;
+}
+
+.wait, .wait * { 
+ cursor: wait !important;
+}
+
+.indent {
+ margin-left: 2em;
+}
+
+.normal {
+ font-weight: normal;
+}
+
+/* ----- additional features from the new webinterface ----- */
+
+/* * HTML tags customization ************************************************ */
+html {
+	overflow-y: scroll;
+}
+
+
+h1 {
+	font-size: 1.6em;
+	padding: 0;
+	margin: 0;
+}
+
+h2 {
+	font-size: 1.2em;
+	padding: 0;
+	margin: 0;
+	/* font-weight: normal; */
+}
+
+h3 {
+	font-size: 1.0em;
+	padding: 0;
+	margin: 0 0 5px 0;
+	font-weight: bold;
+	/*font-style: italic;*/
+}
+
+
+p {
+	margin: 0px;
+	padding: 0;
+}
+
+/* ************************************************************************** */
+
+/* * Top page elements ****************************************************** */
+
+#menu {
+	padding: 0;
+	margin: auto;
+	width: 1024px;
+	clear: both;
+}
+
+#contents {
+	margin: auto;
+	width: 1024px;
+	border: 0px Solid black;
+	padding: 15px 0 15px 0;
+	clear: both;
+}
+
+
+/* ************************************************************************** */
+
+/* * Main Boxes on contents section ***************************************** */
+#menu ul {
+	padding:0px;
+	margin: 5px 0 0 0;
+	list-style:none;
+}
+
+#menu ul li {
+	display: inline;
+}
+
+#menu ul li a {
+	padding: 0 5px 0 0;
+	display: inline-block;
+}
+
+#menu ul li.last {
+	padding: 0 0 0 5px;
+	float: right;
+}
+
+#contents .right {
+	width: 744px;
+	float: right;
+	clear: right;
+}
+
+#contents .all {
+	width: 100%;
+	margin: auto auto;
+	clear: left;
+}
+
+#contents .left { 
+	width: 280px;
+	float: left ;
+	clear: left;
+}
+
+#contents .right .box {
+	margin: 0 0 5px 5px;
+	background-color: #fff6f4;
+}
+
+#contents .left .box { 
+	margin: 0 5px 5px 0;
+	background-color: #fff6f4;
+}
+
+#contents .all .box { 
+	margin: 0 0 5px 0;
+	background-color: #fff6f4;
+}
+
+/* ************************************************************************** */
+
+/* * Modules customization ************************************************** */
+#contents .right .titlebox {
+	border: 1px Solid gray;
+	padding: 5px 10px 5px 10px;
+	color: white;
+	font-weight: bold;
+	background: #4382b5;
+}
+
+#contents .left .titlebox {
+	border: 1px Solid gray;
+	padding: 5px 10px 5px 10px;
+	color: white;
+	font-weight: bold;
+	background: #4382b5;
+}
+
+#contents .all .titlebox {
+	border: 2px Solid #4382b5;
+	padding: 5px 10px 5px 10px;
+	color: white;
+	font-weight: bold;
+	background: #4382b5;
+}
+
+#contents .help {
+	padding: 2px;
+	color: #dddddd;
+	font-size: 0.85em;
+}
+
+#contents .frame {
+	border-left: 0px Solid gray;
+	border-right: 0px Solid gray;
+	border-bottom: 0px Solid gray;
+	min-height: 100px;
+	padding: 10px;
+}
+
+#contents .scrollframe {
+	border-left: 0px Solid gray;
+	border-right: 0px Solid gray;
+	border-bottom: 1px Solid blue;
+	height: 100px;
+	overflow-y: auto;
+	padding: 10px;
+}
+
+.clear {
+	clear: both;
+}
+
+/* ************************************************************************** */

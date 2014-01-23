@@ -1,0 +1,86 @@
+## Map Control default parameters
+#
+
+# maptype can be one of: wms, google (in the future OSM)
+js.maptype = google
+
+# Parameters for google
+js.google.layer = "Google Physical"
+
+# WMS parameters
+js.wms.server = "http://vmap0.tiles.osgeo.org/wms/vmap0"
+js.wms.layer  = "basic"
+
+## Event Search Control default values for parameters
+#
+js.events.magnitudes.minimum = 3.0
+
+js.events.depth.minimum = 0
+js.events.depth.maximum = 999
+
+js.events.coordinates.north = 90
+js.events.coordinates.south = -90
+js.events.coordinates.west = -180
+js.events.coordinates.east = 180
+
+# request group total
+js.request.totalLineLimit = 10000
+js.request.totalSizeLimit = 10000
+
+# metadata requests (not routed)
+js.request.localLineLimit = 4990
+
+# waveform requests
+js.request.lineLimit = 990
+js.request.sizeLimit = 500
+
+# this is your local Arclink server:
+arclink.address = "eida.nohost.nodomain.invalid:18002"
+arclink.timeout.request = 300
+arclink.timeout.status = 300
+arclink.timeout.download = 300
+arclink.networkXML = "eida.xml"
+
+# All event services which will be enabled.
+# Include 'parser' here to support file upload.
+event.catalogs.ids = geofon, comcat, emsc, parser, meteor
+# A service with no description will be hidden, that is requests to
+# "/event/{id}" will be handled, but not listed in the "Events Services"
+# dialog box. Only those services with a non-empty "description" attribute
+# will be displayed.
+event.catalogs.registeredonly = True  #??? NOT NEEDED NOW?
+
+# The preferred service will appear first in the pull-down menu of event
+# services.
+event.catalogs.preferred = geofon
+
+# Maximum number of events which are returned if no limit is set.
+event.defaultLimit = 800
+# Verbosity level a la SeisComP logging.level.
+# 0:quiet, 1:error, 2:warning, 3:info, 4:debug
+event.verbosity = 2
+
+# Service URLs:
+event.service.geofon.description = GFZ
+event.service.geofon.baseURL = "http://geofon.gfz-potsdam.de/eqinfo/list.php"
+event.service.geofon.extraParams = "fmt=csv"
+
+event.service.comcat.description = USGS
+event.service.comcat.baseURL = "http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php"
+event.service.comcat.extraParams = "format=csv"
+
+event.service.emsc.description = EMSC
+event.service.emsc.baseURL = "http://www.emsc-csem.org/Earthquake/"
+event.service.emsc.extraParams = "filter=yes&export=csv"
+# Maybe: column map
+# Maybe^2: filters
+
+# Region lookup
+# If True, look up region names if they are not given.
+event.names.lookupIfEmpty = True
+# If True, replace existing region names.
+event.names.lookupIfGiven = False
+
+DEBUG        =           0
+SERVER_FOLDER =          "/var/www/webinterface/"
+
