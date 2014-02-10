@@ -478,7 +478,7 @@ function SubmitControl(htmlTagId) {
 		}
 
 
-		if (submitinfo.request.type === "DSEED" || submitinfo.request.type === "FSEED") {
+		if (submitinfo.request.requesttype === "DSEED" || submitinfo.request.requesttype === "FSEED") {
 			submitinfo.request.responsedictionary = ( _controlDiv.find("#scResponse input:checked").val() === "yes" ) ? true : false ;
 		}
 
