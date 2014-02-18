@@ -345,9 +345,22 @@ function SubmitControl(htmlTagId) {
 		_controlDiv.find("#scReview").button().bind("click", function() { submit(true) });
 		_controlDiv.find("#scSubmit").button().bind("click", function() { submit(false) });
 
+		requestControl.bind("onDeleteEvents", reselect);
+		requestControl.bind("onAddEvents", reselect);
+
 		// trigger cookie refresh
 		_controlDiv.find("#scUser").change();
 	};
+
+	function reselect() {
+		var mode = null;
+		try {
+			mode = requestControl.hasEvent() ? "sbtTimeModeRelative" : "sbtTimeModeAbsolute"
+		} catch(e) {
+			mode = "sbtTimeModeAbsolute";
+		}
+		_controlDiv.find("#" + mode).click();
+	}
 
 	function fillRequesttype(div,data) {
 		var html = '';
@@ -422,7 +435,13 @@ function SubmitControl(htmlTagId) {
 			$("#scResponseBlock").hide();
 		};
 
-		_controlDiv.find("#sbtTimeModeRelative").click();
+		var mode = null;
+		try {
+			mode = requestControl.hasEvent() ? "sbtTimeModeRelative" : "sbtTimeModeAbsolute"
+		} catch(e) {
+			mode = "sbtTimeModeAbsolute";
+		}
+		_controlDiv.find("#" + mode).click();
 		_controlDiv.find("#sbtStartDate").datepicker("setDate", "now");
 		_controlDiv.find("#sbtEndDate").datepicker("setDate", "now");
 

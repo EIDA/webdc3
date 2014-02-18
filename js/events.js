@@ -453,7 +453,7 @@ function EventSearchControl(htmlTagId) {
 		html += '</div>';
 		_controlDiv.append(html);
 
-		requestControl.onDeleteEvents(function() {
+		requestControl.bind("onDeleteEvents", function() {
 			_controlDiv.find("#escSearch").button("option", "label", "Search");
 		})
 

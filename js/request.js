@@ -942,8 +942,7 @@ function RequestControl(htmlTagId) {
 	// Private
 	var _controlDiv = null;
 	var _data = undefined;
-	var _deleteEventsCB = null;
-	var _deleteStationsCB = null;
+	var _callbacks = { };
 
 	function buildControl() {
 		if (!_controlDiv) return;
@@ -1034,7 +1033,8 @@ function RequestControl(htmlTagId) {
 				if (confirm("Request is empty, remove request?")) remove(id);
 			}
 
-			if (_deleteEventsCB) _deleteEventsCB()
+			var cb = getCallbacks("onDeleteEvents");
+			for(var key in cb) cb[key]();
 		});
 
 		_controlDiv.find('#' + id + '-delete-stations').button().bind("click", function(item){
@@ -1057,7 +1057,8 @@ function RequestControl(htmlTagId) {
 				if (confirm("Request is empty, remove request?")) remove(id);
 			}
 
-			if (_deleteStationsCB) _deleteStationsCB()
+			var cb = getCallbacks("onDeleteStations");
+			for(var key in cb) cb[key]();
 		});
 
 		_controlDiv.find('#' + id + '-freeze').button().bind("click", function(item){
@@ -1072,7 +1073,7 @@ function RequestControl(htmlTagId) {
 
 			pkg.freeze($(item.target).parent("div"));
 		});
-	}
+	};
 
 	function render() {
 		// This is to help on the rendering of the events.
@@ -1192,6 +1193,9 @@ function RequestControl(htmlTagId) {
 		node.addEvent(event_data);
 
 		render();
+
+		var cb = getCallbacks("onAddEvents");
+		for(var key in cb) cb[key]();
 	};
 
 	this.appendStation = function(station_data) {
@@ -1206,6 +1210,9 @@ function RequestControl(htmlTagId) {
 		node.addStation(station_data);
 
 		render();
+
+		var cb = getCallbacks("onAddStations");
+		for(var key in cb) cb[key]();
 	};
 
 	this.hasEvent = function() {
@@ -1279,13 +1286,24 @@ function RequestControl(htmlTagId) {
 	// Load the main module
 	load(htmlTagId);
 
-	this.onDeleteEvents = function(cb) {
-		_deleteEventsCB = cb
-	}
+	this.bind = function(name, method) {
+		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations" ]
+		
+		// The functions registered here will be called when the user 
+		if (valid.indexOf(name) === -1) {
+			throw new WIError("Invalid callback name " + name);
+		};
 
-	this.onDeleteStations = function(cb) {
-		_deleteStationsCB = cb
-	}
+		if (typeof _callbacks[name] === "undefined") _callbacks[name] = [];
+
+		_callbacks[name].push(method);
+	};
+
+	function getCallbacks(name) {
+		if (typeof _callbacks[name] === "undefined" ) return [];
+		return _callbacks[name];
+	};
+
 };
 
 /*

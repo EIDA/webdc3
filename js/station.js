@@ -625,7 +625,7 @@ function StationSearchControl(htmlTagId) {
 		// Append the Main Control
 		_controlDiv.append(html);
 
-		requestControl.onDeleteStations(function() {
+		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
 		})
 
