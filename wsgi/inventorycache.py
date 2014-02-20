@@ -149,6 +149,12 @@ class InventoryCache(object):
         self.streams = []
         self.lastUpdated = datetime.datetime.now()
 
+        # Just to shorten notation
+        ptNets = self.networks
+        ptStats = self.stations
+        ptSens = self.sensorsLoc
+        ptStre = self.streams
+
         start_time = datetime.datetime.now()
 
         # Look how old the two versions of inventory are.
@@ -170,8 +176,8 @@ class InventoryCache(object):
                     raise Exception
 
                 with open(self.cachefile) as cache:
-                    self.networks, self.stations, self.sensorsLoc,\
-                        self.streams, self.streamidx = pickle.load(cache)
+                    (self.networks, self.stations, self.sensorsLoc,
+                     self.streams, self.streamidx) = pickle.load(cache)
                     logs.info('Inventory loaded from pickle version')
                     return
             except:
@@ -257,15 +263,14 @@ class InventoryCache(object):
                             restricted = None
 
                         # Append the network to the list of networks
-                        self.networks.append([netw.get('code'),
-                                             len(self.stations), None, None,
-                                             start_year, end_year,
-                                             netw.get('description'),
-                                             restricted, netw.get('netClass'),
-                                             netw.get('archive'),
-                                             netw.get('institutions')])
+                        ptNets.append([netw.get('code'), len(ptStats), None,
+                                       None, start_year, end_year,
+                                       netw.get('description'), restricted,
+                                       netw.get('netClass'),
+                                       netw.get('archive'),
+                                       netw.get('institutions')])
 
-                        last_child_station = len(self.stations)
+                        last_child_station = len(ptStats)
 
                         # Traverse through the stations
                         for stat in netw.findall(namesp + 'station'):
@@ -303,7 +308,7 @@ class InventoryCache(object):
                             except:
                                 elevation = None
 
-                            stationsDict[stat.get('publicID')] = len(self.stations)
+                            stationsDict[stat.get('publicID')] = len(ptStats)
 
                             # Cast the attribute restricted
                             try:
@@ -318,38 +323,51 @@ class InventoryCache(object):
 
                             # Only store a reference to the network in the
                             # first column
-                            self.stations.append( [len(self.networks)-1, len(self.sensorsLoc), None, None, stat.get('code'), lat, lon, stat.get('description'), stat_start_date, stat_end_date, elevation, restricted] )
+                            ptStats.append([len(ptNets) - 1, len(ptSens), None,
+                                            None, stat.get('code'), lat, lon,
+                                            stat.get('description'),
+                                            stat_start_date, stat_end_date,
+                                            elevation, restricted])
                             last_child_station += 1
 
-                            last_child_sensor = len(self.sensorsLoc)
-                            for sensor in stat.findall(namesp + 'sensorLocation'):
-                                # A reference to the containing station is in the first column
-                                self.sensorsLoc.append( [len(self.stations)-1, len(self.streams), None, None, sensor.get('code')] )
+                            last_child_sensor = len(ptSens)
+                            sensXml = namesp + 'sensorLocation'
+                            for sensor in stat.findall(sensXml):
+                                # A reference to the containing station is
+                                # in the first column
+                                ptSens.append([len(ptStats) - 1, len(ptStre),
+                                               None, None, sensor.get('code')])
                                 last_child_sensor += 1
 
-                                last_child_stream = len(self.streams)
-                                for stream in sensor.findall(namesp + 'stream'):
-                                    sens_type = sensors.get(stream.get('sensor'))
+                                last_child_stream = len(ptStre)
+                                streXml = namesp + 'stream'
+                                for stream in sensor.findall(streXml):
+                                    sens_type = sensors.get(
+                                        stream.get('sensor'))
 
                                     try:
-                                        denom = float(stream.get('sampleRateDenominator'))
-                                        numer = float(stream.get('sampleRateNumerator'))
+                                        d = stream.get('sampleRateDenominator')
+                                        n = stream.get('sampleRateNumerator')
+                                        denom = float(d)
+                                        numer = float(n)
                                     except:
                                         denom = None
                                         numer = None
 
                                     try:
-                                        start_string = stream.get('start')
-                                        start_date = datetime.datetime.strptime(start_string, '%Y-%m-%dT%H:%M:%S.%fZ')
+                                        startString = stream.get('start')
+                                        startDate = datetime.datetime.strptime(
+                                            startString,
+                                            '%Y-%m-%dT%H:%M:%S.%fZ')
                                     except:
-                                        start_date = None
+                                        startDate = None
 
                                     try:
-                                        end_string = stream.get('end')
-                                        end_date = datetime.datetime.strptime(end_string, '%Y-%m-%dT%H:%M:%S.%fZ')
+                                        endString = stream.get('end')
+                                        endDate = datetime.datetime.strptime(
+                                            endString, '%Y-%m-%dT%H:%M:%S.%fZ')
                                     except:
-                                        end_date = None
-
+                                        endDate = None
 
                                     # Cast the attribute restricted
                                     try:
@@ -362,44 +380,54 @@ class InventoryCache(object):
                                     except:
                                         restricted = None
 
-                                    self.streams.append( (len(self.sensorsLoc)-1, stream.get('code'), sens_type, denom, numer, dataloggers.get(stream.get('datalogger')), start_date, end_date, restricted) )
+                                    auxCode = stream.get('code')
+                                    auxDatLog = stream.get('datalogger')
+                                    ptStre.append((len(ptSens) - 1,
+                                                   auxCode, sens_type, denom,
+                                                   numer,
+                                                   dataloggers.get(auxDatLog),
+                                                   startDate, endDate, restricted))
                                     last_child_stream += 1
                                     stream.clear()
 
-                                self.sensorsLoc[-1][2] = last_child_stream
+                                ptSens[-1][2] = last_child_stream
                                 sensor.clear()
 
-                                # Check if there is at least one stream. Otherwise remove sensor.
-                                # This case can happen when there are only auxStreams instead of streams
-                                if self.sensorsLoc[-1][1] == self.sensorsLoc[-1][2]:
-                                    del self.sensorsLoc[-1]
+                                # Check if there is at least one stream.
+                                # Otherwise remove sensor. This case can happen
+                                # when there are only auxStreams instead of
+                                # streams
+                                if ptSens[-1][1] == ptSens[-1][2]:
+                                    del ptSens[-1]
                                     last_child_sensor -= 1
 
                             self.stations[-1][2] = last_child_sensor
                             stat.clear()
 
-                            # Check if there is at least one sensor. Otherwise remove station.
-                            # This case can happen when there are only auxStreams instead of streams
-                            if self.stations[-1][1] == self.stations[-1][2]:
-                                del self.stations[-1]
+                            # Check if there is at least one sensor. Otherwise
+                            # remove station. This case can happen when there
+                            # are only auxStreams instead of streams
+                            if ptStats[-1][1] == ptStats[-1][2]:
+                                del ptStats[-1]
                                 last_child_station -= 1
 
-
-                        self.networks[-1][2] = last_child_station
+                        ptNets[-1][2] = last_child_station
                         netw.clear()
 
-                    if parsetype == 'SENSDAT' and netw.tag == namesp + 'sensor':
-                        sensors[netw.get('publicID')] = netw.get('type')
-
+                    if((parsetype == 'SENSDAT') and (netw.tag == namesp +
+                                                     'sensor')):
+                        pubId = netw.get('publicID')
+                        sensors[pubId] = netw.get('type')
                         netw.clear()
 
-                    if parsetype == 'SENSDAT' and netw.tag == namesp + 'datalogger':
-                        dataloggers[netw.get('publicID')] = netw.get('description')
-
+                    if((parsetype == 'SENSDAT') and (netw.tag == namesp +
+                                                     'datalogger')):
+                        pubId = netw.get('publicID')
+                        dataloggers[pubId] = netw.get('description')
                         netw.clear()
 
-                    if parsetype == 'SENSDAT' and netw.tag == namesp + 'stationGroup':
-
+                    if((parsetype == 'SENSDAT') and (netw.tag == namesp +
+                                                     'stationGroup')):
                         # Extract the year from start
                         try:
                             start_year = netw.get('start')
@@ -414,16 +442,20 @@ class InventoryCache(object):
                         except:
                             end_year = None
 
-                        # Fill a list with station ID's. To be replaced later with the index in self.stations
+                        # Fill a list with station ID's. To be replaced later
+                        # with the index in self.stations
                         virtualStations = []
-                        for statRef in netw.findall(namesp + 'stationReference'):
-                            virtualStations.append( statRef.get('stationID') )
+                        statRefXml = namesp + 'stationReference'
+                        for statRef in netw.findall(statRefXml):
+                            virtualStations.append(statRef.get('stationID'))
 
-                        # Up to this moment virtual networks are always permanent
-                        self.networks.append( [netw.get('code'), None, None, virtualStations, start_year, end_year, netw.get('description'), False, 'p', 'GFZ', 'GFZ'] )
+                        # Virtual networks are always permanent
+                        ptNets.append([netw.get('code'), None, None,
+                                       virtualStations, start_year, end_year,
+                                       netw.get('description'), False, 'p',
+                                       'GFZ', 'GFZ'])
 
                         netw.clear()
-
 
                     root.clear()
 
@@ -431,15 +463,15 @@ class InventoryCache(object):
 
         # Resolving station references in virtual networks
         for netw in self.networks:
-            if netw[1] is None and netw[2] is None:
+            if((netw[1] is None) and (netw[2] is None)):
                 idxs = []
                 for stat in netw[3]:
-                    idxs.append( stationsDict[stat] )
+                    idxs.append(stationsDict[stat])
+
                 netw[3] = idxs
 
-
         end_time = datetime.datetime.now()
-        logs.info('Done with XML:  %s' % (end_time))  # Python 2.7: (end_time - start_time).total_seconds())
+        logs.info('Done with XML:  %s' % (end_time))
 
         self.__indexStreams()
 
@@ -449,17 +481,24 @@ class InventoryCache(object):
                 os.chmod(lockfile, 0666)
                 lck.close()
             except:
-                logs.warning('Error while attempting to create a lockfile (%s). Check whether the inventory is parsed every %d seconds. This could potentialy make some requests slower.' % (lockfile, self.time2refresh))
+                logs.warning(('Error while attempting to create a lockfile' +
+                              ' (%s). Check whether the inventory is parsed' +
+                              ' every %d seconds. This could potentialy' +
+                              ' make some requests slower.') %
+                             (lockfile, self.time2refresh))
                 return
 
             with open(self.cachefile, 'wb') as cache:
                 os.chmod(self.cachefile, 0666)
-                pickle.dump( (self.networks, self.stations, self.sensorsLoc, self.streams, self.streamidx), cache)
+                pickle.dump((ptNets, ptStats, ptSens, ptStre, self.streamidx),
+                            cache)
 
             try:
                 os.remove(lockfile)
             except:
-                logs.error('Error by removing lockfile (%s). Remove it manually or the pickle version will be always skipped.' % lockfile)
+                logs.error(('Error by removing lockfile (%s). Remove it' +
+                            ' manually or the pickle version will be always' +
+                            ' skipped.') % lockfile)
 
 
 
