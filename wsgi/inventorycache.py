@@ -806,7 +806,7 @@ class InventoryCache(object):
 
         netList = []
         for i in netsOK:
-            netList.append( ('%s-%s-%s' % (self.networks[i][0], self.networks[i][4], self.networks[i][5]), '%s%s%s (%s) - %s [%s]' % (self.networks[i][0], '*' if self.networks[i][5] is not None else ' ', '+' if self.networks[i][7] else ' ', self.networks[i][4], self.networks[i][6], self.networks[i][9]) ) )
+            netList.append( ('%s-%s-%s' % (self.networks[i][0], self.networks[i][4], self.networks[i][5]), '%s%s%s (%s) - %s [%s]' % (self.networks[i][0], '*' if self.networks[i][5] is not None else ' ', '+' if self.networks[i][7] == 1 else ' ', self.networks[i][4], self.networks[i][6], self.networks[i][9]) ) )
 
         netList.sort()
         netList.insert(0, ('all', 'All Networks'))
