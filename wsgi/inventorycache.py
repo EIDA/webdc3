@@ -899,7 +899,7 @@ class InventoryCache(object):
         return statsList
 
     def getStreams(self, params):
-        """Get a simple list of streams that satisfies the constraints of the input parameters.
+        """Get a list of streams that satisfy the input parameters.
 
         This method is public and appends the necessary
         information to the streams that belong to the stations
@@ -911,20 +911,23 @@ class InventoryCache(object):
         # Filter and save indexes of stations in statsOK
         statsOK = self.__selectStations(params)
 
+        # The default dictionary is used to be able to count how many times the
+        # keys have been included
         streamDict = defaultdict(int)
 
         # Browse the selected stations
         for statidx in statsOK:
-            first_child_sensorLoc = self.stations[statidx][1]
-            last_child_sensorLoc = self.stations[statidx][2]
+            first_child_sensor = self.stations[statidx][1]
+            last_child_sensor = self.stations[statidx][2]
 
             # Browse the children (sensors) of the current station
-            for senLocidx in range(first_child_sensorLoc, last_child_sensorLoc):
+            for senLocidx in range(first_child_sensor, last_child_sensor):
                 first_child_stream = self.sensorsLoc[senLocidx][1]
                 last_child_stream = self.sensorsLoc[senLocidx][2]
 
                 # Browse the children (streams) of the current sensor
                 for stridx in range(first_child_stream, last_child_stream):
+                    # FIXME: Streams need to be filtered further with params
                     streamDict[self.streams[stridx][1][:2]] += 1
 
         streamList = []
@@ -933,10 +936,8 @@ class InventoryCache(object):
 
         return streamList
 
-
-
     def getQuery(self, params):
-        """Get a list of streams that satisfies the constraints of the input parameters.
+        """Get a list of streams that satisfies the input parameters.
 
         This method is public and appends the necessary
         information to the streams that belong to the stations
@@ -953,11 +954,10 @@ class InventoryCache(object):
 
         start_date = datetime.datetime(start_year, 1, 1, 0, 0, 0)
 
-
         # Build the end date in datetime format
         # Only year-wide windows are allowed here.
         try:
-            end_year = int(params.get('end', datetime.datetime.now().year ))
+            end_year = int(params.get('end', datetime.datetime.now().year))
         except:
             raise wsgicomm.WIClientError, 'Error! End year is invalid.'
 
@@ -983,7 +983,6 @@ class InventoryCache(object):
         # Split the list of streams if any
         try:
             streams = params.get('streams').split(',')
-
         except wsgicomm.WIError:
             raise
         except:
