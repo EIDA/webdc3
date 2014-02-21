@@ -1053,20 +1053,26 @@ class InventoryCache(object):
         except:
             events = None
 
-
         # Try to check parameters for different modes of selecting stations
         # One or all stations have been selected and also lat/lon parameters
-        if station and (latmin is not None or latmax is not None or lonmin is not None or lonmax is not None):
-            raise wsgicomm.WIClientError, 'Error: station and lat/lon parameters are incompatible.'
+        if station and (latmin is not None or latmax is not None or lonmin is
+                        not None or lonmax is not None):
+            msg = 'Error: station and lat/lon parameters are incompatible.'
+            raise wsgicomm.WIClientError, msg
 
-        # One or all stations have been selected and also radius/azimuth parameters
-        if station and (minradius is not None or maxradius is not None or minazimuth is not None or maxazimuth is not None):
-            raise wsgicomm.WIClientError, 'Error: station and radius/azimuth parameters are incompatible.'
+        # One or all stations have been selected and also radius/azimuth params
+        if station and (minradius is not None or maxradius is not None or
+                        minazimuth is not None or maxazimuth is not None):
+            msg = 'Error: station and radius/azimuth parameters are incompatible.'
+            raise wsgicomm.WIClientError, msg
 
         # Lat/lon parameters have been selected and also radius/azimuth
-        if (latmin is not None or latmax is not None or lonmin is not None or lonmax is not None) and (minradius is not None or maxradius is not None or minazimuth is not None or maxazimuth is not None):
-            raise wsgicomm.WIClientError, 'Error: lat/lon and radius/azimuth parameters are incompatible.'
-
+        if (latmin is not None or latmax is not None or lonmin is not None or
+                lonmax is not None) and (minradius is not None or maxradius is
+                                         not None or minazimuth is not None or
+                                         maxazimuth is not None):
+            msg = 'Error: lat/lon and radius/azimuth parameters are incompatible.'
+            raise wsgicomm.WIClientError, msg
 
         # These are the two lists to return
         stats = []
@@ -1074,40 +1080,64 @@ class InventoryCache(object):
         # Filter and save indexes of stations in statsOK
         statsOK = self.__selectStations(params)
 
+        # Just to make notation shorter
+        ptNets = self.networks
+        ptStats = self.stations
+
         if ('station' in params):
             # Builds a list from the selected stations
             for st in statsOK:
-                parent_net = self.stations[st][0]
+                parent_net = ptStats[st][0]
 
-                (loc_ch, restricted) = self.__buildStreamsList(st, streams, sensortype, preferredsps, start_date, end_date)
+                (loc_ch, restricted) = self.__buildStreamsList(st, streams, sensortype,
+                                                 preferredsps, start_date,
+                                                 end_date)
 
                 if len(loc_ch):
-                    stats.append( ( '%s-%s-%s-%s%s%s' % (self.networks[parent_net][0], self.networks[parent_net][4], self.stations[st][4], self.stations[st][8].year, self.stations[st][8].month, self.stations[st][8].day),  self.networks[parent_net][0], self.stations[st][4], self.stations[st][5], self.stations[st][6], self.networks[parent_net][7],  self.networks[parent_net][8],  self.networks[parent_net][9],  self.networks[parent_net][10], loc_ch, restricted ) )
+                    stats.append(('%s-%s-%s-%s%s%s' % (ptNets[parent_net][0],
+                                  ptNets[parent_net][4], ptStats[st][4],
+                                  ptStats[st][8].year, ptStats[st][8].month,
+                                  ptStats[st][8].day),  ptNets[parent_net][0],
+                                  ptStats[st][4], ptStats[st][5],
+                                  ptStats[st][6], ptNets[parent_net][7],
+                                  ptNets[parent_net][8], ptNets[parent_net][9],
+                                  ptNets[parent_net][10], loc_ch, restricted))
 
-
-        elif (latmin is not None and latmax is not None and lonmin is not None and lonmax is not None):
+        elif(latmin is not None and latmax is not None and lonmin is not None
+             and lonmax is not None):
 
             # statsOK is a set and therefore, there will be no repetitions
             for st in statsOK:
                 # Pointer to the parent network
-                parent_net = self.stations[st][0]
+                parent_net = ptStats[st][0]
 
                 # Filter by latitude
-                if(self.stations[st][5] < latmin) or (self.stations[st][5] > latmax):
+                if(ptStats[st][5] < latmin) or (ptStats[st][5] > latmax):
                     continue
 
                 # Filter by longitude
                 if(lonmin <= lonmax):
-                    if (self.stations[st][6] < lonmin) or (self.stations[st][6] > lonmax):
+                    if (ptStats[st][6] < lonmin) or (ptStats[st][6] > lonmax):
                         continue
                 else:
-                    if (self.stations[st][6] < lonmin) and (self.stations[st][6] > lonmax):
+                    if (ptStats[st][6] < lonmin) and (ptStats[st][6] > lonmax):
                         continue
 
-                (loc_ch, restricted) = self.__buildStreamsList(st, streams, sensortype, preferredsps, start_date, end_date)
+                (loc_ch, restricted) = self.__buildStreamsList(st, streams, sensortype,
+                                                 preferredsps, start_date,
+                                                 end_date)
 
                 if len(loc_ch):
-                    stats.append( ( '%s-%s-%s-%s%s%s' % (self.networks[parent_net][0], self.networks[parent_net][4], self.stations[st][4], self.stations[st][8].year, self.stations[st][8].month, self.stations[st][8].day),  self.networks[parent_net][0], self.stations[st][4], self.stations[st][5], self.stations[st][6], self.networks[parent_net][7],  self.networks[parent_net][8],  self.networks[parent_net][9],  self.networks[parent_net][10], loc_ch, restricted ) )
+                    stats.append(('%s-%s-%s-%s%s%s' %
+                                  (ptNets[parent_net][0],
+                                   ptNets[parent_net][4], ptStats[st][4],
+                                   ptStats[st][8].year, ptStats[st][8].month,
+                                   ptStats[st][8].day),
+                                  ptNets[parent_net][0],
+                                  ptStats[st][4], ptStats[st][5],
+                                  ptStats[st][6], ptNets[parent_net][7],
+                                  ptNets[parent_net][8], ptNets[parent_net][9],
+                                  ptNets[parent_net][10], loc_ch, restricted))
 
         elif events is not None:
 
@@ -1115,11 +1145,11 @@ class InventoryCache(object):
 
             for st in statsOK:
                 # Pointer to the parent network
-                parent_net = self.stations[st][0]
+                parent_net = ptStats[st][0]
 
                 # Retrieve latitude and longitude of station
-                slat = self.stations[st][5]
-                slon = self.stations[st][6]
+                slat = ptStats[st][5]
+                slon = ptStats[st][6]
 
                 for evt in events:
                     # Retrieve latitude and longitude of event
@@ -1129,28 +1159,47 @@ class InventoryCache(object):
                     # Calculate radial distance and azimuth
                     (dist, azi, other) = Math.delazi(slat, slon, lat, lon)
 
-                    if (minradius < dist) and (dist < maxradius) and (minazimuth < azi) and (azi < maxazimuth):
-                        (loc_ch, restricted) = self.__buildStreamsList(st, streams, sensortype, preferredsps, start_date, end_date)
+                    if (minradius < dist) and (dist < maxradius) and \
+                       (minazimuth < azi) and (azi < maxazimuth):
+                        (loc_ch, restricted) = self.__buildStreamsList(st, streams,
+                                                         sensortype,
+                                                         preferredsps,
+                                                         start_date,
+                                                         end_date)
 
                         if len(loc_ch):
-                            stats.append( ( '%s-%s-%s-%s%s%s' % (self.networks[parent_net][0], self.networks[parent_net][4], self.stations[st][4], self.stations[st][8].year, self.stations[st][8].month, self.stations[st][8].day),  self.networks[parent_net][0], self.stations[st][4], self.stations[st][5], self.stations[st][6], self.stations[st][11],  self.networks[parent_net][8],  self.networks[parent_net][9],  self.networks[parent_net][10], loc_ch, restricted ) )
+                            stats.append(('%s-%s-%s-%s%s%s' %
+                                          (ptNets[parent_net][0],
+                                           ptNets[parent_net][4],
+                                           ptNets[st][4], ptStats[st][8].year,
+                                           ptStats[st][8].month,
+                                           ptStats[st][8].day),
+                                          ptNets[parent_net][0],
+                                          ptStats[st][4], ptStats[st][5],
+                                          ptStats[st][6],
+                                          ptStats[st][11],
+                                          ptNets[parent_net][8],
+                                          ptNets[parent_net][9],
+                                          ptNets[parent_net][10], loc_ch, restricted))
 
                         # Stop the loop through events and go for the next station
                         break
 
         else:
-            raise wsgicomm.WIClientError, 'Error: not enough parameters have been given.'
+            msg = 'Error: not enough parameters have been given.'
+            raise wsgicomm.WIClientError, msg
 
         stats.sort()
-        stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude', 'restricted', 'netclass', 'archive', 'netoperator', 'streams', 'streams_restricted') )
+
+        stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude',
+                         'restricted', 'netclass', 'archive', 'netoperator',
+                         'streams', 'streams_restricted'))
 
         return stats
-
 
     def getStreamInfo(self, start_time, end_time, net, sta, cha, loc):
         try:
             stream_epochs = self.streamidx[(net, sta, cha, loc)]
-
         except KeyError:
             logs.error("%s,%s,%s,%s not found" % (net, sta, cha, loc))
             return None
@@ -1167,7 +1216,8 @@ class InventoryCache(object):
             # stream_end = datetime.datetime(station[9], 1, 1) if station[9] \
             #         else datetime.datetime(2030, 1, 1)
             stream_start = stream[6]
-            stream_end = stream[7] if stream[7] is not None else (datetime.datetime.now() + datetime.timedelta(days=365))
+            stream_end = stream[7] if stream[7] is not None \
+                else (datetime.datetime.now() + datetime.timedelta(days=365))
 
             if start_time >= stream_end or end_time <= stream_start:
                 continue
@@ -1181,10 +1231,12 @@ class InventoryCache(object):
                 tdiff = tdiff.days * 86400 + tdiff.seconds
                 samp = float(stream[4]) / float(stream[3])
 
-                # assuming approximately 1 bytes per sample (compressed), 512 bytes record size
+                # assuming approximately 1 byte per sample (compressed),
+                # 512 bytes record size
                 bytesper = 1
                 recsize = 512
-                result['size'] = int(recsize * math.ceil(float(tdiff * samp * bytesper) / recsize))
+                result['size'] = int(recsize * math.ceil(
+                                     float(tdiff * samp * bytesper) / recsize))
 
             else:
                 result['size'] = 0
@@ -1192,4 +1244,3 @@ class InventoryCache(object):
             return result
 
         return None
-
