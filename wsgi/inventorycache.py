@@ -512,7 +512,8 @@ class InventoryCache(object):
 
         """
 
-        if self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) < datetime.datetime.now():
+        if(self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
+           datetime.datetime.now()):
             self.update()
 
         # Check parameters
@@ -521,7 +522,9 @@ class InventoryCache(object):
             try:
                 start = int(params.get('start'))
             except:
-                raise wsgicomm.WIClientError, 'Error while converting "start" (%s) to integer.' % params.get('start')
+                msg = 'Error while converting "start" (%s) to integer.' % \
+                    params.get('start')
+                raise wsgicomm.WIClientError, msg
         else:
             start = None
 
@@ -542,16 +545,15 @@ class InventoryCache(object):
 
             # Swap values if they are in the wrong order
             if start > end:
-               aux = start
-               start = end
-               end = aux
-
+                aux = start
+                start = end
+                end = aux
 
         # Look at the attributes associated with every network type
         try:
             networktype = params.get('networktype')
             if networktype is None:
-                 raise Exception
+                raise Exception
 
             for nettype in self.nettypes:
                 if networktype == nettype[0]:
@@ -566,16 +568,13 @@ class InventoryCache(object):
             permanent = None
             restricted = None
 
-
         # Select only one network
         try:
             network = params.get('network')
             if network == 'all':
-               network = None
+                network = None
         except:
             network = None
-
-
 
         # Filter and save indexes of networks in netsOK
         netsOK = set()
@@ -591,24 +590,26 @@ class InventoryCache(object):
                     else:
                         netend = int(netend)
 
-                    # If any of the three parts does not coincide with the current network, skip it
-                    if (netcode != netw[0]) or (netstart != netw[4]) or (netend != netw[5]) :
+                    # If any of the three parts does not coincide with the
+                    # current network, skip it
+                    if((netcode != netw[0]) or (netstart != netw[4]) or
+                       (netend != netw[5])):
                         continue
                     else:
-                        # Once I found the code, insert it in the lists and leave the loop
+                        # Once I found the code, insert it in the lists and
+                        # leave the loop
                         netsOK.add(i)
                         break
 
                 except:
                     continue
 
-
             # Discard if start is after the end of the network operation
             if start and netw[5]:
                 if netw[5] < start:
                     continue
 
-            # Discard if end is previous than the start of the network operation
+            # Discard if end is previous to the start of the network operation
             if end and netw[4]:
                 if end < netw[4]:
                     continue
@@ -626,20 +627,16 @@ class InventoryCache(object):
                 if (not permanent) and (netw[8] == 'p'):
                     continue
 
-            # Virtual networks have no pointers to first child (1) and last child (2).
-            # They have a list of childs (3)
+            # Virtual networks have no pointers to first child (1) and last
+            # child (2). They have a list of childs (3)
             if networktype == 'virt':
-                if netw[1] is not None or netw[2] is not None:
+                if((netw[1] is not None) or (netw[2] is not None)):
                     continue
 
             # All checks have been done, so add the network index to the list
             netsOK.add(i)
 
         return netsOK
-
-
-
-
 
     def __selectStations(self, params):
         """Select stations filtered by the input parameters.
