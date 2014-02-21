@@ -647,7 +647,8 @@ class InventoryCache(object):
 
         """
 
-        if self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) < datetime.datetime.now():
+        if(self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
+           datetime.datetime.now()):
             self.update()
 
         # Check parameters
@@ -674,11 +675,9 @@ class InventoryCache(object):
 
             # Swap values if they are in the wrong order
             if start > end:
-               aux = start
-               start = end
-               end = aux
-
-
+                aux = start
+                start = end
+                end = aux
 
         # Select only one station
         try:
@@ -696,14 +695,17 @@ class InventoryCache(object):
         statcodesOK = set()
         statsOK = set()
 
+        # Just to make notation shorter
+        ptNets = self.networks
+        ptStats = self.stations
+
         for i in netsOK:
             # A normal network has pointers to first and last child
-            if self.networks[i][1] is not None and self.networks[i][2] is not None:
-                list_of_children = range(self.networks[i][1], self.networks[i][2])
+            if((ptNets[i][1] is not None) and (ptNets[i][2] is not None)):
+                list_of_children = range(ptNets[i][1], ptNets[i][2])
             # A virtual network has a list of children
             else:
-                list_of_children = self.networks[i][3]
-
+                list_of_children = ptNets[i][3]
 
             # Filter and add stations
             for s in list_of_children:
@@ -713,32 +715,32 @@ class InventoryCache(object):
                 realParent = self.stations[s][0]
 
                 # Discard if start is after the end of the network operation
-                if start and self.stations[s][9]:
-                    if self.stations[s][9] < start:
+                if start and ptStats[s][9]:
+                    if ptStats[s][9] < start:
                         continue
 
-                # Discard if end is previous than the start of the network operation
-                if end and self.stations[s][8]:
-                    if end < self.stations[s][8]:
+                # Discard if end is previous than the start of the network
+                # operation
+                if end and ptStats[s][8]:
+                    if end < ptStats[s][8]:
                         continue
 
                 # If there is a station selected look only at the codes
                 if stations:
-                    key = '%s-%s-%s-%s' % (self.networks[realParent][0], self.networks[realParent][4], self.networks[realParent][5], self.stations[s][4])
+                    key = '%s-%s-%s-%s' % (ptNets[realParent][0], ptNets[realParent][4], ptNets[realParent][5], ptStats[s][4])
                     if key not in stations:
                         continue
                     else:
-                        # Once I found the code, insert it in the lists and leave the loop
+                        # Once I found the code, insert it in the lists and
+                        # leave the loop
                         statsOK.add(s)
 
 
                 # Filter duplicated stations
-                if (self.networks[realParent][0], self.stations[s][4]) in statcodesOK:
+                if (ptNets[realParent][0], ptStats[s][4]) in statcodesOK:
                     continue
 
-
-
-                statcodesOK.add( (self.networks[i][0], self.stations[s][4]) )
+                statcodesOK.add((ptNets[i][0], ptStats[s][4]))
                 statsOK.add(s)
 
         return statsOK
