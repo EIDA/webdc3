@@ -838,10 +838,10 @@ class InventoryCache(object):
 
         return (loc_ch, restr)
 
-
-    # Visible function that only wraps an internal method that will be used also by "stations"
+    # Public method that wraps a function to select networks based on the input
+    # parameters.
     def getNetworks(self, params):
-        """Get a simple list of networks satisfying the constraints of the input parameters.
+        """Get a simple list of networks which satisfies the input parameters.
 
         This method is public and appends the necessary
         information to the networks actually selected by
@@ -852,20 +852,25 @@ class InventoryCache(object):
 
         netsOK = self.__selectNetworks(params)
 
+        # Just to make notation shorter
+        ptNets = self.networks
+
         netList = []
         for i in netsOK:
-            netList.append( ('%s-%s-%s' % (self.networks[i][0], self.networks[i][4], self.networks[i][5]), '%s%s%s (%s) - %s [%s]' % (self.networks[i][0], '*' if self.networks[i][8] == 't' else ' ', '+' if self.networks[i][7] == 1 else ' ', self.networks[i][4], self.networks[i][6], self.networks[i][9]) ) )
+            netList.append(('%s-%s-%s' % (ptNets[i][0], ptNets[i][4],
+                                          ptNets[i][5]),
+                            '%s%s%s (%s) - %s [%s]' %
+                            (ptNets[i][0],
+                             '*' if ptNets[i][8] == 't' else ' ',
+                             '+' if ptNets[i][7] == 1 else ' ',
+                             ptNets[i][4], ptNets[i][6], ptNets[i][9])))
 
         netList.sort()
         netList.insert(0, ('all', 'All Networks'))
         return netList
 
-
-
-
-    # Visible function that only wraps an internal method that will be used also by "stations"
     def getStations(self, params):
-        """Get a simple list of stations satisfying the constraints of the input parameters.
+        """Get a list of stations that satisfy the input parameters.
 
         This method is public and appends the necessary
         information to the stations actually selected by
@@ -876,17 +881,22 @@ class InventoryCache(object):
 
         statsOK = self.__selectStations(params)
 
+        # Just to make notation shorter
+        ptNets = self.networks
+        ptStats = self.stations
+
         statsList = []
         for i in statsOK:
-            netw = self.networks[self.stations[i][0]]
-            stat = self.stations[i]
-            statsList.append( ( '%s-%s-%s-%s' % (netw[0], netw[4], netw[5], stat[4]), '%-5s %s %s (%d)' % (stat[4], netw[0], stat[7], stat[8].year) ) )
+            stat = ptStats[i]
+            netw = ptNets[stat[0]]
+            statsList.append(('%s-%s-%s-%s' % (netw[0], netw[4], netw[5],
+                                               stat[4]),
+                              '%-5s %s %s (%d)' %
+                              (stat[4], netw[0], stat[7], stat[8].year)))
 
         statsList.sort()
         statsList.insert(0, ('all', 'All Stations'))
         return statsList
-
-
 
     def getStreams(self, params):
         """Get a simple list of streams that satisfies the constraints of the input parameters.
