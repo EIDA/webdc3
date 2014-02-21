@@ -745,10 +745,9 @@ class InventoryCache(object):
 
         return statsOK
 
-
-
-    def __buildStreamsList(self, statidx, streamFilter, sensortype=None, preferredsps=None, start=None, end=None):
-        """Auxiliary function to build a list of streams based on a station index
+    def __buildStreamsList(self, statidx, streamFilter, sensortype=None,
+                           preferredsps=None, start=None, end=None):
+        """Build a list of streams based on a station index
 
         Inputs:
           statidx: Station index on self.stations
@@ -756,10 +755,13 @@ class InventoryCache(object):
                         components. The first one is the location code, while
                         the second one is the two first letters of the
                         channel. For instance, ('00', 'BH')
-          sensortype: as received in parameters
-          preferredsps: the preferred sampla rate. At least one streams is selected from each station.
-          start: start year in datetime format from parameters sent by web client
-          end: end year in datetime format from parameters sent by web client
+          sensortype:   as received in parameters
+          preferredsps: the preferred sample rate. At least one stream is
+                        selected from each station.
+          start:        start year in datetime format from parameters sent by
+                        the web client
+          end:          end year in datetime format from parameters sent by
+                        the web client
 
         """
 
@@ -769,41 +771,46 @@ class InventoryCache(object):
         first_child_sensor = self.stations[statidx][1]
         last_child_sensor = self.stations[statidx][2]
 
+        # Just to make notation shorter
+        ptSens = self.sensorsLoc
+        ptStre = self.streams
+
         loc_ch = []
         spslist = []
         restr = []
         for loc in range(first_child_sensor, last_child_sensor):
-            first_child_stream = self.sensorsLoc[loc][1]
-            last_child_stream = self.sensorsLoc[loc][2]
+            first_child_stream = ptSens[loc][1]
+            last_child_stream = ptSens[loc][2]
 
             for ch in range(first_child_stream, last_child_stream):
 
                 if streamFilter is not None:
-                    if self.streams[ch][1][:2] not in streamFilter:
+                    if ptStre[ch][1][:2] not in streamFilter:
                         continue
 
                 if sensortype is not None:
-                    if (self.streams[ch][2] not in sensortype):
+                    if (ptStre[ch][2] not in sensortype):
                         continue
 
-                if (self.streams[ch][7] is not None) and (start is not None):
-                    if (self.streams[ch][7] < start):
+                if (ptStre[ch][7] is not None) and (start is not None):
+                    if (ptStre[ch][7] < start):
                         continue
 
-                if (self.streams[ch][6] is not None) and (end is not None):
-                    if (end < self.streams[ch][6]):
+                if (ptStre[ch][6] is not None) and (end is not None):
+                    if (end < ptStre[ch][6]):
                         continue
 
-                loc_ch.append( '%s.%s' % (self.sensorsLoc[loc][4], self.streams[ch][1]) )
+                loc_ch.append('%s.%s' % (ptSens[loc][4], ptStre[ch][1]))
                 # Calculate sps for the stream
                 try:
-                    spslist.append(float(self.streams[ch][4] / self.streams[ch][3]))
+                    spslist.append(float(ptStre[ch][4] / ptStre[ch][3]))
                 except:
                     spslist.append(None)
 
                 restr.append(self.streams[ch][8])
 
-        # Extra processing to select only one stream per station if there is a preferred sampling rate
+        # Extra processing to select only one stream per station if there is a
+        # preferred sampling rate
         if preferredsps is not None:
             selected = []
             # Find a proper initial value as the best sample rate found
@@ -812,11 +819,14 @@ class InventoryCache(object):
 
             for posit, sps in enumerate(spslist):
                 if sps is not None:
-                    # If the sampling rate is the same as the best one just add it to the list
+                    # If the sampling rate is the same as the best one just
+                    # add it to the list
                     if abs(best_sps - preferredsps) == abs(sps - preferredsps):
                         selected.append(posit)
-                    # If it is the best one, create a new list containing it and reset best_sps
-                    elif abs(best_sps - preferredsps) > abs(sps - preferredsps):
+                    # If it is the best one, create a new list containing
+                    # it and reset best_sps
+                    elif(abs(best_sps - preferredsps) >
+                         abs(sps - preferredsps)):
                         best_sps = sps
                         selected = [posit]
 
