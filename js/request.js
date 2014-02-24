@@ -1030,7 +1030,7 @@ function RequestControl(htmlTagId) {
 			pkg.removeEvent();
 
 			if (pkg.hasStation() === false && pkg.hasEvent() === false) {
-				if (confirm("Request is empty, remove request?")) remove(id);
+				remove(id);
 			}
 
 			var cb = getCallbacks("onDeleteEvents");
@@ -1054,7 +1054,7 @@ function RequestControl(htmlTagId) {
 
 			pkg.removeStation();
 			if (pkg.hasStation() === false && pkg.hasEvent() === false) {
-				if (confirm("Request is empty, remove request?")) remove(id);
+				remove(id);
 			}
 
 			var cb = getCallbacks("onDeleteStations");
