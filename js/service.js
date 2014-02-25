@@ -206,10 +206,19 @@ window.wiService = new function() {
 			var param = { streams: streams, start: start, end: end,
 				events: events, startphase: startphase, startoffset: startoffset,
 				endphase: endphase, endoffset: endoffset }
-			var url = configurationProxy.serviceRoot() + 'metadata/timewindows'
+			var url = configurationProxy.serviceRoot() + 'metadata/timewindows';
 			var failMsg = "Failed to get time windows"
 			return post(done, fail, bc, url, failMsg, streams, param)
 		},
+
+		export: function(done, fail, bc, streams) {
+			var param = {streams: streams};
+			bc = false;
+			var url = configurationProxy.serviceRoot() + 'metadata/export';
+			var failMsg = "Oops, couldn't save streams list";
+			return post(done, fail, bc, url, failMsg, streams, param);
+		},
+
 	}
 
 	this.event = {
