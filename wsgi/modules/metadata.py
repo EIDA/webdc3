@@ -296,7 +296,6 @@ class WI_Module(object):
                 self.text.next()
 
 
-
         text = ''
 
         for nscl in streams:
@@ -319,9 +318,7 @@ class WI_Module(object):
         content_type = 'text/plain'
 
         body = DownFile(text = text, filename = filename, content_type = content_type)
-
         return body
-
 
 
     def __timewindows_tw(self, streams, start_time, end_time):
