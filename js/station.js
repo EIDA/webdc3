@@ -560,10 +560,27 @@ function StationSearchControl(htmlTagId) {
 	function buildControl() {
 		if ( _controlDiv === null ) return;
 
+		// Create the HTML
+		var html='';
+
+		html += '<h3>Station Information</h3>';
+		html += '<div id="sscStationMode" align="center">';
+		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">EIDA Catalog</label>';
+		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">User Supplied</label>';
+		html += '</div>';
+
+		html += '<div id="sscStationDiv">';
+		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
+		html += '</div>';
+
+		_controlDiv.append(html);
+
+
 		//
 		// Create the controls
 		//
-		var html = '';
+		html = '';
 		html += "<h3>Networks</h3>";
 		html += '<div class="wi-control-item-first">';
 		html += '<div class="wi-spacer">Year from <u><span id="sscStart"></span></u> to <u><span id="sscEnd"></span></u>:</div>';
@@ -614,20 +631,60 @@ function StationSearchControl(htmlTagId) {
 		html += '<div style="padding: 10px;" id="sscStreamSpsDiv"></div>';
 		html += '</div>';
 
-		html += '</div>';
-
 		html += '<div class="wi-control-item-last">';
 		html += '<input id="sscReset" class="wi-inline" type="button" value="Reset" />';
 		html += '<input id="sscSearch" class="wi-inline" type="button" value="Search" />';
 		html += '</div>';
+		html += '</div>';
 
 
 		// Append the Main Control
-		_controlDiv.append(html);
+		_controlDiv.find("#sscStationCatalogDiv").append(html);
 
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
 		})
+
+		html = '<div class="wi-spacer">'
+		html+= '<form name="multiform" id="multiform" action="wsgi/metadata/import" method="POST" enctype="multipart/form-data">'
+		html += '<input id="sscUserStation" class="wi-inline-full" type="file" name="file" value="Upload Station List" />'
+		// html += '<input id="sscSendList" class="wi-inline" type="button" value="Send List" />';
+		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
+		html += '</form>'
+		html += '</div>';
+		_controlDiv.find("#sscStationFileDiv").append(html)
+
+
+
+
+
+
+		/*
+		 * Station Mechanism Mode
+		 */
+		_controlDiv.find("#sscStationMode").buttonset();
+		_controlDiv.find("#sscStationMode").change(function(item) {
+			_controlDiv.find("#sscStationDiv").children("div").hide();
+			_controlDiv.find("#sscStation" + ($(item.target).val()) + 'Div').show();
+		});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		// Station Controls by Code
 		html  = '<div class="wi-spacer">Filter stations by station code:</div>';
@@ -787,6 +844,7 @@ function StationSearchControl(htmlTagId) {
 		// Control Buttons
 		_controlDiv.find("#sscReset").button().bind("click", resetControl);
 		_controlDiv.find("#sscSearch").button().bind("click", query);
+		// _controlDiv.find("#sscSendList").button().bind("click", sendList);
 	};
 
 	function load(htmlTagId) {
