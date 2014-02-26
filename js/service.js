@@ -114,6 +114,10 @@ window.wiService = new function() {
 				delete param[p]
 		}
 
+	        console.log('POST to ' + url + ' with param:');
+		for (var v in param) {
+			console.log(v + ': ' + param[v]);
+		};
 		var f = failFn(fail, bc, failMsg)
 		return $.post(url, param, doneFn(done, bc, f)).fail(f)
 	}
@@ -210,6 +214,18 @@ window.wiService = new function() {
 			var failMsg = "Failed to get time windows"
 			return post(done, fail, bc, url, failMsg, streams, param)
 		},
+
+		export: function(done, fail, bc, streams) {
+			// streams: JSON string, list of ... (TBD)
+			var param = {streams: streams};
+			bc = false;
+			var url = configurationProxy.serviceRoot() + 'metadata/export';
+			var failMsg = "Oops, couldn't save streams list";
+		        //console.log("DEBUG:  About to post to export with streams...");
+		        //console.log(streams);
+			return post(done, fail, bc, url, failMsg, streams, param);
+		},
+
 	}
 
 	this.event = {
