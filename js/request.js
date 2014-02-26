@@ -561,58 +561,6 @@ function Pack(id) {
 		checkbox.prop('checked', !checkbox.prop('checked')).change();
         };
 
-        this.saveStation = function() {
-		// Prepare a JSON object containing
-		// the stream codes, and POST to back end
-		// which prepares a file for downloading.
-		// For doof historical reasons, we transmit to the back end
-		// as ["N", "S", "C", "L"].  FIXME.
-
-		wiConsole.info("Building the list of selected streams...");
-		console.log("In saveStation, _station_list.length = ");
-		console.log(_station_list.length);
-		var streams = Array();
-		var ncol = _station_format.names.indexOf("netcode");
-		var scol = _station_format.names.indexOf("statcode");
-		var ccol = _station_format.names.indexOf("streams");
-		var kcol = _station_format.names.indexOf("key");
-		var t;
-		for (var k in _station_list) {
-			//streams.push(_station_list[k][kcol]);
-			var loccha = _station_list[k][ccol];
-			console.log(_station_list[k][scol] + ": " + loccha);
-			if (typeof loccha !== "undefined" && loccha.length > 0) {
-				var loc_list = Array();
-				var cha_list = Array();
-				var words;
-				for (var i=0; i < loccha.length; i++) {
-					words = loccha[i].split('.');
-					loc_list.push(words[0]);
-					cha_list.push(words[1]);
-				}
-				for (var i=0; i < loc_list.length; i++) {
-					var t = Array(_station_list[k][ncol],
-						      _station_list[k][scol],
-						      cha_list[i],
-						      loc_list[i]);
-					streams.push(t);
-				};
-			};
-		}
-		console.log(streams);
-		wiService.metadata.export(function() {
-			wiConsole.info("...done [export]");
-		},  function(jqxhr) {
-			if (jqxhr.status == 500)
-				var err = jqxhr.statusText;
-			else
-				var err = jqxhr.responseText;
-			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams   // this._station_list
-					  // station_list is wrong, should just be keys
-					 );
-	};
-
 	this.reduceEventsRows = function(rowkeys) {
 		// Either delete the rows with ~~~keys in rowkeys~~~
 		// rows which are checked,
@@ -1113,24 +1061,6 @@ function RequestControl(htmlTagId) {
 			for(var key in cb) cb[key]();
 		});
 
-		_controlDiv.find('#' + id + '-save-stations').button().bind("click", function(item){
-			var id = $(item.target).parent("div").attr('id');
-			var pkg = null;
-
-			try {
-				pkg = package();
-			} catch (e) {
-				return;
-			}
-
-			if (! pkg.hasStation()) {
-				alert("Request has no stations currently associated.");
-				return;
-			}
-
-			pkg.saveStation();
-		});
-
 		_controlDiv.find('#' + id + '-freeze').button().bind("click", function(item){
 			var id = $(item.target).parent("div").attr('id');
 			var pkg = null;
@@ -1172,7 +1102,6 @@ function RequestControl(htmlTagId) {
 			html += '<div class="wi-request-pack-div" id="' + id + '">';
 
 			html += '<input style="float: right;" id="' + id + '-delete-events" type="button" value="Delete Events" />';
-			html += '<input style="float: right;" id="' + id + '-save-stations" type="button" value="Save Stations" />';
 			html += '<input style="float: right;" id="' + id + '-delete-stations" type="button" value="Delete Stations" />';
 			html += '<input style="float: right;" id="' + id + '-freeze" type="button" value="Freeze" />';
 			html += '<div style="float: left;"><h2>Request: </h2></div>';
@@ -1358,7 +1287,7 @@ function RequestControl(htmlTagId) {
 	load(htmlTagId);
 
 	this.bind = function(name, method) {
-		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations", "onSaveStations" ]
+		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations" ]
 		
 		// The functions registered here will be called when the user 
 		if (valid.indexOf(name) === -1) {
