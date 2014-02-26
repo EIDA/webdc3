@@ -562,13 +562,24 @@ function Pack(id) {
         };
 
         this.saveStation = function() {
+		// Prepare a JSON object containing
+		// the stream codes, and POST to back end
+		// which prepares a file for downloading.
+		// For doof historical reasons, we transmit to the back end
+		// as ["N", "S", "C", "L"].  FIXME.
+
 		wiConsole.info("Building the list of selected streams...");
 		console.log("In saveStation, _station_list.length = ");
 		console.log(_station_list.length);
 		var streams = Array();
+		var ncol = _station_format.names.indexOf("netcode");
+		var scol = _station_format.names.indexOf("statcode");
+		
 		var kcol = _station_format.names.indexOf("key");
 		for (var k in _station_list) {
-			streams.push(_station_list[k][kcol]);
+			//streams.push(_station_list[k][kcol]);
+			var t = Array(_station_list[k][ncol], _station_list[k][scol], "QQQ", "--");
+			streams.push(t);
 		}
 		console.log(streams);
 		wiService.metadata.export(function() {
