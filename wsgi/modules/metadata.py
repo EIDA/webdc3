@@ -278,19 +278,30 @@ class WI_Module(object):
 
         # omit empty lines and lines containing only whitespace
         lines = [line.split() for line in params['file'].splitlines() if line.strip()]
+        # Remove duplicate lines
         nslcSet = set([(nscl[0], nscl[1], nscl[3], nscl[2]) for nscl in lines])
 
+        # Create a set of stations to call getQuery
         nsSet = set([(nscl[0], nscl[1]) for nscl in nslcSet])
+        # and transform it to an ordered list
         nsList = sorted(nsSet)
+
+        # Save stations already visited to avoid duplication by different
+        # epochs
         stats = list()
         statsSet = set()
+
         while len(nsList):
+            # Consumes all the stations
             n, s = nsList.pop(0)
 
+            # To make notation shorter
             ptNets = self.ic.networks
             ptStats = self.ic.stations
 
+            # Cycle through networks
             for net in ptNets:
+                # Check if I found the network
                 if n == net[0]:
                     # A normal network has pointers to first and last child
                     if((net[1] is not None) and (net[2] is not None)):
@@ -299,20 +310,54 @@ class WI_Module(object):
                     else:
                         list_of_children = net[3]
 
+                    # Cycle through children (stations)
                     for staIdx in list_of_children:
                         sta = ptStats[staIdx]
+                        # Check if I found the station
                         if s == sta[4]:
 
                             # Build key to avoid duplicates due to different epochs! See GE.APE
                             statKey = '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])
                             if statKey not in statsSet:
-                                # FIXME Still need to filter by location and channel
-                                statsSet.add(statKey)
+                                # Query for ALL the streams in the station
                                 partial = self.ic.getQuery({'network': '%s-%s-%s' % (net[0], net[4], net[5]),
                                                             'station': '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])})
-                                stats.extend(partial[1:])
-                                print partial[1:]
 
+                                # Filter by location and channel
+                                # Remove header
+                                partial = partial[1:]
+                                # Loop through the results
+                                for idx, parSta in enumerate(partial):
+                                    filtStr = list()
+                                    filtStrRestr = list()
+                                    # Loop through all streams (LOC.CH)
+                                    for chIdx, locCh in enumerate(parSta[9]):
+                                        auxLoc, auxCh = locCh.split('.')
+                                        # Take into account the empty location
+                                        # case
+                                        if auxLoc == '':
+                                            auxLoc = '--'
+
+                                        # Check if this stream is among the
+                                        # requested ones
+                                        if (net[0], sta[4], auxLoc, auxCh) in nslcSet:
+                                            # And add it to the filtered
+                                            # streams
+                                            filtStr.append(locCh)
+                                            # With the proper information about
+                                            # restriction
+                                            filtStrRestr.append(parSta[10][chIdx])
+
+                                    # Replace the station in the results with a
+                                    # new one with filtered streams
+                                    partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
+                                                    parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
+
+                                # Add results
+                                statsSet.add(statKey)
+                                stats.extend(partial)
+
+        # Add header
         stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude',
                          'restricted', 'netclass', 'archive', 'netoperator',
                          'streams', 'streams_restricted'))
