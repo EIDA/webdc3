@@ -507,6 +507,7 @@ function StationSearchControl(htmlTagId) {
 		var year = _controlDiv.find("#sscYear");
 		year.slider('values', [ year.slider('option','min'), year.slider('option', 'max')]);
 
+		_controlDiv.find("#sscStationModeCatalog").click()
 		_controlDiv.find("#sscStationSelectionModeCode").click()
 		_controlDiv.find("#sscStreamModeCode").click();
 
@@ -565,8 +566,8 @@ function StationSearchControl(htmlTagId) {
 
 		html += '<h3>Station Information</h3>';
 		html += '<div id="sscStationMode" align="center">';
-		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">EIDA Catalog</label>';
-		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">User Supplied</label>';
+		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
+		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
