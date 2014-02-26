@@ -277,12 +277,12 @@ class WI_Module(object):
         # result = self.ic.getFromUpload(params)
 
         # omit empty lines and lines containing only whitespace
-        lines = [line.split() for line in params['file'].splitlines() if line.strip()]
+        lines = [tuple(line.split()) for line in params['file'].splitlines() if line.strip()]
         # Remove duplicate lines
-        nslcSet = set([(nscl[0], nscl[1], nscl[3], nscl[2]) for nscl in lines])
+        nslcSet = set(lines)
 
         # Create a set of stations to call getQuery
-        nsSet = set([(nscl[0], nscl[1]) for nscl in nslcSet])
+        nsSet = set([(nslc[0], nslc[1]) for nslc in nslcSet])
         # and transform it to an ordered list
         nsList = sorted(nsSet)
 
@@ -350,12 +350,12 @@ class WI_Module(object):
 
                                     # Replace the station in the results with a
                                     # new one with filtered streams
-                                    partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
-                                                    parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
-
-                                # Add results
-                                statsSet.add(statKey)
-                                stats.extend(partial)
+                                    if len(filtStr):
+                                        partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
+                                                        parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
+                                        # Add results
+                                        statsSet.add(statKey)
+                                        stats.append(partial[idx])
 
         # Add header
         stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude',
