@@ -599,7 +599,8 @@ function Pack(id) {
 				};
 			};
 		}
-		console.log(streams);
+		var streams_json = JSON.stringify(streams);
+		console.log(streams_json);
 		wiService.metadata.export(function() {
 			wiConsole.info("...done [export]");
 		},  function(jqxhr) {
@@ -608,7 +609,7 @@ function Pack(id) {
 			else
 				var err = jqxhr.responseText;
 			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams
+		}, true, streams_json
 					 );
 	};
 
