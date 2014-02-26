@@ -72,6 +72,7 @@ class WI_Module(object):
         wi.registerAction("/metadata/stations", self.getStations)
         wi.registerAction("/metadata/streams", self.getStreams)
         wi.registerAction("/metadata/query", self.query)
+        wi.registerAction("/metadata/import", self.upload_selection)
         wi.registerAction("/metadata/export", self.download_selection)
         wi.registerAction("/metadata/timewindows", self.timewindows)
 
@@ -258,6 +259,69 @@ class WI_Module(object):
             raise wsgicomm.WIContentError('No stations have been found.', 0)
 
         return json.dumps( result )
+
+
+    def upload_selection(self, envir, params):
+        """Returns the stations/streams which were received in the uploaded file
+
+        Input: file={file}
+
+        Output: list in JSON format. Every item in the list has ten columns.
+                ID, NETCODE, STATIONCODE, LATITUDE, LONGITUDE, RESTRICTED,
+                NETCLASS, ARCHIVE, NETOPERATOR, STREAMS.
+                STREAMS is a list with the available channels in a
+                two-characters format. e.g. ["BH","HH","LN"].
+
+        """
+
+        # result = self.ic.getFromUpload(params)
+
+        # omit empty lines and lines containing only whitespace
+        lines = [line.split() for line in params['file'].splitlines() if line.strip()]
+        nslcSet = set([(nscl[0], nscl[1], nscl[3], nscl[2]) for nscl in lines])
+
+        nsSet = set([(nscl[0], nscl[1]) for nscl in nslcSet])
+        nsList = sorted(nsSet)
+        stats = list()
+        statsSet = set()
+        while len(nsList):
+            n, s = nsList.pop(0)
+
+            ptNets = self.ic.networks
+            ptStats = self.ic.stations
+
+            for net in ptNets:
+                if n == net[0]:
+                    # A normal network has pointers to first and last child
+                    if((net[1] is not None) and (net[2] is not None)):
+                        list_of_children = range(net[1], net[2])
+                    # A virtual network has a list of children
+                    else:
+                        list_of_children = net[3]
+
+                    for staIdx in list_of_children:
+                        sta = ptStats[staIdx]
+                        if s == sta[4]:
+
+                            # Build key to avoid duplicates due to different epochs! See GE.APE
+                            statKey = '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])
+                            if statKey not in statsSet:
+                                # FIXME Still need to filter by location and channel
+                                statsSet.add(statKey)
+                                partial = self.ic.getQuery({'network': '%s-%s-%s' % (net[0], net[4], net[5]),
+                                                            'station': '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])})
+                                stats.extend(partial[1:])
+                                print partial[1:]
+
+        stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude',
+                         'restricted', 'netclass', 'archive', 'netoperator',
+                         'streams', 'streams_restricted'))
+        # If there is no data available send a 204 error.
+        # There is always one line containing the headers
+        if len(stats) <= 1:
+            raise wsgicomm.WIContentError('No stations have been found.', 0)
+
+        return json.dumps(stats)
 
 
     def download_selection(self, envir, params):
