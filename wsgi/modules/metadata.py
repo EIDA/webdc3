@@ -418,10 +418,14 @@ class WI_Module(object):
                 cha = str(nscl[2])
                 loc = str(nscl[3])
 
+                # Take into account the empty location case
+                if loc == '':
+                    loc = '--'
+
             except (TypeError, ValueError):
                 raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
 
-            text += '%s, %s, %s, %s\n' % (net, sta, cha, loc)
+            text += '%s %s  %s  %s\n' % (net, sta, loc, cha)
 
         # size = len(text)
         filename = 'stationSelection.csv'
