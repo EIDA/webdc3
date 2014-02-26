@@ -580,8 +580,7 @@ function Pack(id) {
 		for (var k in _station_list) {
 			//streams.push(_station_list[k][kcol]);
 			var loccha = _station_list[k][ccol];
-			console.log("loccha.length: " + loccha.length);
-			console.log(loccha);
+			console.log(_station_list[k][scol] + ": " + loccha);
 			if (typeof loccha !== "undefined" && loccha.length > 0) {
 				var loc_list = Array();
 				var cha_list = Array();
