@@ -662,7 +662,7 @@ function Pack(id) {
 		var header = datacopy.shift();
 		for(var key in header) {
 			if (header[key] !== _station_format.names[key])
-				wiConsole.error("request.js: Event header " + header[key] + " format does not match current implementation.");
+				wiConsole.error("request.js: Station header " + header[key] + " format does not match current implementation.");
 		};
 
 		/*
