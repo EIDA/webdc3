@@ -655,10 +655,6 @@ function StationSearchControl(htmlTagId) {
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
 
-
-
-
-
 		/*
 		 * Station Mechanism Mode
 		 */
@@ -667,23 +663,6 @@ function StationSearchControl(htmlTagId) {
 			_controlDiv.find("#sscStationDiv").children("div").hide();
 			_controlDiv.find("#sscStation" + ($(item.target).val()) + 'Div').show();
 		});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 		// Station Controls by Code

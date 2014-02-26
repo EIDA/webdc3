@@ -579,8 +579,7 @@ function Pack(id) {
 			else
 				var err = jqxhr.responseText;
 			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams_json     // this._station_list
-					  // station_list is wrong, should just be keys
+		}, true, streams_json 
 					 );
 	};
 
