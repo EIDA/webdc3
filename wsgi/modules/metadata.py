@@ -425,7 +425,7 @@ class WI_Module(object):
             except (TypeError, ValueError):
                 raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
 
-            text += '%s %s  %s  %s\n' % (net, sta, loc, cha)
+            text += '%s %s %s %s\n' % (net, sta, loc, cha)
 
         # size = len(text)
         filename = 'stationSelection.csv'
