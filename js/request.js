@@ -562,15 +562,44 @@ function Pack(id) {
         };
 
         this.saveStation = function() {
+		// Prepare a JSON object containing
+		// the stream codes, and POST to back end
+		// which prepares a file for downloading.
+		// For doof historical reasons, we transmit to the back end
+		// as ["N", "S", "C", "L"].  FIXME.
+
 		wiConsole.info("Building the list of selected streams...");
 		console.log("In saveStation, _station_list.length = ");
 		console.log(_station_list.length);
 		var streams = Array();
+		var ncol = _station_format.names.indexOf("netcode");
+		var scol = _station_format.names.indexOf("statcode");
+		var ccol = _station_format.names.indexOf("streams");
 		var kcol = _station_format.names.indexOf("key");
+		var t;
 		for (var k in _station_list) {
-			streams.push(_station_list[k][kcol]);
+			//streams.push(_station_list[k][kcol]);
+			var loccha = _station_list[k][ccol];
+			console.log(_station_list[k][scol] + ": " + loccha);
+			if (typeof loccha !== "undefined" && loccha.length > 0) {
+				var loc_list = Array();
+				var cha_list = Array();
+				var words;
+				for (var i=0; i < loccha.length; i++) {
+					words = loccha[i].split('.');
+					loc_list.push(words[0]);
+					cha_list.push(words[1]);
+				}
+				for (var i=0; i < loc_list.length; i++) {
+					var t = Array(_station_list[k][ncol],
+						      _station_list[k][scol],
+						      cha_list[i],
+						      loc_list[i]);
+					streams.push(t);
+				};
+			};
 		}
-		var streams_json = JSON.stringify(streams);
+		console.log(streams);
 		wiService.metadata.export(function() {
 			wiConsole.info("...done [export]");
 		},  function(jqxhr) {
@@ -579,7 +608,7 @@ function Pack(id) {
 			else
 				var err = jqxhr.responseText;
 			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams_json 
+		}, true, streams
 					 );
 	};
 
@@ -684,7 +713,7 @@ function Pack(id) {
 		var header = datacopy.shift();
 		for(var key in header) {
 			if (header[key] !== _station_format.names[key])
-				wiConsole.error("request.js: Event header " + header[key] + " format does not match current implementation.");
+				wiConsole.error("request.js: Station header " + header[key] + " format does not match current implementation.");
 		};
 
 		/*
