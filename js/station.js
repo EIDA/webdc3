@@ -507,6 +507,7 @@ function StationSearchControl(htmlTagId) {
 		var year = _controlDiv.find("#sscYear");
 		year.slider('values', [ year.slider('option','min'), year.slider('option', 'max')]);
 
+		_controlDiv.find("#sscStationModeCatalog").click()
 		_controlDiv.find("#sscStationSelectionModeCode").click()
 		_controlDiv.find("#sscStreamModeCode").click();
 
@@ -556,6 +557,33 @@ function StationSearchControl(htmlTagId) {
 		return value;
 	};
 
+	function parseChannelFile() {
+		// PLE: I have something like this function on sec24c106,
+		// if I haven't accidentially wiped it. FIXME.
+
+		// The following list should be loaded as 5 stations.
+		// It SAVES as 11 channels, because there are multiple
+		// epochs for GE.KBS. Run output through "uniq"?
+		// NOTE: WM.EVO.*.* must remain restricted!
+		var preset_list = Array("GE APE -- BHZ",
+					"GE APE -- BHN",
+					"GE BKB -- HHZ",
+					"GE KBS 00 LHZ",
+					"GE KBS 10 LHZ",
+					"WM EVO -- VHZ",
+				        "WM SFS -- VHZ");
+		var preset_file = preset_list.join('\n');
+		wiConsole.notice('In parseChannelFile, preset_file = "' + preset_file + '"'); 
+		wiService.metadata.import(function(data, textStatus, jqXHR) {
+			if (jqXHR.status == 200) {
+				requestControl.appendStation(data);
+				_controlDiv.find("#sscSearch").button("option", "label", "Append");
+			} else {
+				wiConsole.notice('POST to import returned ', jqXHR.status);
+			};
+		}, null, true, preset_file);
+	};
+
 	// Main toolbar render
 	function buildControl() {
 		if ( _controlDiv === null ) return;
@@ -565,13 +593,15 @@ function StationSearchControl(htmlTagId) {
 
 		html += '<h3>Station Information</h3>';
 		html += '<div id="sscStationMode" align="center">';
-		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">EIDA Catalog</label>';
-		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">User Supplied</label>';
+		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
+		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
+		html += '<input type="radio" value="Preset" id="sscStationModePreset" name="sscStationMode" /><label for="sscStationModePreset">PRESET TEST</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
 		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
 		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';	
 		html += '</div>';
 
 		_controlDiv.append(html);
@@ -640,6 +670,8 @@ function StationSearchControl(htmlTagId) {
 
 		// Append the Main Control
 		_controlDiv.find("#sscStationCatalogDiv").append(html);
+
+		_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
 
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
