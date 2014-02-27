@@ -565,22 +565,25 @@ function Pack(id) {
 		// Prepare a JSON object containing
 		// the stream codes, and POST to back end
 		// which prepares a file for downloading.
+		// These streams are the ones left after
+		// selection and filtering.
 		// For doof historical reasons, we transmit to the back end
 		// as ["N", "S", "C", "L"].  FIXME.
 
 		wiConsole.info("Building the list of selected streams...");
-		console.log("In saveStation, _station_list.length = ");
-		console.log(_station_list.length);
+		console.log("In saveStation, _station_list.length = " + _station_list.length);
 		var streams = Array();
-		var ncol = _station_format.names.indexOf("netcode");
-		var scol = _station_format.names.indexOf("statcode");
-		var ccol = _station_format.names.indexOf("streams");
-		var kcol = _station_format.names.indexOf("key");
+		var neti = _station_format.names.indexOf("netcode");
+		var stai = _station_format.names.indexOf("statcode");
+		var fstreamsi = _station_format.names.indexOf("fstreams");
+		var seli = _station_format.names.indexOf("selected")
 		var t;
 		for (var k in _station_list) {
-			//streams.push(_station_list[k][kcol]);
-			var loccha = _station_list[k][ccol];
-			console.log(_station_list[k][scol] + ": " + loccha);
+			if (_station_list[k][seli] === false) {
+				continue;
+			};
+			var loccha = _station_list[k][fstreamsi];
+			//console.log(_station_list[k][stai] + ": " + loccha);
 			if (typeof loccha !== "undefined" && loccha.length > 0) {
 				var loc_list = Array();
 				var cha_list = Array();
@@ -591,8 +594,8 @@ function Pack(id) {
 					cha_list.push(words[1]);
 				}
 				for (var i=0; i < loc_list.length; i++) {
-					var t = Array(_station_list[k][ncol],
-						      _station_list[k][scol],
+					var t = Array(_station_list[k][neti],
+						      _station_list[k][stai],
 						      cha_list[i],
 						      loc_list[i]);
 					streams.push(t);
@@ -768,7 +771,7 @@ function Pack(id) {
 		buildChannelFilterIndex();
 
 		/*
-		 * Compute the filter results for initializig the fstreams field
+		 * Compute the filter results for initializing the fstreams field
 		 */
 		applyStreamFilter();
 
