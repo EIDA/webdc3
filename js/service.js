@@ -216,14 +216,22 @@ window.wiService = new function() {
 		},
 
 		export: function(done, fail, bc, streams) {
-			// streams: JSON string, list of ... (TBD)
+			// streams: JSON string, list of [N, S, C, L] arrays.
+			// NOTE the perverse ordering. FIXME
+
+			// NOTE that this calls $.post() directly,
+			// so we can explicitly supply dataType = 'text'.
+			// Also the 'fail' argument is unused for now.
+			// (The 'done' function just writes the result to an alert box for now.)
+
 			var param = {streams: streams};
 			bc = false;
 			var url = configurationProxy.serviceRoot() + 'metadata/export';
 			var failMsg = "Oops, couldn't save streams list";
 		        //console.log("DEBUG:  About to post to export with streams...");
 		        //console.log(streams);
-			return post(done, fail, bc, url, failMsg, streams, param);
+			//return post(done, fail, bc, url, failMsg, streams, param);
+			return $.post(url, param, done, "text");
 		},
 
 	}

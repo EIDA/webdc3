@@ -601,8 +601,11 @@ function Pack(id) {
 		}
 		var streams_json = JSON.stringify(streams);
 		console.log(streams_json);
-		wiService.metadata.export(function() {
-			wiConsole.info("...done [export]");
+		wiService.metadata.export(function(response_data) {
+			alert("Your streams (N S L C) are: " + response_data);
+			console.log("Your streams (N S L C): " + response_data);
+			var count = response_data.split('\n').length;
+			wiConsole.info("...done [exported " + count +" stream(s)]");
 		},  function(jqxhr) {
 			if (jqxhr.status == 500)
 				var err = jqxhr.statusText;
