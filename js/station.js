@@ -558,13 +558,24 @@ function StationSearchControl(htmlTagId) {
 	};
 
 	function parseChannelFile() {
-		// PLE: I have something like this on sec24c106, if I
-		// haven't accidentially wiped it. FIXME.
-		var preset_file = "GE APE -- BHZ";
+		// PLE: I have something like this function on sec24c106,
+		// if I haven't accidentially wiped it. FIXME.
+
+		// The following list should be loaded as 5 stations.
+		// It SAVES as 11 channels, because there are multiple
+		// epochs for GE.KBS. Run output through "uniq"?
+		// NOTE: WM.EVO.*.* must remain restricted!
+		var preset_list = Array("GE APE -- BHZ",
+					"GE APE -- BHN",
+					"GE BKB -- HHZ",
+					"GE KBS 00 LHZ",
+					"GE KBS 10 LHZ",
+					"WM EVO -- VHZ",
+				        "WM SFS -- VHZ");
+		var preset_file = preset_list.join('\n');
 		wiConsole.notice('In parseChannelFile, preset_file = "' + preset_file + '"'); 
 		wiService.metadata.import(function(data, textStatus, jqXHR) {
 			if (jqXHR.status == 200) {
-				wiConsole.notice('Done with import, stuff into pack...');
 				requestControl.appendStation(data);
 				_controlDiv.find("#sscSearch").button("option", "label", "Append");
 			} else {
