@@ -557,6 +557,22 @@ function StationSearchControl(htmlTagId) {
 		return value;
 	};
 
+	function parseChannelFile() {
+		// PLE: I have something like this on sec24c106, if I
+		// haven't accidentially wiped it. FIXME.
+		var preset_file = "GE APE -- BHZ";
+		wiConsole.notice('In parseChannelFile, preset_file = "' + preset_file + '"'); 
+		wiService.metadata.import(function(data, textStatus, jqXHR) {
+			if (jqXHR.status == 200) {
+				wiConsole.notice('Done with import, stuff into pack...');
+				requestControl.appendStation(data);
+				_controlDiv.find("#sscSearch").button("option", "label", "Append");
+			} else {
+				wiConsole.notice('POST to import returned ', jqXHR.status);
+			};
+		}, null, true, preset_file);
+	};
+
 	// Main toolbar render
 	function buildControl() {
 		if ( _controlDiv === null ) return;
@@ -568,11 +584,13 @@ function StationSearchControl(htmlTagId) {
 		html += '<div id="sscStationMode" align="center">';
 		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
 		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
+		html += '<input type="radio" value="Preset" id="sscStationModePreset" name="sscStationMode" /><label for="sscStationModePreset">PRESET TEST</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
 		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
 		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';	
 		html += '</div>';
 
 		_controlDiv.append(html);
@@ -641,6 +659,8 @@ function StationSearchControl(htmlTagId) {
 
 		// Append the Main Control
 		_controlDiv.find("#sscStationCatalogDiv").append(html);
+
+		_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
 
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");

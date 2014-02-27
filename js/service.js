@@ -227,11 +227,22 @@ window.wiService = new function() {
 			var param = {streams: streams};
 			bc = false;
 			var url = configurationProxy.serviceRoot() + 'metadata/export';
-			var failMsg = "Oops, couldn't save streams list";
+			var failMsg = "Oops, couldn't save channels list";
 		        //console.log("DEBUG:  About to post to export with streams...");
 		        //console.log(streams);
 			//return post(done, fail, bc, url, failMsg, streams, param);
 			return $.post(url, param, done, "text");
+		},
+
+		import: function(done, fail, bc, file) {
+			// Calls POST to produce a JSON structure,
+			// which must end up in the pack.
+			// file - the list of "N S L C" values
+			var param = {file: file};
+			bc = false;
+			var url = configurationProxy.serviceRoot() + 'metadata/import';
+			var failMsg = "Oops, couldn't process the channels input";
+			return $.post(url, param, done, "json");
 		},
 
 	}
