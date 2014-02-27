@@ -599,16 +599,18 @@ function Pack(id) {
 				};
 			};
 		}
-		console.log(streams);
+		var streams_json = JSON.stringify(streams);
+		console.log(streams_json);
 		wiService.metadata.export(function() {
-			wiConsole.info("...done [export]");
+			wiConsole.info("request.js: ...done [export]");
 		},  function(jqxhr) {
+			console.log('Something wrong here? Status is ' + jqxhr.status);
 			if (jqxhr.status == 500)
 				var err = jqxhr.statusText;
 			else
 				var err = jqxhr.responseText;
 			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams
+		}, true, streams_json
 					 );
 	};
 
