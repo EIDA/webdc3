@@ -9,7 +9,7 @@
  */
 
 /*
- * Page wide variable to provides the configuration proxy to all modules
+ * Page-wide variable to provides the configuration proxy to all modules
  */
 var stationSearchControl = undefined;
 
@@ -603,7 +603,9 @@ function StationSearchControl(htmlTagId) {
 	function buildControl() {
 		if ( _controlDiv === null ) return;
 
-		// Create the HTML
+		//
+		// Create the controls
+		//
 		var html='';
 
 		html += '<h3>Station Information</h3>';
@@ -615,16 +617,70 @@ function StationSearchControl(htmlTagId) {
 
 		html += '<div id="sscStationDiv">';
 		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
-		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center; background: orange;" id="sscStationFileDiv"></div>';
 		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';	
 		html += '</div>';
 
 		_controlDiv.append(html);
 
+		html = '<div class="wi-spacer"><input id="sscUserCatalog" class="wi-inline-full" type="button" value="Upload Catalog" /></div>';
+		_controlDiv.find("#sscStationFileDiv").append(html);  // RENAME: sscStationFile -> sscChannelFile
+
 
 		//
-		// Create the controls
+		// Channel Selection Mode
 		//
+
+		/*
+		 * Text area for customized channel list upload
+		 */
+		html = '<div id="sscChannelLoader">';
+		html += '<p style="margin: 5px 0 5px 0; font-size: 0.85em;">Use this control to upload your personal channel list to be processed by our system. The catalog should be in CSV (comma-separated value) format. You may use a single blank space as a separator. It may contain as many channels as you want, one per line, with the same number of columns. You must also indicate which columns contain the Network, Station, Location and Channel for the channel. All other columns will be ignored.</p>';
+		html += '<p><i>Example:</i> <tt>GE APE -- BHZ</tt></p>';
+		html += '<br/><h3>Column Number Specification:</h3>';
+		html += '<div>';
+		html += 'Network: <input  class="wi-inline-small" id="sscColumnNetwork"  value="1"/>';
+		html += 'Station: <input  class="wi-inline-small" id="sscColumnStation"  value="2"/>';
+		html += 'Location: <input class="wi-inline-small" id="sscColumnLocation" value="3"/>';
+		html += 'Channel: <input  class="wi-inline-small" id="sscColumnChannel"  value="4"/>';
+		html += '</div>';
+
+		html += '<br/><h3>Copy and paste your list into the area below:</h3>';
+		html += '<div id="sscChannelHeader">[No format specified. Press "Send" first.]</div><br>';
+		html += '<div style="margin: 5px 0 10px 0;"><textarea style="width: 100%; height: 4em;" id="sscChannelInput">GE APE -- BHZ</textarea></div>';
+		html += '</div>';
+		$("body").append(html);
+
+		$("body").find("#sscChannelLoader").dialog({
+			title: "Channel List Input Dialog",
+			autoOpen: true, // false,
+			height: 450,
+			width: 550,
+			modal: true,
+			buttons: {
+				Send: function() {
+				    alert("Thank you, your upload is being checked.");
+				    result = parseUserChannels();
+				    console.log("parseUserChannels: " + result.message);
+				    if (result.header !== undefined) {
+					text = "Format: " + result.header;
+					$("body").find("#sscChannelHeader").empty().append(text);
+				    };
+				},
+				Close: function() {
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+
+		// Catalog
+		_controlDiv.find("#sscUserCatalog").button().bind('click', function() {
+			$("#sscChannelLoader").dialog('open');
+		});
+
+		/*
+		 * Normal Pre-Defined Catalog Search Controls
+		 */
 		html = '';
 		html += "<h3>Networks</h3>";
 		html += '<div class="wi-control-item-first">';
@@ -683,7 +739,7 @@ function StationSearchControl(htmlTagId) {
 		html += '</div>';
 
 
-		// Append the Main Control
+		// Append the standard Inventory Control
 		_controlDiv.find("#sscStationCatalogDiv").append(html);
 
 		//_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
@@ -883,7 +939,78 @@ function StationSearchControl(htmlTagId) {
 			event.preventDefault();
 			_controlDiv.find( "#station_upload_response" ).empty().append("<p>[Answer goes here]</p>");
 		});
+	};
 
+	function parseUserChannels() {
+		// After the user has supplied channel list,
+		// check it, and send on to the ??? service.
+		// Return { status: [0 on success], header: string }
+		var result = { status: 1, message: "FAIL", header: "" };
+
+		var network   = Number($("#sscColumnNetwork").val());
+		var station   = Number($("#sscColumnStation").val());
+		var location  = Number($("#sscColumnLocation").val());
+		var channel   = Number($("#sscColumnChannel").val());
+	        var nmax      = Math.max(network, station, location, channel);
+		var nmin      = Math.min(network, station, location, channel);
+
+	        msg = "net = " + network + " sta = " + station + " loc = " + location + " cha = " + channel + " (min:" + nmin + " max:" + nmax + ")";
+		console.log("parseUserChannels: " + msg);
+
+	        if ((nmin < 1) || isNaN(nmax)) {
+			alert("Error: column indices must be integers starting from 1.");
+			return result;
+		};
+
+		var columns = Array();
+	        // FIXME: UNVALIDATED USER INPUT
+	        var input = $("#sscChannelInput").val();
+
+	        if (input === null || input === undefined || input === "") {
+			alert("Please paste your catalog inside the text area before pressing 'Send'.");
+			return result;
+		};
+
+	        // We may need to reorder the input / put the
+	        // columns in N-L-S-C order for the station/channel pack.
+
+	        for (var i=0; i < nmax; i++) columns[i] = "ignore";
+		msg = "More to do still";
+		console.log("parseUserChannels: " + msg);
+		console.log("parseUserChannels: input = " + input);
+                /*
+		 * Old code for when I though about doing this in JS.
+		 * Instead use the /metadata/import method.
+		 *
+		 *  data = input.split("\n");  // UNVALIDATED ****
+		 *  requestControl.addChannels(data);
+		 *  console.log("data after addChannels:[" + data + ']');
+		 */
+		wiService.metadata.import(function(data) {
+			if (typeof data == "undefined") {
+				wiConsole.alert("...import got 'undefined'.");
+			} else {
+				wiConsole.info("...done importing " + (data.length-1) + " stations(s).");
+				requestControl.appendStation(data);
+			};
+		}, function(jqxhr) {
+			if (jqxhr.status != 200)
+				var err = jqxhr.statusText;
+			else
+				var err = jqxhr.responseText;
+			alert(err);
+
+			wiConsole.error("Failed to import: " + err);
+		}, true, input);
+
+	        _controlDiv.find("#sscSearch").button("option", "label", "Append");
+
+	        var br = "\n"; // "<br>";
+		msg = "OK, params are:" + br;
+		msg += " columns: '" + columns + "'" + br;
+		msg += " input: '" + input + "'" + br;
+		result = {status: 0, message: msg, header: columns };
+                return result;
 	};
 
 	function load(htmlTagId) {
