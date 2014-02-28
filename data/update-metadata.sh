@@ -13,7 +13,32 @@ export PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/seiscomp3/bin
 # Check in which directory is this script located
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+function show_usage() {
+	echo "$0: update webinterface metadata cache(s)"
+	cat <<EOF
+
+Options:
+  -h  : show this help.
+  -v  : be verbose.
+EOF
+}
+
+
 verbosity=0
+
+while getopts ":v" opt; do
+	case "$opt" in
+		h)  show_usage
+			exit 0
+			;;
+		v)  verbosity=1
+			;;
+		*)  show_usage
+			exit 1
+			;;
+	esac
+done
+
 if [ $verbosity -gt 0 ]; then
     echo "Dir: $DIR"
     echo "Path: $PATH"
