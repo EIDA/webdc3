@@ -177,7 +177,7 @@ function Pack(id) {
 					var channelparts = channel.split(".");
 
 					if (channelparts.length !== 2) {
-						wiConsole.error("request.js: Invalid channel/location patter " + channel + ". It has more than two fields.");
+						wiConsole.error("request.js: Invalid channel/location pattern " + channel + ". It has more than two fields.");
 						continue;
 					}
 
@@ -771,7 +771,8 @@ function Pack(id) {
 		buildChannelFilterIndex();
 
 		/*
-		 * Compute the filter results for initializing the fstreams field
+		 * Compute the filter results for initializing the
+		 * fstreams field
 		 */
 		applyStreamFilter();
 

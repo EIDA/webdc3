@@ -116,7 +116,7 @@ window.wiService = new function() {
 
 	        console.log('POST to ' + url + ' with param:');
 		for (var v in param) {
-			console.log(v + ': >' + param[v] + '<');
+			console.log(v + ': ' + param[v] + '');
 		};
 		var f = failFn(fail, bc, failMsg)
 		return $.post(url, param, doneFn(done, bc, f)).fail(f)
