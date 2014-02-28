@@ -5,9 +5,15 @@ var colour = "purple";
 
 function whatColor() {
 	console.log("In whatColor");
-	var content = "RED, NO, GREEN";
-	content = colour;
-	$( "#learnbox" ).empty().append( content );
+	var content = ''
+	content += '<form method="POST" action="downloader.php">';
+	content += '<p>RED, NO, GREEN</p>';
+	content += 'x: <input name="x" type="text">';
+	content += 'p: <input name="p" type="text">';
+	content += '<input type="submit">';
+	content += '</form>';
+	//content = colour;
+	$( "#learnbox" ).html( content );
 };
 
 // whatColor();
@@ -35,6 +41,7 @@ function myPost(url, params) {
 // This is server-specific:
 //var baseurl="/webinterface/wsgi";
 var baseurl="/testwi/webdc3/wsgi";  // For sec24c106.
+var baseurl="/webinterface/wsgi";
 var url;
 var params;
 
@@ -45,9 +52,10 @@ if ( false ) {
 	      networktype: "all"};
 };
 
-test_export = false;
-test_import = true;
-test_streams = false;
+var test_export = false;
+var test_import = false;
+var test_streams = true;
+var test_download = false;
 
 if ( test_export ) {
 	url = baseurl + "/metadata/export";
@@ -60,13 +68,17 @@ if ( test_export ) {
 	// params = {file: 'GE APE -- BHZ\nGE APE -- BHE\n'}
 	expected = "Pack object for addStations";
 
-} else if ( test_streams) {
+} else if ( test_streams ) {
 	url = baseurl + "/metadata/streams";
 	params = {network: "GE-1993-None", station: "all",
 		start: "2010",
 		end: "2015",
 		networktype: "all"};
 	expected = Array("BH", "LH", "VH", "...", "BN");
+} else if ( test_download ) {
+	url = "downloader.php";
+	params = {x: "Exity ex ex", p: 3.14};
+        expected = "A page which should prompt for download";
 } else {
 	url = baseurl + "/metadata/networktypes";
 	params = {};
