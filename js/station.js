@@ -559,7 +559,7 @@ function StationSearchControl(htmlTagId) {
 
 	function parseChannelFile() {
 		// PLE: I have something like this function on sec24c106,
-		// if I haven't accidentially wiped it. FIXME.
+		// if I haven't accidently wiped it. FIXME.
 
 		// The following list should be loaded as 5 stations.
 		// It SAVES as 11 channels, because there are multiple
@@ -582,6 +582,21 @@ function StationSearchControl(htmlTagId) {
 				wiConsole.notice('POST to import returned ', jqXHR.status);
 			};
 		}, null, true, preset_file);
+	};
+
+	function parseLoadChannelFile() {
+		// PLE: I have something like this function on sec24c106,
+		// if I haven't accidentally wiped it. FIXME.
+		var file_contents = "GE BOAB -- BHZ\n"; // Read from client's file and JSON stringify???
+		wiConsole.notice('In parseLoadChannelFile, file = "' + file_contents + '"'); 
+		wiService.metadata.import(function(data, textStatus, jqXHR) {
+			if (jqXHR.status == 200) {
+				requestControl.appendStation(data);
+				_controlDiv.find("#sscSearch").button("option", "label", "Append");
+			} else {
+				wiConsole.notice('POST to import returned ', jqXHR.status);
+			};
+		}, null, true, file_contents);
 	};
 
 	// Main toolbar render
@@ -671,18 +686,23 @@ function StationSearchControl(htmlTagId) {
 		// Append the Main Control
 		_controlDiv.find("#sscStationCatalogDiv").append(html);
 
-		_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
+		//_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
+		//_controlDiv.find("#sscSendListButton").bind("click", parseLoadChannelFile);
+		//_controlDiv.find("#sscStationFileDiv").bind("click", parseLoadChannelFile);
 
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
 		})
 
 		html = '<div class="wi-spacer">'
-		html+= '<form name="multiform" id="multiform" action="wsgi/metadata/import" method="POST" enctype="multipart/form-data">'
+		/////html+= '<form name="multiform" id="multiform" action="wsgi/metadata/import" method="POST" enctype="multipart/form-data">'
+		html+= '<form name="station_upload_multiform" id="station_upload_multiform" action="test/uploader3.php" method="POST" enctype="multipart/form-data">'
 		html += '<input id="sscUserStation" class="wi-inline-full" type="file" name="file" value="Upload Station List" />'
 		// html += '<input id="sscSendList" class="wi-inline" type="button" value="Send List" />';
 		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
-		html += '</form>'
+		html += '</form>';
+		html += '<div id="station_upload_response" style="border: 1px Solid red; background: orange;"></div>';
+		html += '<div style="border: 1px Solid Red; background: pink;" id="sscSendListButton">GO</div>';
 		html += '</div>';
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
@@ -856,6 +876,14 @@ function StationSearchControl(htmlTagId) {
 		_controlDiv.find("#sscReset").button().bind("click", resetControl);
 		_controlDiv.find("#sscSearch").button().bind("click", query);
 		// _controlDiv.find("#sscSendList").button().bind("click", sendList);
+
+
+		$( "#station_upload_multiform" ).submit(function(event) {
+			alert("Handler for .submit() called.");
+			event.preventDefault();
+			_controlDiv.find( "#station_upload_response" ).empty().append("<p>[Answer goes here]</p>");
+		});
+
 	};
 
 	function load(htmlTagId) {
