@@ -3,6 +3,7 @@ import sys
 import unittest
 #import urllib
 import urllib2
+import urlparse
 
 sys.path.append(os.path.join('..', 'wsgi'))  # for wsgicomm
 sys.path.append(os.path.join('..', 'wsgi', 'modules'))
@@ -13,7 +14,7 @@ import wsgicomm
 
 from testHelpers import *
 
-test_verbosity = 1   # How noisy should the *unittests* be?
+test_verbosity = 0   # How noisy should the *unittests* be?
 
 
 # ----------------------------------------------------------------------
@@ -54,9 +55,11 @@ class TestMetadata2(unittest.TestCase):
 
     >>> python manage.py -p 8008
 
-    to start the stand-alone server, but this is not ideal. The setUp
-    method could do it, but then it would be started and stopped for
-    each test ==> SLOW. Perhaps it could start only if not already running.
+    to start the stand-alone server, but this is not ideal.
+    The setUp method could do it, but then it would be started and
+    stopped for each test ==> SLOW. Perhaps it could start only if not
+    already running.
+    Also needed: some reference metadata.
 
     """
 
@@ -94,17 +97,17 @@ class TestMetadata2(unittest.TestCase):
         # Expect a long JSON list.
         self.assertGreater(len(response), 10)
 
-        fd = urllib2.urlopen(self.service_url + 'metadata/stations?network=GE-1980-None')
+        fd = urllib2.urlopen(self.service_url + 'metadata/stations?network=GE-1993-None')
         response = fd.read()
         # Expect a long list of stations.
         self.assertGreater(len(response), 10)
 
-        fd = urllib2.urlopen(self.service_url + 'metadata/streams?station=GE-1980-None-IMMV')
+        fd = urllib2.urlopen(self.service_url + 'metadata/streams?station=GE-1993-None-IMMV')
         response = fd.read()
         resp = json.loads(response)
         # Expect a list like this:
-        expected = [".BH", ".HH", ".HN", ".LH", ".SH", ".VH"]
-        self.assertListEqual(resp, expected)
+        expected = [u'BH', u'HH', u'HN', u'LH', u'SH', u'VH']
+        self.assertListEqual(sorted(resp), sorted(expected))
 
 
 # ----------------------------------------------------------------------
@@ -116,24 +119,37 @@ class TestMetadataTimewindows(unittest.TestCase):
         qs = '&'.join(params)
         env = {'PATH_INFO': 'metadata/timewindows', 'QUERY_STRING': qs}
         params = cgi.parse_qs(qs)
-        response = mod.timewindows(env, params)
-        if test_verbosity:
-            print response
 
-        self.assertEqual(len(response), 2)
-        self.assertEqual(response[0], '400 Bad Request')
-        self.assertGreater(response[1].find('invalid streams'), -1)
+        # Requires Python >= 2.7?:
+        with self.assertRaises(wsgicomm.WIClientError) as cm:
+            response = mod.timewindows(env, params)
+            if test_verbosity:
+                print response
+        response = cm.exception
+        if test_verbosity:
+            print "Exception body: ", response.body
+            print "Exception mesg: ", response.message
+            print "Exception args: ", response.args
+        
+        #self.assertEqual(len(response), 2)
+        #self.assertEqual(response[0], '400 Bad Request')
+        #self.assertGreater(response[1].find('invalid streams'), -1)
+        self.assertGreater(response.body.find('missing streams'), -1)
 
     def test_timewindows1(self):
-        params = ['start=2013-04-01 00:00:00', 'end=2013-04-30 00:00:00', ]
+	"""FAILS 2014-03-04: __get_params sees a list instead of
+	its first element.
+	"""
+        params = ['start=2013-04-01T00:00:00Z', 'end=2013-04-30T00:00:00Z', ]
         ##params.append("streams=" + urllib.quote_plus(json.dumps(["GE","APE","","BHZ"])))
-        params.append("streams=" + json.dumps(["GE","APE","","BHZ"]))
+        params.append("streams=[" + json.dumps(["GE","APE","BHZ",""]).replace(" ", "") + "]")
         qs = '&'.join(params)
         env = {'PATH_INFO': 'metadata/timewindows', 'QUERY_STRING': qs}
-        params = cgi.parse_qs(qs)
+        params = urlparse.parse_qs(qs)
         response = mod.timewindows(env, params)
         if test_verbosity:
             print "QS:", qs
+            print "params:", params
             print "Response:", response
 
         self.assertGreater(count_json_obj(response), 0)
