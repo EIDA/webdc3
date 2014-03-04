@@ -10,7 +10,7 @@
 
 """Metadata module for the ArcLink web interface
 
-(c) 2013 GEOFON, GFZ Potsdam
+(c) 2013, 2014 GEOFON team, GFZ Potsdam
 
 Exports the functions needed by the Javascript running in the web-browser.
 All the functions must be called via an URL with the following format
@@ -32,10 +32,10 @@ The list of functions exported by this module is:
 - timewindows: prepares time windows for each (event, stream)
 
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any later
-version. For more information, see http://www.gnu.org/
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version. For more information, see http://www.gnu.org/
 
 """
 
@@ -256,7 +256,7 @@ class WI_Module(object):
         # If there is no data available send a 204 error.
         # There is always one line containing the headers
         if len(result) <= 1:
-            raise wsgicomm.WIContentError('No stations have been found.', 0)
+            raise wsgicomm.WIContentError('No stations were found.', 0)
 
         return json.dumps( result )
 
@@ -364,7 +364,7 @@ class WI_Module(object):
         # If there is no data available send a 204 error.
         # There is always one line containing the headers
         if len(stats) <= 1:
-            raise wsgicomm.WIContentError('No stations have been found.', 0)
+            raise wsgicomm.WIContentError('No stations were found.', 0)
 
         return json.dumps(stats)
 
@@ -405,7 +405,6 @@ class WI_Module(object):
                 self.text.next()
 
 
-
         text = ''
 
         for nscl in streams:
@@ -432,9 +431,7 @@ class WI_Module(object):
         content_type = 'text/plain'
 
         body = DownFile(text = text, filename = filename, content_type = content_type)
-
         return body
-
 
 
     def __timewindows_tw(self, streams, start_time, end_time):
@@ -624,7 +621,10 @@ class WI_Module(object):
     def timewindows(self, envir, params):
         """ <wsgi root>/metadata/query<?parameters>     ## Metadata query for preparing
                                                      ## request
-           Parameters: start={datetimestring}
+           Parameters:
+               start={datetimestring}
+               end={datetimestring}
+               streams=JSON
            Response:   JSON
 
         """
