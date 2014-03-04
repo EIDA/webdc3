@@ -1,10 +1,10 @@
 /*
  * GEOFON WebInterface
  *
+ * station.js module: set up a control module to bring channels to the request.
+ *
  * Begun by:
  *  Marcelo Bianchi, Peter Evans, Javier Quinteros, GFZ Potsdam
- *
- * station.js module: setup a control module to bring channels to the request
  *
  */
 
@@ -355,7 +355,7 @@ function StationSearchControl(htmlTagId) {
 		if ( _controlDiv === null ) return;
 
 		// 
-		// Initiallize all variables
+		// Initialize all variables
 		// 
 
 		// Network
@@ -558,8 +558,7 @@ function StationSearchControl(htmlTagId) {
 	};
 
 	function parseChannelFile() {
-		// PLE: I have something like this function on sec24c106,
-		// if I haven't accidently wiped it. FIXME.
+		// PLE: Move this function to the testing code. FIXME.
 
 		// The following list should be loaded as 5 stations.
 		// It SAVES as 11 channels, because there are multiple
@@ -585,8 +584,11 @@ function StationSearchControl(htmlTagId) {
 	};
 
 	function parseLoadChannelFile() {
-		// PLE: I have something like this function on sec24c106,
-		// if I haven't accidentally wiped it. FIXME.
+		// FIXME: Fundamental problem: there's no way to read
+		// in the contents of a local file - the whole
+		// browser/JS/AJAX concept is designed to prevent
+		// that!
+
 		var file_contents = "GE BOAB -- BHZ\n"; // Read from client's file and JSON stringify???
 		wiConsole.notice('In parseLoadChannelFile, file = "' + file_contents + '"'); 
 		wiService.metadata.import(function(data, textStatus, jqXHR) {
@@ -612,7 +614,8 @@ function StationSearchControl(htmlTagId) {
 		html += '<div id="sscStationMode" align="center">';
 		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
 		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
-		html += '<input type="radio" value="Preset" id="sscStationModePreset" name="sscStationMode" /><label for="sscStationModePreset">PRESET TEST</label>';
+		//TEST
+		// html += '<input type="radio" value="Preset" id="sscStationModePreset" name="sscStationMode" /><label for="sscStationModePreset">PRESET</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
@@ -653,7 +656,7 @@ function StationSearchControl(htmlTagId) {
 
 		$("body").find("#sscChannelLoader").dialog({
 			title: "Channel List Input Dialog",
-			autoOpen: true, // false,
+			autoOpen: false,
 			height: 450,
 			width: 550,
 			modal: true,
@@ -757,8 +760,9 @@ function StationSearchControl(htmlTagId) {
 		// html += '<input id="sscSendList" class="wi-inline" type="button" value="Send List" />';
 		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
 		html += '</form>';
-		html += '<div id="station_upload_response" style="border: 1px Solid red; background: orange;"></div>';
-		html += '<div style="border: 1px Solid Red; background: pink;" id="sscSendListButton">GO</div>';
+// TESTING ONLY:
+//TEST		html += '<div id="station_upload_response" style="border: 1px Solid red; background: orange;"></div>';
+//TEST		html += '<div style="border: 1px Solid Red; background: pink;" id="sscSendListButton">GO</div>';
 		html += '</div>';
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
@@ -943,7 +947,8 @@ function StationSearchControl(htmlTagId) {
 
 	function parseUserChannels() {
 		// After the user has supplied channel list,
-		// check it, and send on to the ??? service.
+		// check it, and send on to the /metadata/import service.
+		// That service expects N-S-L-C order.
 		// Return { status: [0 on success], header: string }
 		var result = { status: 1, message: "FAIL", header: "" };
 
@@ -963,20 +968,54 @@ function StationSearchControl(htmlTagId) {
 		};
 
 		var columns = Array();
-	        // FIXME: UNVALIDATED USER INPUT
+		var col_indices = Array(network, station, location, channel);
+		var col_tags = Array("network", "station", "location", "channel");
+	        // We may need to reorder the input / put the
+	        // columns in N-L-S-C order for the station/channel pack.
+		// Column-checking code is copied from
+		// parseUserCatalog() (in events.js)
+
+	        for (var i=0; i < nmax; i++) columns[i] = "ignore";
+		for (var i = 0 ; i < col_indices.length; i++) {
+			if (col_indices[i] === undefined) {
+				console.warn('Item ' + i + ':' + col_tags[i] + ' is undefined');
+			};
+		};
+
+		for (var i = 0 ; i < col_tags.length; i++) {
+			var index = col_indices[i]-1;
+			if (columns[index] === "ignore") {
+				columns[index] = col_tags[i];
+			} else {
+				var msg = "Error: " + columns[index] + " and " + col_tags[i] +
+					  " can't both be given in column " + (index+1) + ".";
+				alert(msg);
+				var msg2 = "parseUserCatalog: indices were " + col_indices + "; " + columns.length + " columns: '" + columns + "')";
+				console.log(msg2);
+				columns = columns.toString();
+				result = { status: 1, message: "Index problem", header: columns };
+				return result; // {status: 1; header: columns};
+			};
+		};
+
+		columns = columns.toString();  // A comma-separated string
+
+
+		console.log("parseUserChannels: columns" + columns);
+
+	        // FIXME: UNVALIDATED USER INPUT.
+		// But client-side validation only gets us so far.
+		// Network - max length, alphanumeric [A-Z0-9+-_]
+		// Station - max length
+		// Location [-0-9], just pass on '--' etc.
+		// Channel
+
 	        var input = $("#sscChannelInput").val();
 
 	        if (input === null || input === undefined || input === "") {
 			alert("Please paste your catalog inside the text area before pressing 'Send'.");
 			return result;
 		};
-
-	        // We may need to reorder the input / put the
-	        // columns in N-L-S-C order for the station/channel pack.
-
-	        for (var i=0; i < nmax; i++) columns[i] = "ignore";
-		msg = "More to do still";
-		console.log("parseUserChannels: " + msg);
 		console.log("parseUserChannels: input = " + input);
                 /*
 		 * Old code for when I though about doing this in JS.
@@ -988,7 +1027,7 @@ function StationSearchControl(htmlTagId) {
 		 */
 		wiService.metadata.import(function(data) {
 			if (typeof data == "undefined") {
-				wiConsole.alert("...import got 'undefined'.");
+				wiConsole.notice("Failed to import: ...import returned 'undefined'.");
 			} else {
 				wiConsole.info("...done importing " + (data.length-1) + " stations(s).");
 				requestControl.appendStation(data);
