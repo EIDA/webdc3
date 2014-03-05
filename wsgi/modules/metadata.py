@@ -81,7 +81,6 @@ class WI_Module(object):
         self.ic = wi.ic
         self.ttt = seiscomp3.Seismology.TravelTimeTable()
 
-
     def networktypes(self, envir, params):
         """Returns the available types of networks.
 
@@ -101,13 +100,11 @@ class WI_Module(object):
          ["permr", "Non-public permanent nets", true, true],
          ["tempr", "Non-public temporary nets", false, true]]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
         return json.dumps(self.ic.nettypes)
-
-
 
     def sensortypes(self, envir, params):
         """Returns the available sensor types.
@@ -126,12 +123,11 @@ class WI_Module(object):
          ["SM", "Strong motion"],
          ["OBS", "Ocean bottom seismometer"]]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
         return json.dumps(self.ic.senstypes)
-
 
     def phases(self, envir, params):
         """Returns the available types of phases.
@@ -144,15 +140,15 @@ class WI_Module(object):
         [["P", "P/Pdiff"],
          ["S", "S/Sdiff"]]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
         return json.dumps(self.ic.phases)
 
-
     def getNetworks(self, envir, params):
-        """Returns the available networks which pass the filter criteria in params.
+        """Returns the available networks which pass the filter criteria
+        received in params.
 
         Input: start={int}
                end={int}
@@ -163,18 +159,18 @@ class WI_Module(object):
 
         Example:
         [["all", "All Networks"],
-         ["3A-1980-None", "3A   (1980) - RESIF - SISMOB mobile antenna [RESIF]"],
-         ["AB-1980-None", "AB   (1980) - National Seismic Network of Azerbaijan [ODC]"]]
+         ["3A-1980-None", "3A (1980) - RESIF - SISMOB mobile antenna [RESIF]"],
+         ["AB-1980-None", "AB (1980) - National Network of Azerbaijan [ODC]"]]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
-        return json.dumps( self.ic.getNetworks(params) )
-
+        return json.dumps(self.ic.getNetworks(params))
 
     def getStations(self, envir, params):
-        """Returns the available stations which pass the filter criteria in params.
+        """Returns the available stations which pass the filter criteria
+        received in params.
 
         Input: start={int}
                end={int}
@@ -189,15 +185,15 @@ class WI_Module(object):
          ("AB-1980-None-GANJ", "GANJ  AB Ganja, Azerbaijan (2003)"),
          ("AB-1980-None-QZX", "QZX   AB Qazah, Azerbaijan (2010)")]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
-        return json.dumps( self.ic.getStations(params) )
-
+        return json.dumps(self.ic.getStations(params))
 
     def getStreams(self, envir, params):
-        """Returns the available streams which pass the filter criteria in params.
+        """Returns the available streams which pass the filter criteria
+        received in params.
 
         Input: start={int}
                end={int}
@@ -215,15 +211,15 @@ class WI_Module(object):
          "HH",
          "VH"]
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
-        return json.dumps( self.ic.getStreams(params) )
-
+        return json.dumps(self.ic.getStreams(params))
 
     def query(self, envir, params):
-        """Returns the stations/streams which pass the filter criteria in params.
+        """Returns the stations/streams which pass the filter criteria
+        received in params.
 
            Input: start={int}
                   end={int}
@@ -258,11 +254,10 @@ class WI_Module(object):
         if len(result) <= 1:
             raise wsgicomm.WIContentError('No stations were found.', 0)
 
-        return json.dumps( result )
-
+        return json.dumps(result)
 
     def upload_selection(self, envir, params):
-        """Returns the stations/streams which were received in the uploaded file
+        """Returns the stations/streams received in the uploaded file
 
         Input: file={file}
 
@@ -277,7 +272,8 @@ class WI_Module(object):
         # result = self.ic.getFromUpload(params)
 
         # omit empty lines and lines containing only whitespace
-        lines = [tuple(line.split()) for line in params['file'].splitlines() if line.strip()]
+        lines = [tuple(line.split()) for line in params['file'].splitlines()
+                 if line.strip()]
         # Remove duplicate lines
         nslcSet = set(lines)
 
@@ -316,12 +312,17 @@ class WI_Module(object):
                         # Check if I found the station
                         if s == sta[4]:
 
-                            # Build key to avoid duplicates due to different epochs! See GE.APE
-                            statKey = '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])
+                            # Build key to avoid duplicates due to different
+                            # epochs! See GE.APE
+                            statKey = '%s-%s-%s-%s' % (net[0], net[4],
+                                                       net[5], sta[4])
                             if statKey not in statsSet:
                                 # Query for ALL the streams in the station
-                                partial = self.ic.getQuery({'network': '%s-%s-%s' % (net[0], net[4], net[5]),
-                                                            'station': '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])})
+                                auxParams = {'network': '%s-%s-%s' %
+                                             (net[0], net[4], net[5]),
+                                             'station': '%s-%s-%s-%s' %
+                                             (net[0], net[4], net[5], sta[4])}
+                                partial = self.ic.getQuery(auxParams)
 
                                 # Filter by location and channel
                                 # Remove header
@@ -340,19 +341,25 @@ class WI_Module(object):
 
                                         # Check if this stream is among the
                                         # requested ones
-                                        if (net[0], sta[4], auxLoc, auxCh) in nslcSet:
+                                        if ((net[0], sta[4], auxLoc, auxCh)
+                                                in nslcSet):
                                             # And add it to the filtered
                                             # streams
                                             filtStr.append(locCh)
                                             # With the proper information about
                                             # restriction
-                                            filtStrRestr.append(parSta[10][chIdx])
+                                            filtStrRestr.append(
+                                                parSta[10][chIdx])
 
                                     # Replace the station in the results with a
                                     # new one with filtered streams
                                     if len(filtStr):
-                                        partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
-                                                        parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
+                                        partial[idx] = (parSta[0], parSta[1],
+                                                        parSta[2], parSta[3],
+                                                        parSta[4], parSta[5],
+                                                        parSta[6], parSta[7],
+                                                        parSta[8], filtStr,
+                                                        filtStrRestr)
                                         # Add results
                                         statsSet.add(statKey)
                                         stats.append(partial[idx])
@@ -368,30 +375,30 @@ class WI_Module(object):
 
         return json.dumps(stats)
 
-
     def download_selection(self, envir, params):
         """Downloads a file with the selected stations/streams in CSV format.
 
         Input: streams={list of stream keys in JSON format}
-               Every stream key in the list is a tuple with four components. Namely,
+               Every stream key in the list is a tuple with four components.
+               Namely,
                NETWORK_CODE, STATION_CODE, CHANNEL_CODE, LOCATION_CODE
         Output: Nothing.
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
         try:
             streams = json.loads(params.get('streams'))
         except:
-            raise wsgicomm.WIClientError, "invalid or inexistent values in parameter 'streams'"
-
-
+            msg = "Invalid or inexistent values in parameter 'streams'"
+            raise wsgicomm.WIClientError, msg
 
         class DownFile(object):
             def __init__(self, text, filename, content_type):
                 if not isinstance(text, basestring):
-                    raise wsgicomm.WIError, 'Content to download is not of a valid type (string).'
+                    msg = 'Content to download is not a valid type (string).'
+                    raise wsgicomm.WIError, msg
 
                 self.text = iter(text)
                 self.size = len(text)
@@ -404,13 +411,13 @@ class WI_Module(object):
             def next(self):
                 self.text.next()
 
-
         text = ''
 
         for nscl in streams:
             try:
                 if len(nscl) != 4:
-                    raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                    msg = "Invalid stream: " + str(nscl)
+                    raise wsgicomm.WIClientError, msg
 
                 net = str(nscl[0])
                 sta = str(nscl[1])
@@ -430,9 +437,9 @@ class WI_Module(object):
         filename = 'stationSelection.csv'
         content_type = 'text/plain'
 
-        body = DownFile(text = text, filename = filename, content_type = content_type)
+        body = DownFile(text=text, filename=filename,
+                        content_type=content_type)
         return body
-
 
     def __timewindows_tw(self, streams, start_time, end_time):
         result = []
@@ -440,7 +447,8 @@ class WI_Module(object):
         for nscl in streams:
             try:
                 if len(nscl) != 4:
-                    raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                    msg = "Invalid stream: " + str(nscl)
+                    raise wsgicomm.WIClientError, msg
 
                 net = str(nscl[0])
                 sta = str(nscl[1])
@@ -450,54 +458,61 @@ class WI_Module(object):
             except (TypeError, ValueError):
                 raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
 
-            streamInfo = self.ic.getStreamInfo(start_time, end_time, net, sta, cha, loc)
+            streamInfo = self.ic.getStreamInfo(start_time, end_time, net,
+                                               sta, cha, loc)
 
-            if streamInfo: # stream does exist in this time range
-                result.append((start_time, end_time, net, sta, cha, loc, streamInfo['size']))
+            if streamInfo:  # stream does exist in this time range
+                result.append((start_time, end_time, net, sta, cha, loc,
+                               streamInfo['size']))
 
                 if len(result) > self.max_lines:
-                    raise wsgicomm.WIClientError, "maximum request size exceeded"
+                    msg = "Maximum request size exceeded"
+                    raise wsgicomm.WIClientError, msg
 
         return result
 
-
     def __isphase(self, ttphase, phase):
 
-        # The list of phases P and S has been provided by Joachim per email on 14.08.2013
-        # The case of P and a distance larger than 120 deg must be checked outside this function
-        # as we do not have this information here.
+        # The list of phases P and S has been provided by Joachim per email
+        # on 14.08.2013
+        # The case of P and a distance larger than 120 deg must be checked
+        # outside this function as we do not have this information here.
         if phase == 'P':
             if ttphase in ('P', 'Pg', 'Pb', 'Pn', 'Pdif', 'Pdiff'):
                 return True
 
         elif phase == 'S':
-            if ( ttphase in ('S', 'Sg', 'Sb', 'Sn', 'Sdif', 'Sdiff') or ttphase.startswith('SKS') ):
+            if ((ttphase in ('S', 'Sg', 'Sb', 'Sn', 'Sdif', 'Sdiff')) or
+                    ttphase.startswith('SKS')):
                 return True
 
         else:
-            raise wsgicomm.WIClientError, 'Wrong phase received! Only "P" and "S" are implemented.'
+            msg = 'Wrong phase received! Only "P" and "S" are implemented.'
+            raise wsgicomm.WIClientError, msg
 
         return False
 
-
-    def __timewindows_ev(self, streams, events, startphase, startoffset, endphase, endoffset):
+    def __timewindows_ev(self, streams, events, startphase, startoffset,
+                         endphase, endoffset):
         """Helper function to calculate time windows related to events.
 
         Input: streams={list of stream keys}
                events={list of events} # [[lat, lon, depth, time],..]
                startphase={string}     # 'P' or 'S'
                startoffset={int}       # time in minutes to start time window.
-                                       # POSITIVE if AFTER arrival of 'startphase' at station.
+                                       # POSITIVE if AFTER arrival of
+                                       # 'startphase' at station.
                endphase={string}       # 'P' or 'S'
                endoffset={int}         # time in minutes to end time window.
-                                       # POSITIVE if AFTER arrival of 'endphase' at station.
+                                       # POSITIVE if AFTER arrival of
+                                       # 'endphase' at station.
 
-	    Output: list of start and end times per channel, AND estimated data volume,
+        Output: list of start/end times per stream, AND estimated data volume,
                 (start_time, end_time, net, sta, cha, loc, streamInfo['size'])
 
-	    NOTE 1: stream is a list of [net, sta, cha, loc] instead of nslc here!
-	    NOTE 2: There are many redundant time window computations for multiple streams at the same location
-
+        NOTE 1: stream is a list of [net, sta, cha, loc] instead of nslc here!
+        NOTE 2: There are many redundant time window computations for multiple
+        streams at the same location
         """
 
         result = []
@@ -518,7 +533,8 @@ class WI_Module(object):
             for nscl in streams:
                 try:
                     if len(nscl) != 4:
-                        raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                        msg = "Invalid stream: " + str(nscl)
+                        raise wsgicomm.WIClientError, msg
 
                     net = str(nscl[0])
                     sta = str(nscl[1])
@@ -526,12 +542,15 @@ class WI_Module(object):
                     loc = str(nscl[3])
 
                 except (TypeError, ValueError):
-                    raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                    msg = "Invalid stream: " + str(nscl)
+                    raise wsgicomm.WIClientError, msg
 
-                # we don't have actual time window yet, just use ev_time to get the coordinates
-                streamInfo = self.ic.getStreamInfo(ev_time, ev_time, net, sta, cha, loc)
+                # we don't have actual time window yet, just use ev_time to
+                # get the coordinates
+                streamInfo = self.ic.getStreamInfo(ev_time, ev_time, net, sta,
+                                                   cha, loc)
 
-                if streamInfo is None: # stream is not available
+                if streamInfo is None:  # stream is not available
                     continue
 
                 st_lat = streamInfo['latitude']
@@ -541,72 +560,101 @@ class WI_Module(object):
                 start_time = None
                 end_time = None
 
-		# Assumption here is that compute() returns phases sorted by time.
-		# Therefore breaking after the first gives the earliest phase in
-		# the set defined in __isphase().
-		# FIXME: Combine startphase and endphase logic into function+loop?
+                # Assumption here is that compute() returns phases sorted by
+                # time. Therefore breaking after the first gives the earliest
+                # phase in the set defined in __isphase().
+                # FIXME: Combine startphase and endphase logic into
+                # function+loop?
 
                 # Compute in delta the distance between event and station
                 delta = Math.delazi(ev_lat, ev_lon, st_lat, st_lon)[0]
-                # Threshold distance in degrees at which PKP arrives earlier than P and friends
-                # (see Joachim's email - 14.08.2013)
+                # Threshold distance in degrees at which PKP arrives earlier
+                # than P and friends (see Joachim's email - 14.08.2013)
                 delta_threshold = 120
 
-		try:
-                    ttlist = self.ttt.compute(ev_lat, ev_lon, ev_dep, st_lat, st_lon, st_alt)
+                try:
+                    ttlist = self.ttt.compute(ev_lat, ev_lon, ev_dep, st_lat,
+                                              st_lon, st_alt)
                 except Exception, e:
-                    logs.error("/metadata/timewindows: exception from ttt.compute(): " + str(e))
+                    msg = "/metadata/timewindows: exception from " + \
+                        "ttt.compute(): " + str(e)
+                    logs.error(msg)
                     continue
 
                 try:
                     for tt in ttlist:
                         if (startphase == 'P') and (delta >= delta_threshold):
-                            if tt.phase.startswith('PKP') or tt.phase.startswith('PKiKP'):
-                                start_time = ev_time + datetime.timedelta(seconds=tt.time+startoffset*60)
+                            if (tt.phase.startswith('PKP') or
+                                    tt.phase.startswith('PKiKP')):
+                                start_time = ev_time + \
+                                    datetime.timedelta(seconds=tt.time +
+                                                       startoffset * 60)
                                 break
 
-                        elif (startphase == 'S') or ((startphase == 'P') and (delta < delta_threshold)):
+                        elif ((startphase == 'S') or
+                              ((startphase == 'P') and
+                               (delta < delta_threshold))):
                             if self.__isphase(tt.phase, startphase):
-                                start_time = ev_time + datetime.timedelta(seconds=tt.time+startoffset*60)
+                                start_time = ev_time + datetime.timedelta(
+                                    seconds=tt.time + startoffset * 60)
                                 break
 
                         else:
-                            raise wsgicomm.WIClientError, 'Wrong startphase received! Only "P" and "S" are implemented.'
+                            msg = 'Wrong startphase received! Only "P" ' + \
+                                ' and "S" are implemented.'
+                            raise wsgicomm.WIClientError, msg
 
                     for tt in ttlist:
                         if (endphase == 'P') and (delta >= delta_threshold):
-                            if tt.phase.startswith('PKP') or tt.phase.startswith('PKiKP'):
-                                end_time = ev_time + datetime.timedelta(seconds=tt.time+endoffset*60)
+                            if (tt.phase.startswith('PKP') or
+                                    tt.phase.startswith('PKiKP')):
+                                end_time = ev_time + datetime.timedelta(
+                                    seconds=tt.time + endoffset * 60)
                                 break
 
-
-                        elif (endphase == 'S') or ((endphase == 'P') and (delta < delta_threshold)):
+                        elif ((endphase == 'S') or
+                              ((endphase == 'P') and
+                               (delta < delta_threshold))):
                             if self.__isphase(tt.phase, endphase):
-                                end_time = ev_time + datetime.timedelta(seconds=tt.time+endoffset*60)
+                                end_time = ev_time + datetime.timedelta(
+                                    seconds=tt.time + endoffset * 60)
                                 break
 
                         else:
-                            raise wsgicomm.WIClientError, 'Wrong endphase received! Only "P" and "S" are implemented.'
+                            msg = 'Wrong endphase received! Only "P" and ' + \
+                                '"S" are implemented.'
+                            raise wsgicomm.WIClientError, msg
 
                 except Exception, e:
                     logs.error("/metadata/timewindows: " + str(e))
                     continue
 
                 if start_time is None:
-                    logs.error("/metadata/timewindows: did not find startphase '%s' for %s" % (startphase, str((ev_lat, ev_lon, ev_dep, st_lat, st_lon, st_alt))))
+                    msg = "/metadata/timewindows: did not find startphase " \
+                        + "'%s' for %s" % (startphase, str((ev_lat, ev_lon,
+                                                            ev_dep, st_lat,
+                                                            st_lon, st_alt)))
+                    logs.error(msg)
 
                 if end_time is None:
-                    logs.error("/metadata/timewindows: did not find endphase '%s' for %s" % (endphase, str((ev_lat, ev_lon, ev_dep, st_lat, st_lon, st_alt))))
+                    msg = "/metadata/timewindows: did not find endphase " \
+                        + "'%s' for %s" % (endphase, str((ev_lat, ev_lon,
+                                                          ev_dep, st_lat,
+                                                          st_lon, st_alt)))
+                    logs.error(msg)
 
                 if start_time is not None and end_time is not None:
                     # retry with actual time window
-                    streamInfo = self.ic.getStreamInfo(start_time, end_time, net, sta, cha, loc)
+                    streamInfo = self.ic.getStreamInfo(start_time, end_time,
+                                                       net, sta, cha, loc)
 
                     if streamInfo:
-                        result.append((start_time, end_time, net, sta, cha, loc, streamInfo['size']))
+                        result.append((start_time, end_time, net, sta, cha,
+                                       loc, streamInfo['size']))
 
                         if len(result) > self.max_lines:
-                            raise wsgicomm.WIClientError, "maximum request size exceeded"
+                            msg = "Maximum request size exceeded"
+                            raise wsgicomm.WIClientError, msg
 
         return result
 
@@ -615,12 +663,12 @@ class WI_Module(object):
             return conv(params.get(name))
 
         except (TypeError, ValueError):
-            raise ValueError, "invalid " + name
-
+            msg = "Invalid " + name
+            raise ValueError(msg)
 
     def timewindows(self, envir, params):
-        """ <wsgi root>/metadata/query<?parameters>     ## Metadata query for preparing
-                                                     ## request
+        """ <wsgi root>/metadata/query<?parameters>
+        Metadata query for preparing request
            Parameters:
                start={datetimestring}
                end={datetimestring}
@@ -633,7 +681,8 @@ class WI_Module(object):
             raise wsgicomm.WIClientError, "missing streams"
 
         tw_params = ('start', 'end')
-        ev_params = ('events', 'startphase', 'startoffset', 'endphase', 'endoffset')
+        ev_params = ('events', 'startphase', 'startoffset', 'endphase',
+                     'endoffset')
 
         tw_params_count = reduce(lambda a, b: a + (b in tw_params), params, 0)
         ev_params_count = reduce(lambda a, b: a + (b in ev_params), params, 0)
@@ -669,7 +718,8 @@ class WI_Module(object):
             result = self.__timewindows_tw(streams, start_time, end_time)
 
         else:
-            result = self.__timewindows_ev(streams, events, startphase, startoffset, endphase, endoffset)
+            result = self.__timewindows_ev(streams, events, startphase,
+                                           startoffset, endphase, endoffset)
 
         if isinstance(result, tuple):
             return result
