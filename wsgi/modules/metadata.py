@@ -10,7 +10,7 @@
 
 """Metadata module for the ArcLink web interface
 
-(c) 2013 GEOFON, GFZ Potsdam
+(c) 2013, 2014 GEOFON team, GFZ Potsdam
 
 Exports the functions needed by the Javascript running in the web-browser.
 All the functions must be called via an URL with the following format
@@ -32,10 +32,10 @@ The list of functions exported by this module is:
 - timewindows: prepares time windows for each (event, stream)
 
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any later
-version. For more information, see http://www.gnu.org/
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version. For more information, see http://www.gnu.org/
 
 """
 
@@ -72,6 +72,7 @@ class WI_Module(object):
         wi.registerAction("/metadata/stations", self.getStations)
         wi.registerAction("/metadata/streams", self.getStreams)
         wi.registerAction("/metadata/query", self.query)
+        wi.registerAction("/metadata/import", self.upload_selection)
         wi.registerAction("/metadata/export", self.download_selection)
         wi.registerAction("/metadata/timewindows", self.timewindows)
 
@@ -255,9 +256,117 @@ class WI_Module(object):
         # If there is no data available send a 204 error.
         # There is always one line containing the headers
         if len(result) <= 1:
-            raise wsgicomm.WIContentError('No stations have been found.', 0)
+            raise wsgicomm.WIContentError('No stations were found.', 0)
 
         return json.dumps( result )
+
+
+    def upload_selection(self, envir, params):
+        """Returns the stations/streams which were received in the uploaded file
+
+        Input: file={file}
+
+        Output: list in JSON format. Every item in the list has ten columns.
+                ID, NETCODE, STATIONCODE, LATITUDE, LONGITUDE, RESTRICTED,
+                NETCLASS, ARCHIVE, NETOPERATOR, STREAMS.
+                STREAMS is a list with the available channels in a
+                two-characters format. e.g. ["BH","HH","LN"].
+
+        """
+
+        # result = self.ic.getFromUpload(params)
+
+        # omit empty lines and lines containing only whitespace
+        lines = [tuple(line.split()) for line in params['file'].splitlines() if line.strip()]
+        # Remove duplicate lines
+        nslcSet = set(lines)
+
+        # Create a set of stations to call getQuery
+        nsSet = set([(nslc[0], nslc[1]) for nslc in nslcSet])
+        # and transform it to an ordered list
+        nsList = sorted(nsSet)
+
+        # Save stations already visited to avoid duplication by different
+        # epochs
+        stats = list()
+        statsSet = set()
+
+        while len(nsList):
+            # Consumes all the stations
+            n, s = nsList.pop(0)
+
+            # To make notation shorter
+            ptNets = self.ic.networks
+            ptStats = self.ic.stations
+
+            # Cycle through networks
+            for net in ptNets:
+                # Check if I found the network
+                if n == net[0]:
+                    # A normal network has pointers to first and last child
+                    if((net[1] is not None) and (net[2] is not None)):
+                        list_of_children = range(net[1], net[2])
+                    # A virtual network has a list of children
+                    else:
+                        list_of_children = net[3]
+
+                    # Cycle through children (stations)
+                    for staIdx in list_of_children:
+                        sta = ptStats[staIdx]
+                        # Check if I found the station
+                        if s == sta[4]:
+
+                            # Build key to avoid duplicates due to different epochs! See GE.APE
+                            statKey = '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])
+                            if statKey not in statsSet:
+                                # Query for ALL the streams in the station
+                                partial = self.ic.getQuery({'network': '%s-%s-%s' % (net[0], net[4], net[5]),
+                                                            'station': '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])})
+
+                                # Filter by location and channel
+                                # Remove header
+                                partial = partial[1:]
+                                # Loop through the results
+                                for idx, parSta in enumerate(partial):
+                                    filtStr = list()
+                                    filtStrRestr = list()
+                                    # Loop through all streams (LOC.CH)
+                                    for chIdx, locCh in enumerate(parSta[9]):
+                                        auxLoc, auxCh = locCh.split('.')
+                                        # Take into account the empty location
+                                        # case
+                                        if auxLoc == '':
+                                            auxLoc = '--'
+
+                                        # Check if this stream is among the
+                                        # requested ones
+                                        if (net[0], sta[4], auxLoc, auxCh) in nslcSet:
+                                            # And add it to the filtered
+                                            # streams
+                                            filtStr.append(locCh)
+                                            # With the proper information about
+                                            # restriction
+                                            filtStrRestr.append(parSta[10][chIdx])
+
+                                    # Replace the station in the results with a
+                                    # new one with filtered streams
+                                    if len(filtStr):
+                                        partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
+                                                        parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
+                                        # Add results
+                                        statsSet.add(statKey)
+                                        stats.append(partial[idx])
+
+        # Add header
+        stats.insert(0, ('key', 'netcode', 'statcode', 'latitude', 'longitude',
+                         'restricted', 'netclass', 'archive', 'netoperator',
+                         'streams', 'streams_restricted'))
+        # If there is no data available send a 204 error.
+        # There is always one line containing the headers
+        if len(stats) <= 1:
+            raise wsgicomm.WIContentError('No stations were found.', 0)
+
+        return json.dumps(stats)
 
 
     def download_selection(self, envir, params):
@@ -308,10 +417,14 @@ class WI_Module(object):
                 cha = str(nscl[2])
                 loc = str(nscl[3])
 
+                # Take into account the empty location case
+                if loc == '':
+                    loc = '--'
+
             except (TypeError, ValueError):
                 raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
 
-            text += '%s, %s, %s, %s\n' % (net, sta, cha, loc)
+            text += '%s %s %s %s\n' % (net, sta, loc, cha)
 
         # size = len(text)
         filename = 'stationSelection.csv'
@@ -508,7 +621,10 @@ class WI_Module(object):
     def timewindows(self, envir, params):
         """ <wsgi root>/metadata/query<?parameters>     ## Metadata query for preparing
                                                      ## request
-           Parameters: start={datetimestring}
+           Parameters:
+               start={datetimestring}
+               end={datetimestring}
+               streams=JSON
            Response:   JSON
 
         """
