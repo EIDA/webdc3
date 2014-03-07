@@ -608,7 +608,9 @@ function Pack(id) {
 			alert("Your streams (N S L C) are: " + response_data);
 			console.log("Your streams (N S L C): " + response_data);
 			var count = response_data.split('\n').length;
-			wiConsole.info("requst.js: ...done [exported " + count +" stream(s)]");
+			wiConsole.info("request.js: ...done [exported " + count +" stream(s)]");
+			stuff = new Pack('adsjfhasdjkh');
+			stuff.saveStreamsControl("requestControlSaveArea", response_data);
 		},  function(jqxhr) {
 			console.log('Something wrong here? Status is ' + jqxhr.status);
 			if (jqxhr.status == 500)
@@ -618,6 +620,24 @@ function Pack(id) {
 			wiConsole.error("Failed to save stations: " + err);
 		}, true, streams_json
 					 );
+	};
+
+	this.saveStreamsControl = function(htmlTagId, data) {
+		// FIXME: Output from wiService.metadata.export
+		// seems to have no \n or \r separating each stream!!!
+		// Some sort of encoding issue??
+
+		var target = $(requestControlSaveArea);  // or quote??
+		console.log("saveStreamsControl: called with target " + htmlTagId);
+		var data_out = "";
+		var crlf = "\n";
+		var lines = data.split(' ');
+		for (var lineno in lines) {
+			data_out += lines[lineno] + crlf;
+		}
+		target.empty().append("<p>" + data + "</p><pre>" + data_out + "</pre>");
+		console.log("saveStreamsControl: leaving.");
+		return;
 	};
 
 	this.reduceEventsRows = function(rowkeys) {
@@ -1010,6 +1030,7 @@ function RequestControl(htmlTagId) {
 		var html = '';
 		html += '<div id="requestControlControls"></div>';
 		html += '<div id="requestControlTables"></div>';
+		html += '<div id="requestControlSaveArea" style="border:1px Solid red; background-color: orange; padding: 3px;"></div>';
 		_controlDiv.append(html);
 	};
 
