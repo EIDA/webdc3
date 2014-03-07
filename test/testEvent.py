@@ -1237,6 +1237,51 @@ class TestEventServiceFDSN(unittest.TestCase):
                 elif what == 'maxlon':
                     self.assertLessEqual(ev[col], lon)
 
+    def test_events_start(self):
+        """As we increase time window, number of events must not decrease"""
+
+        params = {'end': '2014-03-01',
+                  'start': '2014-02-28',
+                  'format': 'json'}
+        qs = urllib.urlencode(params)
+        response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
+        resp = json.loads(response)
+        num = len(resp)
+        self.assertGreater(num, 0)
+        for start_date in ('2014-02-27',
+                           '2014-02-26',
+                           '2014-02-25',
+                           '2014-02-21',
+                           '2014-02-14',
+                           '2014-02-01',
+                           '2014-01-15',):
+            params['start'] = start_date
+            qs = urllib.urlencode(params)
+            response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
+            resp = json.loads(response)
+            num_new = len(resp)
+            print "Start = %s; qs='%s'; num=%d" % (start_date, qs, num_new)
+            self.assertGreaterEqual(num_new, num)
+            num = num_new
+
+    def test_events_minmag(self):
+        """As we increase minmag, number of events must not increase"""
+
+        params = {'start': '2014-01-01',
+                  'format': 'json'}
+        qs = urllib.urlencode(params)
+        response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
+        resp = json.loads(response)
+        num = len(resp)
+        for mag in (4.0, 5.0, 6.0, 7.0):
+            params['minmag'] = mag
+            qs = urllib.urlencode(params)
+            response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
+            resp = json.loads(response)
+            num_new = len(resp)
+            print "Mag = %d; qs='%s'; num=%d" % (mag, qs, num_new)
+            self.assertLessEqual(num_new, num)
+            num = num_new
 
 # ----------------------------------------------------------------------
 
