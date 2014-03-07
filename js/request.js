@@ -610,7 +610,7 @@ function Pack(id) {
 			var count = response_data.split('\n').length;
 			wiConsole.info("request.js: ...done [exported " + count +" stream(s)]");
 			stuff = new Pack('adsjfhasdjkh');
-			stuff.saveStreamsControl("requestControlSaveArea", response_data);
+			stuff.saveStreamsControl("#requestControlSaveArea", response_data);
 		},  function(jqxhr) {
 			console.log('Something wrong here? Status is ' + jqxhr.status);
 			if (jqxhr.status == 500)
@@ -1032,6 +1032,24 @@ function RequestControl(htmlTagId) {
 		html += '<div id="requestControlTables"></div>';
 		html += '<div id="requestControlSaveArea" style="border:1px Solid red; background-color: orange; padding: 3px;"></div>';
 		_controlDiv.append(html);
+
+		$("body").find("#requestControlSaveArea").dialog({
+			title: "Save Channels Data",
+			autoOpen: true, // Set to false once it works
+			height: 450,
+			width: 550,
+			modal: false,  // Should be ?? true,
+			buttons: {
+				Close: function() {
+					$( this ).dialog("close");
+				}
+			}
+		});
+
+		// FIXME: What happens when there are multiple packs?
+		_controlDiv.find("#theone-save-stations").button().bind('click', function () {
+			$("#requestControlSaveArea").dialog('open');
+		});
 	};
 
 	function load(htmlTagId) {
