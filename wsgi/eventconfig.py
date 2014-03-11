@@ -5,7 +5,7 @@
 conf = {}
 conf['catalogs'] = dict()
 ## not used: conf['catalogs']['ids'] = ('geofon', 'comcat', 'emsc', 'meteor')
-conf['catalogs']['ids'] = ('geofon', 'comcat', 'emsc', 'parser', 'meteor')
+conf['catalogs']['ids'] = ('geofon', 'comcat', 'emsc', 'parser', 'meteor','ingv')
 conf['catalogs']['preferred'] = 'geofon'
 conf['defaultLimit'] = 480
 
@@ -27,9 +27,15 @@ conf['service']['emsc'] = {
         'baseURL': 'http://www.emsc-csem.org/Earthquake/',
         'extraParams': 'filter=yes&export=csv',
         }
+conf['service']['ingv'] = {
+        'description': 'INGV',
+        'baseURL': 'http://webservices.rm.ingv.it/fdsnws/event/1/query',
+        'extraParams': 'format=text&user=webinterface',
+    }
 conf['service']['meteor'] = {
         'description': None,
 	}
+
 conf['service']['parser'] = {
 	# Service needs to be created, but not displayed.
 	'description': None,
