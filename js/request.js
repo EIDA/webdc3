@@ -569,6 +569,7 @@ function Pack(id) {
 		// selection and filtering.
 		// For doof historical reasons, we transmit to the back end
 		// as ["N", "S", "C", "L"].  FIXME.
+		// Display this in a popup, and let the user try to download.
 
 		wiConsole.info("Building the list of selected streams...");
 		console.log("In saveStation, _station_list.length = " + _station_list.length);
@@ -603,9 +604,13 @@ function Pack(id) {
 			};
 		}
 		var streams_json = JSON.stringify(streams);
+
+		// ISSUE: What happens when there are multiple packs?
+		// There's only one requestControlSaveArea.
+		$("#requestControlSaveArea").dialog('open');
+
 		console.log(streams_json);
 		wiService.metadata.export(function(response_data) {
-			alert("Your streams (N S L C) are: " + response_data);
 			console.log("Your streams (N S L C): " + response_data);
 			var count = response_data.split('\n').length;
 			wiConsole.info("request.js: ...done [exported " + count +" stream(s)]");
@@ -1030,26 +1035,26 @@ function RequestControl(htmlTagId) {
 		var html = '';
 		html += '<div id="requestControlControls"></div>';
 		html += '<div id="requestControlTables"></div>';
-		html += '<div id="requestControlSaveArea" style="border:1px Solid red; background-color: orange; padding: 3px;"></div>';
+		html += '<div id="requestControlSaveArea" style="padding: 3px;">[Streams selected for saving appear here]</div>';
 		_controlDiv.append(html);
 
 		$("body").find("#requestControlSaveArea").dialog({
 			title: "Save Channels Data",
-			autoOpen: true, // Set to false once it works
+			autoOpen: false,
 			height: 450,
 			width: 550,
-			modal: false,  // Should be ?? true,
+			modal: true,
 			buttons: {
+				Download: function() {
+					// FIXME: Not available yet.
+					alert("Sorry, not implemented yet.");
+				}
 				Close: function() {
 					$( this ).dialog("close");
 				}
 			}
 		});
 
-		// FIXME: What happens when there are multiple packs?
-		_controlDiv.find("#theone-save-stations").button().bind('click', function () {
-			$("#requestControlSaveArea").dialog('open');
-		});
 	};
 
 	function load(htmlTagId) {
