@@ -370,7 +370,7 @@ class WI_Module(object):
 
 
     def download_selection(self, envir, params):
-        """Downloads a file with the selected stations/streams in CSV format.
+        """Produce a text/plain file with the selected stations/streams in CSV format.
 
         Input: streams={list of stream keys in JSON format}
                Every stream key in the list is a tuple with four components. Namely,
@@ -395,7 +395,7 @@ class WI_Module(object):
 
                 self.text = iter(text)
                 self.size = len(text)
-                self.content_type = 'text/plain'
+                self.content_type = content_type
                 self.filename = filename
 
             def __iter__(self):
@@ -428,7 +428,7 @@ class WI_Module(object):
 
         # size = len(text)
         filename = 'stationSelection.csv'
-        content_type = 'text/plain'
+        content_type = 'text/plain' ## + "; charset=us-ascii'  # try charset
 
         body = DownFile(text = text, filename = filename, content_type = content_type)
         return body
