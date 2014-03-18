@@ -32,3 +32,7 @@ assert( len(sb.intersection(sr) == 0 )
 
 EOF
 
+
+wget -S "http://localhost/webinterface/wsgi/metadata/export?streams=[[%22GE%22,%22UGM%22,%22BHZ%22,%22%22],[%22GE%22,%22APE%22,%22BHE%22,%22%22]]" -o foo.wget -O foo.dat
+od -a foo.dat
+
