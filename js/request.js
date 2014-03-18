@@ -572,7 +572,7 @@ function Pack(id) {
 		// Display this in a popup, and let the user try to download.
 
 		wiConsole.info("Building the list of selected streams...");
-		console.log("In saveStation, _station_list.length = " + _station_list.length);
+		//console.log("In saveStation, _station_list.length = " + _station_list.length);
 		var streams = Array();
 		var neti = _station_format.names.indexOf("netcode");
 		var stai = _station_format.names.indexOf("statcode");
@@ -609,12 +609,11 @@ function Pack(id) {
 		// There's only one requestControlSaveArea.
 		$("#requestControlSaveArea").dialog('open');
 
-		console.log(streams_json);
 		wiService.metadata.export(function(response_data) {
-			console.log("Your streams (N S L C): " + response_data);
+			//console.log("Your streams (N S L C):\n" + response_data);
 			var count = response_data.split('\n').length;
-			wiConsole.info("request.js: ...done [exported " + count +" stream(s)]");
-			stuff = new Pack('adsjfhasdjkh');
+			wiConsole.info("request.js: ...exported " + count +" stream(s)");
+			stuff = new Pack('zuul');
 			stuff.saveStreamsControl("#requestControlSaveArea", response_data);
 		},  function(jqxhr) {
 			console.log('Something wrong here? Status is ' + jqxhr.status);
@@ -628,20 +627,25 @@ function Pack(id) {
 	};
 
 	this.saveStreamsControl = function(htmlTagId, data) {
-		// FIXME: Output from wiService.metadata.export
-		// seems to have no \n or \r separating each stream!!!
-		// Some sort of encoding issue??
+		// Inputs:
+		//  - htmlTagId: id of a DOM element to fill
+		//  - data: Output from wiService.metadata.export()
+		// ISSUE (FIXED?) output seemed to have no \n separating
+		// each stream!!!
+		// Was that an encoding issue? Or related to the
+		// attempt at a download method with the
+		// Content-Disposition header?? Or just old Python???
 
-		var target = $(requestControlSaveArea);  // or quote??
-		console.log("saveStreamsControl: called with target " + htmlTagId);
+		var target = $(htmlTagId);
+		//console.log("saveStreamsControl: called with target " + htmlTagId);
 		var data_out = "";
 		var crlf = "\n";
-		var lines = data.split(' ');
+		var lines = data.split('\n');
+		var num_lines = lines.length - 1;
 		for (var lineno in lines) {
 			data_out += lines[lineno] + crlf;
 		}
-		target.empty().append("<p>" + data + "</p><pre>" + data_out + "</pre>");
-		console.log("saveStreamsControl: leaving.");
+		target.empty().append("<p>Your " + num_lines + " streams (Net Sta Loc Cha):</p>" + "<pre>" + data_out + "</pre>");
 		return;
 	};
 
@@ -1048,7 +1052,7 @@ function RequestControl(htmlTagId) {
 				Download: function() {
 					// FIXME: Not available yet.
 					alert("Sorry, not implemented yet.");
-				}
+				},
 				Close: function() {
 					$( this ).dialog("close");
 				}

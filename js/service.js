@@ -221,9 +221,7 @@ window.wiService = new function() {
 
 			// NOTE that this calls $.post() directly,
 			// so we can explicitly supply dataType = 'text'.
-			// Also the 'fail' argument is unused for now.
-			// (The 'done' function just writes the result to an alert box for now.)
-
+			// The 'fail' argument is unused for now.
 			var param = {streams: streams};
 			bc = false;
 			var url = configurationProxy.serviceRoot() + 'metadata/export';
@@ -232,6 +230,12 @@ window.wiService = new function() {
 		        //console.log(streams);
 			//return post(done, fail, bc, url, failMsg, streams, param);
 			return $.post(url, param, done, "text");
+//			var posting = $.post(url, param, done, "text");
+//			posting.done(function( data ) {
+//				//alert(data.replace(/[ENZ]/g, "_"));
+//				alert(data.replace(/[\n]/g, "{crlf}"));
+//			});
+//			return posting;
 		},
 
 		import: function(done, fail, bc, file) {
