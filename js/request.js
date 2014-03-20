@@ -606,24 +606,11 @@ function Pack(id) {
 		var streams_json = JSON.stringify(streams);
 
 		// ISSUE: What happens when there are multiple packs?
-		// There's only one requestControlSaveArea.
-		$("#requestControlSaveArea").dialog('open');
-
-		wiService.metadata.export(function(response_data) {
-			//console.log("Your streams (N S L C):\n" + response_data);
-			var count = response_data.split('\n').length;
-			wiConsole.info("request.js: ...exported " + count +" stream(s)");
-			stuff = new Pack('zuul');
-			stuff.saveStreamsControl("#requestControlSaveArea", response_data);
-		},  function(jqxhr) {
-			console.log('Something wrong here? Status is ' + jqxhr.status);
-			if (jqxhr.status == 500)
-				var err = jqxhr.statusText;
-			else
-				var err = jqxhr.responseText;
-			wiConsole.error("Failed to save stations: " + err);
-		}, true, streams_json
-					 );
+		// There's only one exportForm.
+		var downloadForm = document.getElementById('exportForm');
+		downloadForm.elements[0].value = streams_json;
+		downloadForm.submit();
+		wiConsole.info(" ...exported stream(s)");
 	};
 
 	this.saveStreamsControl = function(htmlTagId, data) {
@@ -1225,12 +1212,18 @@ function RequestControl(htmlTagId) {
 		 */
 		// This should be the package id
 		if (_controlDiv.find("#" + id).length === 0) {
+			var exportURL = configurationProxy.serviceRoot() + 'metadata/export';
 			html += '<div class="wi-request-pack-div" id="' + id + '">';
 
 			html += '<input style="float: right;" id="' + id + '-delete-events" type="button" value="Delete Events" />';
 			html += '<input style="float: right;" id="' + id + '-save-stations" type="button" value="Save Stations" />';
 			html += '<input style="float: right;" id="' + id + '-delete-stations" type="button" value="Delete Stations" />';
 			html += '<input style="float: right;" id="' + id + '-freeze" type="button" value="Freeze" />';
+			html += '<form id="exportForm" name="exportForm" action="' + exportURL + '" target="exportIframe" method="post" enctype="multipart/form-data">';
+			html += '<input type="text" name="streams" value="" style="display: none;" />';
+			html += '</form>';
+			html += '<iframe name="exportIframe" src="#" style="display: none;" ></iframe>';
+
 			html += '<div style="float: left;"><h2>Request: </h2></div>';
 			html += '<br class="wi-clear"/>';
 
