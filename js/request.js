@@ -607,9 +607,8 @@ function Pack(id) {
 
 		// ISSUE: What happens when there are multiple packs?
 		// There's only one exportForm.
-		var downloadForm = document.getElementById('exportForm');
-		downloadForm.elements[0].value = streams_json;
-		downloadForm.submit();
+		$('form[name="exportForm"]').find('input[name="streams"]')[0].value = streams_json;
+		$('form[name="exportForm"]').submit();
 		wiConsole.info(" ...exported stream(s)");
 	};
 
