@@ -166,7 +166,7 @@ Service version:
         cn = config['names']
         options['lookupIfEmpty'] = cn.get('lookupIfEmpty', True)
         options['lookupIfGiven'] = cn.get('lookupIfGiven', False)
-        options['defaultLimit'] = config.get('defaultLimit', 500)
+        options['defaultLimit'] = config.get('defaultLimit', 800)
         logs.info("Options:")
         for k in sorted(options):
             logs.info('%24s: %s' % (k, str(options[k])))
@@ -637,7 +637,7 @@ class EventWriter(object):
 
     # Required for header info for both CSV and JSON formats:
     # NOTE the names here must match what is expected by the webinterface JavaScript.
-    output_header = ('datetime', 'magnitude', 'latitude', 'longitude', 'depth', 'key', 'region')
+    output_header = ('datetime', 'magnitude', 'magtype', 'latitude', 'longitude', 'depth', 'key', 'region')
 
     def __init__(self, data):
         #print "EventWriter::init (generic) says hello world!"
@@ -868,7 +868,6 @@ class Helpers(object):
         return new_row
 
     def filtercols(self, row, filters):
-        
         """Apply a different function to each element of row.
 
         Inputs:
@@ -884,8 +883,7 @@ class Helpers(object):
         assert len(row) == len(filters) 
         new_row = []
         for j in range(len(row)):
-            #DEBUG 
-            print >>sys.stderr, j, filters[j], "applied to", row[j]
+            #DEBUG print >>sys.stderr, j, filters[j], "applied to", row[j]
             if filters[j]:
                 try:
                     fun = filters[j]
@@ -906,6 +904,9 @@ class EventResponse(object):
         self.input_mapping = mapping
         self.filters = filters
         self.rows = None
+        self.cols = {'otm': 0, 'mag': 1, 'mtyp': 2,
+                     'lat': 3, 'lon': 4, 'dep': 5,
+                     'id': 6, 'region': 7}
         self.ed = EventData() #####
 
         self.lookupIfEmpty = options['lookupIfEmpty']
@@ -982,8 +983,8 @@ class EventResponse(object):
 
         if verbosity > 3:
             logs.error("Header (%i cols): %s" % (len(header_cols), str(header_cols)))
-            #logs.error("Mapping: %s" % (str(mapping)))
-            #logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, mapping)))
+            logs.error("Mapping: %s" % (str(mapping)))
+            logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, mapping)))
         new_header = helper.mapcols(header_cols, self.input_mapping)
         #s += "|".join(new_header) + "\n"
 
@@ -1008,8 +1009,8 @@ class EventResponse(object):
         return
 
     def _lookup_region(self, ev):
-        lat = ev[2]
-        lon = ev[3]
+        lat = ev[self.cols['lat']]
+        lon = ev[self.cols['lon']]
 
          # FIXME: Why are lat/lon not already floats?
         try:
@@ -1017,7 +1018,6 @@ class EventResponse(object):
             flon = float(lon)
         except ValueError:
             logs.warning("In _lookup_region: lat=%s lon=%s are not convertable to float" % (str(lat), str(lon)))
-            
         return Seismology.Regions().getRegionName(flat, flon)
 
 
@@ -1031,8 +1031,9 @@ class EventResponse(object):
         they aren't wanted.
 
         """
+        col = self.cols['region']
         if self.lookupIfEmpty or self.lookupIfGiven:
-            old = ev[6].strip()
+            old = ev[col].strip()
             new = old
             if old == "" or old == "-" or old == "--":
                 if self.lookupIfEmpty:
@@ -1042,7 +1043,7 @@ class EventResponse(object):
                     new = self._lookup_region(ev)
             if new != old:
                 #logs.debug("(%s -> %s)" % (old, new))
-                ev[6] = new
+                ev[col] = new
 
     def fill_keys(self, prefix = "row", keyIfGiven = False):
         """Use this function to assign event IDs.
@@ -1058,10 +1059,11 @@ class EventResponse(object):
             return
 
         seq_fmt = "%%0%1ii" % (int(math.log10(num_rows))+1)
+        col = self.cols['id']
         for row in range(num_rows):
             ev = self.ed.data[row]
-            if len(ev[5]) == 0 or ((len(ev[5]) > 0) and keyIfGiven):
-                ev[5] = prefix + seq_fmt % (row)
+            if len(ev[col]) == 0 or ((len(ev[col]) > 0) and keyIfGiven):
+                ev[col] = prefix + seq_fmt % (row)
 
     def fill_regions(self):
         """Use this function to re-assign region names."""
@@ -1134,8 +1136,8 @@ class EventService(object):
     >> return esMine.handler(environ, start_response)
 
     """
-    column_map = (4, 2, 5, 6, 7, 0, 1)
-    filter_table = (date_T, floatordash, float, float, floatordash, None, None)
+    column_map = (5, 2, 3, 6, 7, 8, 0, 1)
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
     csv_dialect = csv.excel
 
     # The basic structure of this template for errors (and the
@@ -1249,6 +1251,7 @@ Service version:
         pairs.append(self.extra_params)
         url = self.service_url + '?' + '&'.join(pairs)
         logs.info("Service '%s' fetching URL: %s" % (self.id, url))
+        print >>sys.stderr, "Service '%s' fetching URL: %s" % (self.id, url)
 
         dryrun = False  # Not implemented yet.
         if dryrun:
@@ -1259,7 +1262,7 @@ Service version:
                 rows = response.read()
             except urllib2.URLError as e:
                 logs.error("Errors fetching from URL: %s" % (url))
-                logs.error(e)
+                logs.error(str(e))
                 raise ##urllib2.URLError(e)
                 #return self.error_page(environ, start_response,
                 #                       '503 Temporarily Unavailable',
@@ -1596,10 +1599,10 @@ class ESFile(EventService):
         (2, None, 0, 1, 4, None, None)
 
         """
-        cols = 7*[None]
-        d = {'latitude': 2,
-             'longitude': 3,
-             'depth': 4,
+        cols = 8*[None]
+        d = {'latitude': 3,
+             'longitude': 4,
+             'depth': 5,
              'time': 0 }
         for k, v in d.items():
             try:
@@ -1756,7 +1759,7 @@ class ESEMSC(EventService):
     class my_dialect(csv.excel):
         delimiter = ';'
     csv_dialect = my_dialect
-    column_map = (0, 6, 1, 2, 3, 9, 7)  # column numbers are *after* merging cols 0 and 1
+    column_map = (0, 6, 5, 1, 2, 3, 9, 7)  # column numbers are *after* merging cols 0 and 1
 
     def handler(self, environ, parameters):
         """The EMSC event service, retrieved from CSV.
@@ -1946,8 +1949,8 @@ class ESComcat(EventService):
     """
     csv_dialect = csv.excel
 
-    column_map = (0, 4, 1, 2, 3, 11, None)  # Note: comcat gives no region.
-    filter_table = (date_T, floatordash, float, float, floatordash, None, None)
+    column_map = (0, 4, 5, 1, 2, 3, 11, None)  # Note: comcat gives no region.
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
 
     def handler(self, environ, parameters):
         """The Comcat service from USGS (Replacement for NEIC?)
@@ -1969,6 +1972,7 @@ class ESComcat(EventService):
         paramMap['maxlat'] = 'maxEventLatitude'
         paramMap['minlon'] = 'minEventLongitude'
         paramMap['maxlon'] = 'maxEventLongitude'
+        paramMap['limit'] = 'limit'
 
         pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
 
@@ -2117,8 +2121,10 @@ def geofon_prevday(name, parameters):
 class ESGeofon(EventService):
     class geofon_dialect(csv.excel):
         delimiter = ';'
+    #column_map = (5, 2, 3, 6, 7, 8, 0, 1)    # if we provide mag type in column 3
+    column_map = (4, 2, None, 5, 6, 7, 0, 1)  # if not
     csv_dialect = geofon_dialect
-    filter_table = (date_T, floatordash, float, float, floatordash, None, None)
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
 
     def _area_circle_check(self, environ, d):
         """Plausibility check of circle arguments.
@@ -2184,10 +2190,11 @@ class ESGeofon(EventService):
         p_lat = circle_params['lat']
         p_lon = circle_params['lon']
 
+        col = {'lat': 3, 'lon': 4}
         er_new = EventResponse(funny_dialect, self.column_map, self.filter_table, self.options)
         for ev in er.ed.data:
-            lat = ev[2]
-            lon = ev[3]
+            lat = ev[col['lat']]
+            lon = ev[col['lon']]
             d = Math.delazi(p_lat, p_lon, lat, lon)[0]
             # Offline?
             #d = Math().delazi(p_lat, p_lon, lat, lon)
@@ -2374,8 +2381,6 @@ class ESGeofon(EventService):
 
         return self.send_response(environ, start_response, header, allrows, limit, fmt)
 
-
-
    
 # ------------------------------------------------------INGV ES ----------------------------------------- #
 
@@ -2390,16 +2395,19 @@ class ESINGV(EventService):
    
     
     #               
-    #   column_map -> field meaning & position : 'datetime'-0, 'magnitude'-1, 'latitude'-2, 'longitude'-3, 'depth'-4, 'key'-5, 'region'-6
+    #   column_map -> field meaning & position :
+    #    'datetime'-0, 'magnitude'-1,
+    #    'magtype' - 2
+    #    'latitude'-3, 'longitude'-4, 'depth'-5, 'key'-6, 'region'-7
     #
     
-    column_map = (0, 1, 2, 3, 4, 5, 6)  
+    column_map = (0, 1, 2, 3, 4, 5, 6, 7)
     
     #
     #    filter_table 
     #
     
-    filter_table = (date_T, floatordash, float, float, floatordash, None, None) 
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None) 
    
     
 
@@ -2409,7 +2417,8 @@ class ESINGV(EventService):
         self.id = name
         self.service_url = service_url
         self.extra_params = extra_params
-        
+        self.defaultLimit = options['defaultLimit']
+      
       
     def handler(self, environ, parameters):
         
@@ -2428,12 +2437,23 @@ class ESINGV(EventService):
         paramMap['maxdepth'] = 'maxdepth'        
         paramMap['minmag'] = 'minmag'
         paramMap['maxmag'] = 'maxmag'
+        paramMap['limit'] = 'limit'
                 
         header = '' 
        
     	pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
         
+        limit = hold_dict.get('limit', self.defaultLimit)
+        try:
+            limit = int(limit) + 1
+        except ValueError:
+            self.raise_client_400("Parameter 'limit' must be an integer")
         
+        for k in range(len(pairs)):
+            if pairs[k].startswith('limit'):
+                del pairs[k]
+        pairs.append("limit=%s" % (limit))
+    
         # send a request
         try:
             allrows, url = self.send_request(pairs)
@@ -2464,16 +2484,14 @@ class ESINGV(EventService):
                             
                 this_row = item.split("|")                
                 mytime = this_row[1].split(".")
-                my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 2 | 3 | 4 | 0 | 12
-               
+                my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[9]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
+   
         fmt = str(parameters.get('format', ['text'])[0])
              
-        return self.send_response(environ, start_response, header, my_row_for_send, 100, fmt)
+        return self.send_response(environ, start_response, header, my_row_for_send, limit, fmt)
      
 
     #### ------------------------------------------------------ ###
-
-
 
 
 def bodyBadRequest(environ, msg):

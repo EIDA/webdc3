@@ -1044,9 +1044,14 @@ class TestEventServiceFDSN(unittest.TestCase):
     """
     Tests of the fdsn-event handler, using the INGV implementation.
     """
-    service_base_url = "http://eida.rm.ingv.it/webinterface/wsgi"
+    #service_base_url = "http://eida.rm.ingv.it/webinterface/wsgi"
+    service_base_url = "http://localhost:8008"  #  -- for manage.py
     catalog_url = service_base_url + "/event/catalogs"
     fdsn_url = service_base_url + "/event/ingv"
+
+    # Header contents must match what JavaScript (request.js) expects,
+    # as defined in its _event_format structure.
+    expected_header = ("datetime", "magnitude", "magtype", "latitude", "longitude", "depth", "key", "region")
 
     def test_catalog(self):
         try:
@@ -1063,8 +1068,11 @@ class TestEventServiceFDSN(unittest.TestCase):
         self.assertTrue(resp.has_key('ingv'))
 
     def test_events_no_qs(self):
-        """Empty query string, should get SOMETHING."""
-        url = self.service_base_url + "/event/ingv"
+        """Empty query string, should get SOMETHING.
+
+        Probably defaultLimit events, as CSV or text.
+        """
+        url = self.fdsn_url
         try:
             fd = urllib2.urlopen(url)
         except urllib2.HTTPError as err:
@@ -1073,11 +1081,7 @@ class TestEventServiceFDSN(unittest.TestCase):
                 self.fail()
                 return
         response = fd.read()
-
-        # Probably CSV, 15 events? Or today's events?
-        # Looks like: time, mag, lat, lon, depth, event ID?, region
         self.assertGreater(len(response), 5)
-        print response
 
     def test_events_json(self):
         """Some unrestricted JSON output"""
@@ -1092,20 +1096,21 @@ class TestEventServiceFDSN(unittest.TestCase):
 
         response = fd.read()
         resp = json.loads(response)
-        print resp
         self.assertGreater(len(resp), 3)
 
         # Header contents must match what JavaScript (request.js) expects,
         # defined in its _event_format structure.
         header = resp[0]
-        self.assertEqual(len(header), 7)
+        self.assertEqual(len(header), len(self.expected_header))
         self.assertEqual(header[0], 'datetime')
         self.assertEqual(header[1], 'magnitude')
-        # magtype??
+        for k in range(0, len(self.expected_header)):
+            self.assertEqual(header[k], self.expected_header[k])
 
     def test_events_limit(self):
         """Specify only a few events; CSV output"""
-        params = {'limit': 3}
+        num = 3
+        params = {'limit': num, 'format': 'csv'}
 
         qs = urllib.urlencode(params)
         try:
@@ -1115,14 +1120,14 @@ class TestEventServiceFDSN(unittest.TestCase):
             self.fail()
 
         response = fd.read()
-        self.assertEqual(len(response.split("\n")), 3)  # CSV Service provides no header.
+        self.assertEqual(len(response.split("\n")), num+3)
 
     def test_events_limit_json(self):
         """Specify only a few events; JSON output.
-        FAILS, 2014-03-07
         """
+        num = 3
         params = {'format': 'json',
-                  'limit': 3}
+                  'limit': num}
 
         qs = urllib.urlencode(params)
         try:
@@ -1134,7 +1139,7 @@ class TestEventServiceFDSN(unittest.TestCase):
         response = fd.read()
         resp = json.loads(response)
         #print resp
-        self.assertEqual(len(resp), 4) 
+        self.assertEqual(len(resp), num+1) # Extra row for the JSON header.
 
 
     def test_events_mindepth1(self):
@@ -1149,8 +1154,8 @@ class TestEventServiceFDSN(unittest.TestCase):
             self.fail()
 
         response = fd.read()
-        print "\n", response
-        self.assertGreater(len(response.split("\n")), 0)
+        #print "Response:\n", response
+        self.assertGreater(len(response.split("\n")), 2)
 
     def test_events_maxdepth1(self):
         """Specify only shallow events; CSV output"""
@@ -1165,8 +1170,8 @@ class TestEventServiceFDSN(unittest.TestCase):
             self.fail()
 
         response = fd.read()
-        print "\n", response
-        self.assertGreater(len(response.split("\n")), 0)
+        #print "Response:\n", response
+        self.assertGreater(len(response.split("\n")), 2)
 
     def test_events_mindepthj(self):
         """Specify only deep events; JSON output"""
@@ -1176,30 +1181,32 @@ class TestEventServiceFDSN(unittest.TestCase):
 
         qs = urllib.urlencode(params)
         response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-        print ; print response
+        #print "Response:\n", response
         resp = json.loads(response)
-        self.assertEqual(resp[0][4], 'depth')
+        col = self.expected_header.index('depth')
+        self.assertEqual(resp[0][col], 'depth')
         for ev in resp[1:]:
-            self.assertGreaterEqual(ev[4], z)
+            self.assertGreaterEqual(ev[col], z)
 
     def test_events_maxdepthj(self):
         """Specify only shallow events; JSON output"""
         z = 50
         params = {'format': 'json',
                   'maxdepth': z}
+        col = self.expected_header.index('depth')
 
         qs = urllib.urlencode(params)
         response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-        print ; print response
+        #print "Response:\n", response
         resp = json.loads(response)
-        self.assertEqual(resp[0][4], 'depth')
+        self.assertEqual(resp[0][col], 'depth')
         for ev in resp[1:]:
-            self.assertLessEqual(ev[4], z)
+            self.assertLessEqual(ev[col], z)
 
     def test_events_minmaxlat(self):
-        """Specify only northly/southly events; JSON output"""
+        """Specify only northerly/southerly events; JSON output"""
         lat = 42.0
-        col = 2     # JSON output column for latitude
+        col = self.expected_header.index('latitude')     # JSON output column for latitude
 
         for what in ('minlat', 'maxlat'):
             params = {'format': 'json'}
@@ -1208,7 +1215,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             qs = urllib.urlencode(params)
             print "qs:", qs
             response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-            print ; print response
+            #print "Response:\n", response
             resp = json.loads(response)
             self.assertEqual(resp[0][col], 'latitude')
             for ev in resp[1:]:
@@ -1220,7 +1227,7 @@ class TestEventServiceFDSN(unittest.TestCase):
     def test_events_minmaxlong(self):
         """Specify only easterly/westerly events; JSON output"""
         lon = 11.0
-        col = 3     # JSON output column for longitude
+        col =  self.expected_header.index('longitude')     # JSON output column for longitude
 
         for what in ('minlon', 'maxlon'):
             params = {'format': 'json'}
@@ -1229,7 +1236,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             qs = urllib.urlencode(params)
             print "qs:", qs
             response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-            print ; print response
+            #print "Response:\n", response
             resp = json.loads(response)
             self.assertEqual(resp[0][col], 'longitude')
             for ev in resp[1:]:
