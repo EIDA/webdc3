@@ -626,56 +626,6 @@ function StationSearchControl(htmlTagId) {
 
 		_controlDiv.append(html);
 
-		html = '<div class="wi-spacer"><input id="sscUserCatalog" class="wi-inline-full" type="button" value="Upload Catalog" /></div>';
-		_controlDiv.find("#sscStationFileDiv").append(html);  // RENAME: sscStationFile -> sscChannelFile
-
-
-		//
-		// Channel Selection Mode
-		//
-
-		/*
-		 * Text area for customized channel list upload
-		 */
-		html = '<div id="sscChannelLoader">';
-		html += '<p style="margin: 5px 0 5px 0; font-size: 0.85em;">Use this control to upload your personal channel list to be processed by our system. The catalog should be in CSV (comma-separated value) format. You may use a single blank space as a separator. It may contain as many channels as you want, one per line, with the same number of columns. You must also indicate which columns contain the Network, Station, Location and Channel for the channel. All other columns will be ignored.</p>';
-		html += '<p><i>Example:</i> <tt>GE APE -- BHZ</tt></p>';
-		html += '<br/><h3>Column Number Specification:</h3>';
-		html += '<div>';
-		html += 'Network: <input  class="wi-inline-small" id="sscColumnNetwork"  value="1"/>';
-		html += 'Station: <input  class="wi-inline-small" id="sscColumnStation"  value="2"/>';
-		html += 'Location: <input class="wi-inline-small" id="sscColumnLocation" value="3"/>';
-		html += 'Channel: <input  class="wi-inline-small" id="sscColumnChannel"  value="4"/>';
-		html += '</div>';
-
-		html += '<br/><h3>Copy and paste your list into the area below:</h3>';
-		html += '<div id="sscChannelHeader">[No format specified. Press "Send" first.]</div><br>';
-		html += '<div style="margin: 5px 0 10px 0;"><textarea style="width: 100%; height: 4em;" id="sscChannelInput">GE APE -- BHZ</textarea></div>';
-		html += '</div>';
-		$("body").append(html);
-
-		$("body").find("#sscChannelLoader").dialog({
-			title: "Channel List Input Dialog",
-			autoOpen: false,
-			height: 450,
-			width: 550,
-			modal: true,
-			buttons: {
-				Send: function() {
-				    alert("Thank you, your upload is being checked.");
-				    result = parseUserChannels();
-				    console.log("parseUserChannels: " + result.message);
-				    if (result.header !== undefined) {
-					text = "Format: " + result.header;
-					$("body").find("#sscChannelHeader").empty().append(text);
-				    };
-				},
-				Close: function() {
-					$( this ).dialog( "close" );
-				}
-			}
-		});
-
 		// Catalog
 		_controlDiv.find("#sscUserCatalog").button().bind('click', function() {
 			$("#sscChannelLoader").dialog('open');
@@ -745,24 +695,15 @@ function StationSearchControl(htmlTagId) {
 		// Append the standard Inventory Control
 		_controlDiv.find("#sscStationCatalogDiv").append(html);
 
-		//_controlDiv.find("#sscStationPresetDiv").bind("click", parseChannelFile);
-		//_controlDiv.find("#sscSendListButton").bind("click", parseLoadChannelFile);
-		//_controlDiv.find("#sscStationFileDiv").bind("click", parseLoadChannelFile);
-
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
 		})
 
 		html = '<div class="wi-spacer">'
-		/////html+= '<form name="multiform" id="multiform" action="wsgi/metadata/import" method="POST" enctype="multipart/form-data">'
 		html+= '<form name="station_upload_multiform" id="station_upload_multiform" action="test/uploader3.php" method="POST" enctype="multipart/form-data">'
 		html += '<input id="sscUserStation" class="wi-inline-full" type="file" name="file" value="Upload Station List" />'
-		// html += '<input id="sscSendList" class="wi-inline" type="button" value="Send List" />';
 		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
 		html += '</form>';
-// TESTING ONLY:
-//TEST		html += '<div id="station_upload_response" style="border: 1px Solid red; background: orange;"></div>';
-//TEST		html += '<div style="border: 1px Solid Red; background: pink;" id="sscSendListButton">GO</div>';
 		html += '</div>';
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
@@ -935,121 +876,6 @@ function StationSearchControl(htmlTagId) {
 		// Control Buttons
 		_controlDiv.find("#sscReset").button().bind("click", resetControl);
 		_controlDiv.find("#sscSearch").button().bind("click", query);
-		// _controlDiv.find("#sscSendList").button().bind("click", sendList);
-
-
-		$( "#station_upload_multiform" ).submit(function(event) {
-			alert("Handler for .submit() called.");
-			event.preventDefault();
-			_controlDiv.find( "#station_upload_response" ).empty().append("<p>[Answer goes here]</p>");
-		});
-	};
-
-	function parseUserChannels() {
-		// After the user has supplied channel list,
-		// check it, and send on to the /metadata/import service.
-		// That service expects N-S-L-C order.
-		// Return { status: [0 on success], header: string }
-		var result = { status: 1, message: "FAIL", header: "" };
-
-		var network   = Number($("#sscColumnNetwork").val());
-		var station   = Number($("#sscColumnStation").val());
-		var location  = Number($("#sscColumnLocation").val());
-		var channel   = Number($("#sscColumnChannel").val());
-	        var nmax      = Math.max(network, station, location, channel);
-		var nmin      = Math.min(network, station, location, channel);
-
-	        msg = "net = " + network + " sta = " + station + " loc = " + location + " cha = " + channel + " (min:" + nmin + " max:" + nmax + ")";
-		console.log("parseUserChannels: " + msg);
-
-	        if ((nmin < 1) || isNaN(nmax)) {
-			alert("Error: column indices must be integers starting from 1.");
-			return result;
-		};
-
-		var columns = Array();
-		var col_indices = Array(network, station, location, channel);
-		var col_tags = Array("network", "station", "location", "channel");
-	        // We may need to reorder the input / put the
-	        // columns in N-L-S-C order for the station/channel pack.
-		// Column-checking code is copied from
-		// parseUserCatalog() (in events.js)
-
-	        for (var i=0; i < nmax; i++) columns[i] = "ignore";
-		for (var i = 0 ; i < col_indices.length; i++) {
-			if (col_indices[i] === undefined) {
-				console.warn('Item ' + i + ':' + col_tags[i] + ' is undefined');
-			};
-		};
-
-		for (var i = 0 ; i < col_tags.length; i++) {
-			var index = col_indices[i]-1;
-			if (columns[index] === "ignore") {
-				columns[index] = col_tags[i];
-			} else {
-				var msg = "Error: " + columns[index] + " and " + col_tags[i] +
-					  " can't both be given in column " + (index+1) + ".";
-				alert(msg);
-				var msg2 = "parseUserCatalog: indices were " + col_indices + "; " + columns.length + " columns: '" + columns + "')";
-				console.log(msg2);
-				columns = columns.toString();
-				result = { status: 1, message: "Index problem", header: columns };
-				return result; // {status: 1; header: columns};
-			};
-		};
-
-		columns = columns.toString();  // A comma-separated string
-
-
-		console.log("parseUserChannels: columns" + columns);
-
-	        // FIXME: UNVALIDATED USER INPUT.
-		// But client-side validation only gets us so far.
-		// Network - max length, alphanumeric [A-Z0-9+-_]
-		// Station - max length
-		// Location [-0-9], just pass on '--' etc.
-		// Channel
-
-	        var input = $("#sscChannelInput").val();
-
-	        if (input === null || input === undefined || input === "") {
-			alert("Please paste your catalog inside the text area before pressing 'Send'.");
-			return result;
-		};
-		console.log("parseUserChannels: input = " + input);
-                /*
-		 * Old code for when I though about doing this in JS.
-		 * Instead use the /metadata/import method.
-		 *
-		 *  data = input.split("\n");  // UNVALIDATED ****
-		 *  requestControl.addChannels(data);
-		 *  console.log("data after addChannels:[" + data + ']');
-		 */
-		wiService.metadata.import(function(data) {
-			if (typeof data == "undefined") {
-				wiConsole.notice("Failed to import: ...import returned 'undefined'.");
-			} else {
-				wiConsole.info("...done importing " + (data.length-1) + " stations(s).");
-				requestControl.appendStation(data);
-			};
-		}, function(jqxhr) {
-			if (jqxhr.status != 200)
-				var err = jqxhr.statusText;
-			else
-				var err = jqxhr.responseText;
-			alert(err);
-
-			wiConsole.error("Failed to import: " + err);
-		}, true, input);
-
-	        _controlDiv.find("#sscSearch").button("option", "label", "Append");
-
-	        var br = "\n"; // "<br>";
-		msg = "OK, params are:" + br;
-		msg += " columns: '" + columns + "'" + br;
-		msg += " input: '" + input + "'" + br;
-		result = {status: 0, message: msg, header: columns };
-                return result;
 	};
 
 	function load(htmlTagId) {

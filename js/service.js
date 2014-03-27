@@ -114,10 +114,6 @@ window.wiService = new function() {
 				delete param[p]
 		}
 
-	        console.log('POST to ' + url + ' with param:');
-		for (var v in param) {
-			console.log(v + ': ' + param[v] + '');
-		};
 		var f = failFn(fail, bc, failMsg)
 		return $.post(url, param, doneFn(done, bc, f)).fail(f)
 	}
@@ -214,18 +210,6 @@ window.wiService = new function() {
 			var failMsg = "Failed to get time windows"
 			return post(done, fail, bc, url, failMsg, streams, param)
 		},
-
-		import: function(done, fail, bc, file) {
-			// Calls POST to produce a JSON structure,
-			// which must end up in the pack.
-			// file - the list of "N S L C" values
-			var param = {file: file};
-			bc = false;
-			var url = configurationProxy.serviceRoot() + 'metadata/import';
-			var failMsg = "Oops, couldn't process the channels input";
-			return $.post(url, param, done, "json");
-		},
-
 	}
 
 	this.event = {

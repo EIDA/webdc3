@@ -569,10 +569,8 @@ function Pack(id) {
 		// selection and filtering.
 		// For doof historical reasons, we transmit to the back end
 		// as ["N", "S", "C", "L"].  FIXME.
-		// Display this in a popup, and let the user try to download.
 
 		wiConsole.info("Building the list of selected streams...");
-		//console.log("In saveStation, _station_list.length = " + _station_list.length);
 		var streams = Array();
 		var neti = _station_format.names.indexOf("netcode");
 		var stai = _station_format.names.indexOf("statcode");
@@ -584,7 +582,6 @@ function Pack(id) {
 				continue;
 			};
 			var loccha = _station_list[k][fstreamsi];
-			//console.log(_station_list[k][stai] + ": " + loccha);
 			if (typeof loccha !== "undefined" && loccha.length > 0) {
 				var loc_list = Array();
 				var cha_list = Array();
@@ -610,29 +607,6 @@ function Pack(id) {
 		$('form[name="exportForm"]').find('input[name="streams"]')[0].value = streams_json;
 		$('form[name="exportForm"]').submit();
 		wiConsole.info(" ...exported stream(s)");
-	};
-
-	this.saveStreamsControl = function(htmlTagId, data) {
-		// Inputs:
-		//  - htmlTagId: id of a DOM element to fill
-		//  - data: Output from wiService.metadata.export()
-		// ISSUE (FIXED?) output seemed to have no \n separating
-		// each stream!!!
-		// Was that an encoding issue? Or related to the
-		// attempt at a download method with the
-		// Content-Disposition header?? Or just old Python???
-
-		var target = $(htmlTagId);
-		//console.log("saveStreamsControl: called with target " + htmlTagId);
-		var data_out = "";
-		var crlf = "\n";
-		var lines = data.split('\n');
-		var num_lines = lines.length - 1;
-		for (var lineno in lines) {
-			data_out += lines[lineno] + crlf;
-		}
-		target.empty().append("<p>Your " + num_lines + " streams (Net Sta Loc Cha):</p>" + "<pre>" + data_out + "</pre>");
-		return;
 	};
 
 	this.reduceEventsRows = function(rowkeys) {
@@ -1025,26 +999,7 @@ function RequestControl(htmlTagId) {
 		var html = '';
 		html += '<div id="requestControlControls"></div>';
 		html += '<div id="requestControlTables"></div>';
-		html += '<div id="requestControlSaveArea" style="padding: 3px;">[Streams selected for saving appear here]</div>';
 		_controlDiv.append(html);
-
-		$("body").find("#requestControlSaveArea").dialog({
-			title: "Save Channels Data",
-			autoOpen: false,
-			height: 450,
-			width: 550,
-			modal: true,
-			buttons: {
-				Download: function() {
-					// FIXME: Not available yet.
-					alert("Sorry, not implemented yet.");
-				},
-				Close: function() {
-					$( this ).dialog("close");
-				}
-			}
-		});
-
 	};
 
 	function load(htmlTagId) {
