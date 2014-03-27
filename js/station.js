@@ -557,50 +557,6 @@ function StationSearchControl(htmlTagId) {
 		return value;
 	};
 
-	function parseChannelFile() {
-		// PLE: Move this function to the testing code. FIXME.
-
-		// The following list should be loaded as 5 stations.
-		// It SAVES as 11 channels, because there are multiple
-		// epochs for GE.KBS. Run output through "uniq"?
-		// NOTE: WM.EVO.*.* must remain restricted!
-		var preset_list = Array("GE APE -- BHZ",
-					"GE APE -- BHN",
-					"GE BKB -- HHZ",
-					"GE KBS 00 LHZ",
-					"GE KBS 10 LHZ",
-					"WM EVO -- VHZ",
-				        "WM SFS -- VHZ");
-		var preset_file = preset_list.join('\n');
-		wiConsole.notice('In parseChannelFile, preset_file = "' + preset_file + '"'); 
-		wiService.metadata.import(function(data, textStatus, jqXHR) {
-			if (jqXHR.status == 200) {
-				requestControl.appendStation(data);
-				_controlDiv.find("#sscSearch").button("option", "label", "Append");
-			} else {
-				wiConsole.notice('POST to import returned ', jqXHR.status);
-			};
-		}, null, true, preset_file);
-	};
-
-	function parseLoadChannelFile() {
-		// FIXME: Fundamental problem: there's no way to read
-		// in the contents of a local file - the whole
-		// browser/JS/AJAX concept is designed to prevent
-		// that!
-
-		var file_contents = "GE BOAB -- BHZ\n"; // Read from client's file and JSON stringify???
-		wiConsole.notice('In parseLoadChannelFile, file = "' + file_contents + '"'); 
-		wiService.metadata.import(function(data, textStatus, jqXHR) {
-			if (jqXHR.status == 200) {
-				requestControl.appendStation(data);
-				_controlDiv.find("#sscSearch").button("option", "label", "Append");
-			} else {
-				wiConsole.notice('POST to import returned ', jqXHR.status);
-			};
-		}, null, true, file_contents);
-	};
-
 	// Main toolbar render
 	function buildControl() {
 		if ( _controlDiv === null ) return;
