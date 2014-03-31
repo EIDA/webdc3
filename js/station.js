@@ -656,13 +656,37 @@ function StationSearchControl(htmlTagId) {
 		})
 
 		html = '<div class="wi-spacer">'
-		html+= '<form name="station_upload_multiform" id="station_upload_multiform" action="test/uploader3.php" method="POST" enctype="multipart/form-data">'
-		html += '<input id="sscUserStation" class="wi-inline-full" type="file" name="file" value="Upload Station List" />'
-		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
-		html += '</form>';
+// BEGIN TEST
+			var importURL = configurationProxy.serviceRoot() + 'metadata/import';
+			html += '<form id="importForm" name="importForm" action="' + importURL + '" target="importIframe" method="post" enctype="multipart/form-data">';
+			html += '<input type="file" name="file" value="" class="wi-inline-full" />';
+			html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
+			html += '</form>';
+			html += '<iframe name="importIframe" src="#" style="display: none;" ></iframe>';
+// END TEST
 		html += '</div>';
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
+		_controlDiv.find("#importForm").submit(function () {
+			var formdata = new FormData($(this)[0]);
+			$.ajax({
+				url: importURL,
+				type: 'POST',
+				data: formdata, //{'file': 'GE APE -- BHZ'}
+				processData: false,
+				encType: 'multipart/form-data',
+				contentType: false,
+				success: function (returndata) {
+					var data = (returndata !== undefined)? $.parseJSON(returndata): undefined
+					//console.log(data);
+					requestControl.appendStation(data);
+				},
+				error: function(){
+					wiConsole.log("Something went wrong with ajax");
+				}
+			});
+			return false;
+		});
 
 		/*
 		 * Station Mechanism Mode
