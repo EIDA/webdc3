@@ -276,8 +276,23 @@ class WI_Module(object):
 
         # result = self.ic.getFromUpload(params)
 
-        # omit empty lines and lines containing only whitespace
-        lines = [tuple(line.split()) for line in params['file'].splitlines() if line.strip()]
+        # Omit empty lines and lines containing only whitespace
+        lines = [line for line in params['file'].splitlines()
+                 if line.strip()]
+        # Test if we are working with a FDSN-WS station file (at chennel level)
+        if lines[0][0] == '#':
+            separ = '|'
+            lines = lines[1:]
+        # or with an own file
+        else:
+            separ = ' '
+
+        auxLines = [tuple(line.split(separ, 4)) for line in lines]
+
+        # Remove extra fields if they are present
+        lines = [(line[0], line[1], line[2] if len(line[2]) else '--', line[3])
+                 for line in auxLines if len(line) >= 4]
+
         # Remove duplicate lines
         nslcSet = set(lines)
 
