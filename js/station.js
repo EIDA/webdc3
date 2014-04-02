@@ -675,9 +675,14 @@ function StationSearchControl(htmlTagId) {
 				processData: false,
 				encType: 'multipart/form-data',
 				contentType: false,
-				success: function (returndata) {
-					var data = (returndata !== undefined)? $.parseJSON(returndata): undefined
-					requestControl.appendStation(data);
+				success: function (returndata, textStatus, jqxhr) {
+					if (jqxhr.status == 204) {
+						alert("Got no stations from the uploaded file.\nHas the file the proper format?");
+					}
+					else {
+						var data = (returndata !== undefined)? $.parseJSON(returndata): undefined
+						requestControl.appendStation(data);
+					}
 				},
 				error: function(){
 					wiConsole.log("Something went wrong with ajax");
