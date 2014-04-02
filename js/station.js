@@ -570,8 +570,6 @@ function StationSearchControl(htmlTagId) {
 		html += '<div id="sscStationMode" align="center">';
 		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
 		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
-		//TEST
-		// html += '<input type="radio" value="Preset" id="sscStationModePreset" name="sscStationMode" /><label for="sscStationModePreset">PRESET</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
@@ -656,15 +654,15 @@ function StationSearchControl(htmlTagId) {
 		})
 
 		html = '<div class="wi-spacer">'
-// BEGIN TEST
-			var importURL = configurationProxy.serviceRoot() + 'metadata/import';
-			html += '<form id="importForm" name="importForm" action="' + importURL + '" target="importIframe" method="post" enctype="multipart/form-data">';
-			html += '<input type="file" name="file" value="" class="wi-inline-full" />';
-			html += '<div style="padding: 8px; text-align: left;" class="wi-spacer"><br>You can upload files in one of the following two formats: <ul><li> * a list of stations previously saved in WebDC3 (by means of the button "Save Stations" in the "Event and Station List")</li><li> * a file retrieved from any FDSN compliant Station-Web Service in text format</li></ul></div><br>'
-			html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
-			html += '</form>';
-			html += '<iframe name="importIframe" src="#" style="display: none;" ></iframe>';
-// END TEST
+		// Form to upload the file with the station list
+		var importURL = configurationProxy.serviceRoot() + 'metadata/import';
+		html += '<form id="importForm" name="importForm" action="' + importURL + '" target="importIframe" method="post" enctype="multipart/form-data">';
+		html += '<input type="file" name="file" value="" class="wi-inline-full" />';
+		html += '<div style="padding: 8px; text-align: left;" class="wi-spacer"><br>You can upload files in one of the following two formats: <ul><li> * a list of stations previously saved in WebDC3 (by means of the button "Save Stations" in the "Event and Station List")</li><li> * a file retrieved from any FDSN compliant Station-Web Service in text format</li></ul></div><br>'
+		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
+		html += '</form>';
+		html += '<iframe name="importIframe" src="#" style="display: none;" ></iframe>';
+
 		html += '</div>';
 		_controlDiv.find("#sscStationFileDiv").append(html)
 
@@ -673,13 +671,12 @@ function StationSearchControl(htmlTagId) {
 			$.ajax({
 				url: importURL,
 				type: 'POST',
-				data: formdata, //{'file': 'GE APE -- BHZ'}
+				data: formdata,
 				processData: false,
 				encType: 'multipart/form-data',
 				contentType: false,
 				success: function (returndata) {
 					var data = (returndata !== undefined)? $.parseJSON(returndata): undefined
-					//console.log(data);
 					requestControl.appendStation(data);
 				},
 				error: function(){
