@@ -1194,7 +1194,8 @@ class InventoryCache(object):
                             stats.append(('%s-%s-%s-%s%s%s' %
                                           (ptNets[parent_net][0],
                                            ptNets[parent_net][4],
-                                           ptNets[st][4], ptStats[st][8].year,
+                                           ptStats[st][4],
+                                           ptStats[st][8].year,
                                            ptStats[st][8].month,
                                            ptStats[st][8].day),
                                           ptNets[parent_net][0],
