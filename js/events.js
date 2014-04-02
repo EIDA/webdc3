@@ -369,6 +369,7 @@ function EventSearchControl(htmlTagId) {
 		// sending to the event service.
 		var format = "csv";
 		var columns = Array();
+	        // FIXME: UNVALIDATED USER INPUT??
 		var input = $("#escCatalogInput").val();
 
 		if (input === null || input === undefined || input === "") {

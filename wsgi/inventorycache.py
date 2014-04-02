@@ -475,7 +475,7 @@ class InventoryCache(object):
                 netw[3] = idxs
 
         end_time = datetime.datetime.now()
-        logs.info('Done with XML:  %s' % (end_time))
+        logs.info('Done with XML:  %s' % (end_time))  # Python 2.7: (end_time - start_time).total_seconds())
 
         self.__indexStreams()
 
@@ -914,8 +914,8 @@ class InventoryCache(object):
         # Filter and save indexes of stations in statsOK
         statsOK = self.__selectStations(params)
 
-        # The default dictionary is used to be able to count how many times the
-        # keys have been included
+        # The default dictionary is used to be able to count
+        # how many times the keys have been included.
         streamDict = defaultdict(int)
 
         # Browse the selected stations
@@ -1269,3 +1269,4 @@ class InventoryCache(object):
             return result
 
         return None
+

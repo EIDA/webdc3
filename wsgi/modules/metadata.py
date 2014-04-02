@@ -257,7 +257,7 @@ class WI_Module(object):
         return json.dumps(result)
 
     def upload_selection(self, envir, params):
-        """Returns the stations/streams which were received in the uploaded file
+        """Returns the stations/streams received in the uploaded file
 
         Input: file={file}
 
@@ -326,12 +326,17 @@ class WI_Module(object):
                         # Check if I found the station
                         if s == sta[4]:
 
-                            # Build key to avoid duplicates due to different epochs! See GE.APE
-                            statKey = '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])
+                            # Build key to avoid duplicates due to different
+                            # epochs! See GE.APE
+                            statKey = '%s-%s-%s-%s' % (net[0], net[4],
+                                                       net[5], sta[4])
                             if statKey not in statsSet:
                                 # Query for ALL the streams in the station
-                                partial = self.ic.getQuery({'network': '%s-%s-%s' % (net[0], net[4], net[5]),
-                                                            'station': '%s-%s-%s-%s' % (net[0], net[4], net[5], sta[4])})
+                                auxParams = {'network': '%s-%s-%s' %
+                                             (net[0], net[4], net[5]),
+                                             'station': '%s-%s-%s-%s' %
+                                             (net[0], net[4], net[5], sta[4])}
+                                partial = self.ic.getQuery(auxParams)
 
                                 # Filter by location and channel
                                 # Remove header
@@ -350,19 +355,25 @@ class WI_Module(object):
 
                                         # Check if this stream is among the
                                         # requested ones
-                                        if (net[0], sta[4], auxLoc, auxCh) in nslcSet:
+                                        if ((net[0], sta[4], auxLoc, auxCh)
+                                                in nslcSet):
                                             # And add it to the filtered
                                             # streams
                                             filtStr.append(locCh)
                                             # With the proper information about
                                             # restriction
-                                            filtStrRestr.append(parSta[10][chIdx])
+                                            filtStrRestr.append(
+                                                parSta[10][chIdx])
 
                                     # Replace the station in the results with a
                                     # new one with filtered streams
                                     if len(filtStr):
-                                        partial[idx] = (parSta[0], parSta[1], parSta[2], parSta[3], parSta[4], parSta[5],
-                                                        parSta[6], parSta[7], parSta[8], filtStr, filtStrRestr)
+                                        partial[idx] = (parSta[0], parSta[1],
+                                                        parSta[2], parSta[3],
+                                                        parSta[4], parSta[5],
+                                                        parSta[6], parSta[7],
+                                                        parSta[8], filtStr,
+                                                        filtStrRestr)
                                         # Add results
                                         statsSet.add(statKey)
                                         stats.append(partial[idx])
@@ -382,25 +393,26 @@ class WI_Module(object):
         """Produce a text/plain file with the selected stations/streams in CSV format.
 
         Input: streams={list of stream keys in JSON format}
-               Every stream key in the list is a tuple with four components. Namely,
+               Every stream key in the list is a tuple with four components.
+               Namely,
                NETWORK_CODE, STATION_CODE, CHANNEL_CODE, LOCATION_CODE
         Output: Nothing.
 
-        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+        Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, June 2013
 
         """
 
         try:
             streams = json.loads(params.get('streams'))
         except:
-            raise wsgicomm.WIClientError, "invalid or inexistent values in parameter 'streams'"
-
-
+            msg = "Invalid or inexistent values in parameter 'streams'"
+            raise wsgicomm.WIClientError, msg
 
         class DownFile(object):
             def __init__(self, text, filename, content_type):
                 if not isinstance(text, basestring):
-                    raise wsgicomm.WIError, 'Content to download is not of a valid type (string).'
+                    msg = 'Content to download is not a valid type (string).'
+                    raise wsgicomm.WIError, msg
 
                 self.text = iter(text)
                 self.size = len(text)
@@ -413,13 +425,13 @@ class WI_Module(object):
             def next(self):
                 self.text.next()
 
-
         text = ''
 
         for nscl in streams:
             try:
                 if len(nscl) != 4:
-                    raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                    msg = "Invalid stream: " + str(nscl)
+                    raise wsgicomm.WIClientError, msg
 
                 net = str(nscl[0])
                 sta = str(nscl[1])
@@ -439,7 +451,8 @@ class WI_Module(object):
         filename = 'stationSelection.csv'
         content_type = 'text/plain' ## + "; charset=us-ascii'  # try charset
 
-        body = DownFile(text = text, filename = filename, content_type = content_type)
+        body = DownFile(text=text, filename=filename,
+                        content_type=content_type)
         return body
 
     def __timewindows_tw(self, streams, start_time, end_time):
@@ -668,8 +681,8 @@ class WI_Module(object):
             raise ValueError(msg)
 
     def timewindows(self, envir, params):
-        """ <wsgi root>/metadata/query<?parameters>     ## Metadata query for preparing
-                                                     ## request
+        """ <wsgi root>/metadata/query<?parameters>
+        Metadata query for preparing request
            Parameters:
                start={datetimestring}
                end={datetimestring}
