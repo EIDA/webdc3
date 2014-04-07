@@ -1,15 +1,15 @@
 /*
  * GEOFON WebInterface
  *
+ * station.js module: set up a control module to bring channels to the request.
+ *
  * Begun by:
  *  Marcelo Bianchi, Peter Evans, Javier Quinteros, GFZ Potsdam
- *
- * station.js module: setup a control module to bring channels to the request
  *
  */
 
 /*
- * Page wide variable to provides the configuration proxy to all modules
+ * Page-wide variable to provides the configuration proxy to all modules
  */
 var stationSearchControl = undefined;
 
@@ -355,7 +355,7 @@ function StationSearchControl(htmlTagId) {
 		if ( _controlDiv === null ) return;
 
 		// 
-		// Initiallize all variables
+		// Initialize all variables
 		// 
 
 		// Network
@@ -507,6 +507,7 @@ function StationSearchControl(htmlTagId) {
 		var year = _controlDiv.find("#sscYear");
 		year.slider('values', [ year.slider('option','min'), year.slider('option', 'max')]);
 
+		_controlDiv.find("#sscStationModeCatalog").click()
 		_controlDiv.find("#sscStationSelectionModeCode").click()
 		_controlDiv.find("#sscStreamModeCode").click();
 
@@ -563,7 +564,31 @@ function StationSearchControl(htmlTagId) {
 		//
 		// Create the controls
 		//
-		var html = '';
+		var html='';
+
+		html += '<h3>Station Information</h3>';
+		html += '<div id="sscStationMode" align="center">';
+		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
+		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">User Supplied</label>';
+		html += '</div>';
+
+		html += '<div id="sscStationDiv">';
+		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
+		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';	
+		html += '</div>';
+
+		_controlDiv.append(html);
+
+		// Catalog
+		_controlDiv.find("#sscUserCatalog").button().bind('click', function() {
+			$("#sscChannelLoader").dialog('open');
+		});
+
+		/*
+		 * Normal Pre-Defined Catalog Search Controls
+		 */
+		html = '';
 		html += "<h3>Networks</h3>";
 		html += '<div class="wi-control-item-first">';
 		html += '<div class="wi-spacer">Year from <u><span id="sscStart"></span></u> to <u><span id="sscEnd"></span></u>:</div>';
@@ -614,20 +639,62 @@ function StationSearchControl(htmlTagId) {
 		html += '<div style="padding: 10px;" id="sscStreamSpsDiv"></div>';
 		html += '</div>';
 
-		html += '</div>';
-
 		html += '<div class="wi-control-item-last">';
 		html += '<input id="sscReset" class="wi-inline" type="button" value="Reset" />';
 		html += '<input id="sscSearch" class="wi-inline" type="button" value="Search" />';
 		html += '</div>';
+		html += '</div>';
 
 
-		// Append the Main Control
-		_controlDiv.append(html);
+		// Append the standard Inventory Control
+		_controlDiv.find("#sscStationCatalogDiv").append(html);
 
 		requestControl.bind("onDeleteStations", function() {
 			_controlDiv.find("#sscSearch").button("option", "label", "Search");
 		})
+
+		html = '<div class="wi-spacer">'
+		// Form to upload the file with the station list
+		var importURL = configurationProxy.serviceRoot() + 'metadata/import';
+		html += '<form id="importForm" name="importForm" action="' + importURL + '" target="importIframe" method="post" enctype="multipart/form-data">';
+		html += '<input type="file" name="file" value="" class="wi-inline-full" />';
+		html += '<div style="padding: 8px; text-align: left;" class="wi-spacer"><br>You can upload <i>text</i> files in one of the following two formats:<ul><li>A list of stations previously saved here. (Use the "Save Stations"  button in the "Event and Station List").</li><li>A file retrieved from any FDSN compliant fdsnws-station Web Service in text format.</li></ul></div><br>'
+		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
+		html += '</form>';
+		html += '<iframe name="importIframe" src="#" style="display: none;" ></iframe>';
+
+		html += '</div>';
+		_controlDiv.find("#sscStationFileDiv").append(html)
+
+		_controlDiv.find("#importForm").submit(function () {
+			var formdata = new FormData($(this)[0]);
+			$.ajax({
+				url: importURL,
+				type: 'POST',
+				data: formdata,
+				processData: false,
+				encType: 'multipart/form-data',
+				contentType: false,
+				success: function (returndata) {
+					var data = (returndata !== undefined)? $.parseJSON(returndata): undefined
+					requestControl.appendStation(data);
+				},
+				error: function(){
+					wiConsole.notice("Something went wrong with AJAX");
+				}
+			});
+			return false;
+		});
+
+		/*
+		 * Station Mechanism Mode
+		 */
+		_controlDiv.find("#sscStationMode").buttonset();
+		_controlDiv.find("#sscStationMode").change(function(item) {
+			_controlDiv.find("#sscStationDiv").children("div").hide();
+			_controlDiv.find("#sscStation" + ($(item.target).val()) + 'Div').show();
+		});
+
 
 		// Station Controls by Code
 		html  = '<div class="wi-spacer">Filter stations by station code:</div>';
