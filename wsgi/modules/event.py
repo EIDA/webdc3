@@ -182,6 +182,8 @@ Service version:
                 es = ESComcat(s, options, props['baseURL'], props['extraParams'])
             elif s == 'emsc':
                 es = ESEMSC(s, options,   props['baseURL'], props['extraParams'])
+            elif s == 'ingv':
+                es = ESINGV(s, options,   props['baseURL'], props['extraParams'])
             elif s == 'meteor':
                 es = ESMeteor(s, options)
             elif s == 'neic':
@@ -809,7 +811,7 @@ class EventData(object):
     def write_begin(self, fmt, limit):
         return self.handlers[fmt].write_begin(limit)
 
-    def write_one(self, fmt, index):
+    def write_one(self, fmt, limit):
         return self.handlers[fmt].write_one(limit)
 
     def write_events(self, fmt, start, limit):
@@ -984,6 +986,7 @@ class EventResponse(object):
             logs.error("Mapping: %s" % (str(mapping)))
             logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, mapping)))
         new_header = helper.mapcols(header_cols, self.input_mapping)
+        #s += "|".join(new_header) + "\n"
 
         for row in reader:
             if len(row) > 0:
@@ -995,6 +998,7 @@ class EventResponse(object):
                 if first.startswith('#'):
                     # Comment line, so ignore it
                     continue
+                #s += "|".join(row) + "\n"
                 new_row = helper.mapcols(row, self.input_mapping)
                 new_row = helper.filtercols(new_row, self.filters)
                 self.ed.append(new_row)
@@ -1247,6 +1251,7 @@ Service version:
         pairs.append(self.extra_params)
         url = self.service_url + '?' + '&'.join(pairs)
         logs.info("Service '%s' fetching URL: %s" % (self.id, url))
+        #print >>sys.stderr, "Service '%s' fetching URL: %s" % (self.id, url)
 
         dryrun = False  # Not implemented yet.
         if dryrun:
@@ -1257,7 +1262,7 @@ Service version:
                 rows = response.read()
             except urllib2.URLError as e:
                 logs.error("Errors fetching from URL: %s" % (url))
-                logs.error(e)
+                logs.error(str(e))
                 raise ##urllib2.URLError(e)
                 #return self.error_page(environ, start_response,
                 #                       '503 Temporarily Unavailable',
@@ -2375,6 +2380,119 @@ class ESGeofon(EventService):
             header += "# Lines: " + str(numrows) + '\n'
 
         return self.send_response(environ, start_response, header, allrows, limit, fmt)
+
+   
+# ------------------------------------------------------INGV ES ----------------------------------------- #
+
+
+class ESINGV(EventService):
+    #### """An event service for INGV ws (FDSN) """
+   
+    class ingv_dialect(csv.excel):
+        delimiter = '|'
+        
+    csv_dialect = ingv_dialect
+   
+    
+    #               
+    #   column_map -> field meaning & position :
+    #    'datetime'-0, 'magnitude'-1,
+    #    'magtype' - 2
+    #    'latitude'-3, 'longitude'-4, 'depth'-5, 'key'-6, 'region'-7
+    #
+    
+    column_map = (0, 1, 2, 3, 4, 5, 6, 7)
+    
+    #
+    #    filter_table 
+    #
+    
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None) 
+   
+    
+
+    def __init__(self, name, options,service_url,extra_params):
+        self.name = name
+        self.options = options
+        self.id = name
+        self.service_url = service_url
+        self.extra_params = extra_params
+        self.defaultLimit = options['defaultLimit']
+      
+      
+    def handler(self, environ, parameters):
+        
+        paramMap = defaultParamMap
+        paramMap['start'] = 'starttime'
+        paramMap['end'] = 'endtime'
+        paramMap['minlat'] = 'minlat'
+        paramMap['maxlat'] = 'maxlat'
+        paramMap['minlon'] = 'minlon'
+        paramMap['maxlon'] = 'maxlon'        
+        paramMap['lat'] = 'lat'
+        paramMap['lon'] = 'lon'
+        paramMap['minradius'] = 'minradius'
+        paramMap['maxradius'] = 'maxradius'
+        paramMap['mindepth'] = 'mindepth'
+        paramMap['maxdepth'] = 'maxdepth'        
+        paramMap['minmag'] = 'minmag'
+        paramMap['maxmag'] = 'maxmag'
+        paramMap['limit'] = 'limit'
+                
+        header = '' 
+       
+    	pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
+        
+        limit = hold_dict.get('limit', self.defaultLimit)
+        try:
+            limit = int(limit) + 1
+        except ValueError:
+            self.raise_client_400("Parameter 'limit' must be an integer")
+        
+        for k in range(len(pairs)):
+            if pairs[k].startswith('limit'):
+                del pairs[k]
+        pairs.append("limit=%s" % (limit))
+    
+        # send a request
+        try:
+            allrows, url = self.send_request(pairs)
+        except urllib2.URLError as e:
+            msg = "No answer from URL / %s" % (e)
+            self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
+
+        # Heuristic to identify "no data" from ingv
+        numrows = allrows.count('\n')
+        if numrows <= 1 and allrows.count(self.csv_dialect.delimiter) > 1:
+            self.raise_client_204(environ, 'No events returned')
+        
+        # check response for "no data" returned            
+        check_string = "Error 413"        
+        if (check_string in allrows) or (len(allrows) < 5 ):
+            self.raise_client_204(environ, 'No events returned')
+                   
+        myallrow = allrows.split("\n")
+        myallrow[0] = "#"+myallrow[0]
+        
+        my_row_for_send =''
+        
+        # rebuild the resultset
+        for item in myallrow:
+            if(item):    
+                if(item[0]=="#"): 
+                    continue
+                            
+                this_row = item.split("|")                
+                mytime = this_row[1].split(".")
+                my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[9]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
+   
+        fmt = str(parameters.get('format', ['text'])[0])
+             
+        return self.send_response(environ, start_response, header, my_row_for_send, limit, fmt)
+     
+
+    #### ------------------------------------------------------ ###
+
 
 def bodyBadRequest(environ, msg):
     """A text/plain message in case of trouble before reaching getEvents().

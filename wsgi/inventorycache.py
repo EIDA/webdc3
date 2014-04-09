@@ -1270,4 +1270,3 @@ class InventoryCache(object):
             return result
 
         return None
-
