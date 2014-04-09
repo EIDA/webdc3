@@ -177,7 +177,7 @@ function Pack(id) {
 					var channelparts = channel.split(".");
 
 					if (channelparts.length !== 2) {
-						wiConsole.error("request.js: Invalid channel/location patter " + channel + ". It has more than two fields.");
+						wiConsole.error("request.js: Invalid channel/location pattern " + channel + ". It has more than two fields.");
 						continue;
 					}
 
@@ -561,6 +561,54 @@ function Pack(id) {
 		checkbox.prop('checked', !checkbox.prop('checked')).change();
         };
 
+        this.saveStation = function() {
+		// Prepare a JSON object containing
+		// the stream codes, and POST to back end
+		// which prepares a file for downloading.
+		// These streams are the ones left after
+		// selection and filtering.
+		// For doof historical reasons, we transmit to the back end
+		// as ["N", "S", "C", "L"].  FIXME.
+
+		wiConsole.info("Building the list of selected streams...");
+		var streams = Array();
+		var neti = _station_format.names.indexOf("netcode");
+		var stai = _station_format.names.indexOf("statcode");
+		var fstreamsi = _station_format.names.indexOf("fstreams");
+		var seli = _station_format.names.indexOf("selected")
+		var t;
+		for (var k in _station_list) {
+			if (_station_list[k][seli] === false) {
+				continue;
+			};
+			var loccha = _station_list[k][fstreamsi];
+			if (typeof loccha !== "undefined" && loccha.length > 0) {
+				var loc_list = Array();
+				var cha_list = Array();
+				var words;
+				for (var i=0; i < loccha.length; i++) {
+					words = loccha[i].split('.');
+					loc_list.push(words[0]);
+					cha_list.push(words[1]);
+				}
+				for (var i=0; i < loc_list.length; i++) {
+					var t = Array(_station_list[k][neti],
+						      _station_list[k][stai],
+						      cha_list[i],
+						      loc_list[i]);
+					streams.push(t);
+				};
+			};
+		}
+		var streams_json = JSON.stringify(streams);
+
+		// ISSUE: What happens when there are multiple packs?
+		// There's only one exportForm.
+		$('form[name="exportForm"]').find('input[name="streams"]')[0].value = streams_json;
+		$('form[name="exportForm"]').submit();
+		wiConsole.info(" ...exported stream(s)");
+	};
+
 	this.reduceEventsRows = function(rowkeys) {
 		// Either delete the rows with ~~~keys in rowkeys~~~
 		// rows which are checked,
@@ -712,7 +760,8 @@ function Pack(id) {
 		buildChannelFilterIndex();
 
 		/*
-		 * Compute the filter results for initializig the fstreams field
+		 * Compute the filter results for initializing the
+		 * fstreams field
 		 */
 		applyStreamFilter();
 
@@ -1061,6 +1110,24 @@ function RequestControl(htmlTagId) {
 			for(var key in cb) cb[key]();
 		});
 
+		_controlDiv.find('#' + id + '-save-stations').button().bind("click", function(item){
+			var id = $(item.target).parent("div").attr('id');
+			var pkg = null;
+
+			try {
+				pkg = package();
+			} catch (e) {
+				return;
+			}
+
+			if (! pkg.hasStation()) {
+				alert("Request has no stations currently associated.");
+				return;
+			}
+
+			pkg.saveStation();
+		});
+
 		_controlDiv.find('#' + id + '-freeze').button().bind("click", function(item){
 			var id = $(item.target).parent("div").attr('id');
 			var pkg = null;
@@ -1099,11 +1166,18 @@ function RequestControl(htmlTagId) {
 		 */
 		// This should be the package id
 		if (_controlDiv.find("#" + id).length === 0) {
+			var exportURL = configurationProxy.serviceRoot() + 'metadata/export';
 			html += '<div class="wi-request-pack-div" id="' + id + '">';
 
 			html += '<input style="float: right;" id="' + id + '-delete-events" type="button" value="Delete Events" />';
+			html += '<input style="float: right;" id="' + id + '-save-stations" type="button" value="Save Stations" />';
 			html += '<input style="float: right;" id="' + id + '-delete-stations" type="button" value="Delete Stations" />';
 			html += '<input style="float: right;" id="' + id + '-freeze" type="button" value="Freeze" />';
+			html += '<form id="exportForm" name="exportForm" action="' + exportURL + '" target="exportIframe" method="post" enctype="multipart/form-data">';
+			html += '<input type="text" name="streams" value="" style="display: none;" />';
+			html += '</form>';
+			html += '<iframe name="exportIframe" src="#" style="display: none;" ></iframe>';
+
 			html += '<div style="float: left;"><h2>Request: </h2></div>';
 			html += '<br class="wi-clear"/>';
 
@@ -1287,7 +1361,7 @@ function RequestControl(htmlTagId) {
 	load(htmlTagId);
 
 	this.bind = function(name, method) {
-		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations" ]
+		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations", "onSaveStations" ]
 		
 		// The functions registered here will be called when the user 
 		if (valid.indexOf(name) === -1) {

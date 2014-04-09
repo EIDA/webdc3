@@ -271,9 +271,23 @@ class WI_Module(object):
 
         # result = self.ic.getFromUpload(params)
 
-        # omit empty lines and lines containing only whitespace
-        lines = [tuple(line.split()) for line in params['file'].splitlines()
+        # Omit empty lines and lines containing only whitespace
+        lines = [line for line in params['file'].splitlines()
                  if line.strip()]
+        # Test if we are working with a FDSN-WS station file (at chennel level)
+        if lines[0][0] == '#':
+            separ = '|'
+            lines = lines[1:]
+        # or with an own file
+        else:
+            separ = ' '
+
+        auxLines = [tuple(line.split(separ, 4)) for line in lines]
+
+        # Remove extra fields if they are present
+        lines = [(line[0], line[1], line[2] if len(line[2]) else '--', line[3])
+                 for line in auxLines if len(line) >= 4]
+
         # Remove duplicate lines
         nslcSet = set(lines)
 
@@ -376,7 +390,7 @@ class WI_Module(object):
         return json.dumps(stats)
 
     def download_selection(self, envir, params):
-        """Downloads a file with the selected stations/streams in CSV format.
+        """Produce a text/plain file with the selected stations/streams in CSV format.
 
         Input: streams={list of stream keys in JSON format}
                Every stream key in the list is a tuple with four components.
@@ -402,7 +416,7 @@ class WI_Module(object):
 
                 self.text = iter(text)
                 self.size = len(text)
-                self.content_type = 'text/plain'
+                self.content_type = content_type
                 self.filename = filename
 
             def __iter__(self):
@@ -435,7 +449,7 @@ class WI_Module(object):
 
         # size = len(text)
         filename = 'stationSelection.csv'
-        content_type = 'text/plain'
+        content_type = 'text/plain' ## + "; charset=us-ascii'  # try charset
 
         body = DownFile(text=text, filename=filename,
                         content_type=content_type)

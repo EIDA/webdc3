@@ -475,7 +475,7 @@ class InventoryCache(object):
                 netw[3] = idxs
 
         end_time = datetime.datetime.now()
-        logs.info('Done with XML:  %s' % (end_time))
+        logs.info('Done with XML:  %s' % (end_time))  # Python 2.7: (end_time - start_time).total_seconds())
 
         self.__indexStreams()
 
@@ -513,7 +513,7 @@ class InventoryCache(object):
 
         """
 
-        if(self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
+        if (self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
            datetime.datetime.now()):
             self.update()
 
@@ -610,7 +610,7 @@ class InventoryCache(object):
                 if netw[5] < start:
                     continue
 
-            # Discard if end is previous to the start of the network operation
+            # Discard if end is before the start of the network operation
             if end and netw[4]:
                 if end < netw[4]:
                     continue
@@ -631,7 +631,7 @@ class InventoryCache(object):
             # Virtual networks have no pointers to first child (1) and last
             # child (2). They have a list of childs (3)
             if networktype == 'virt':
-                if((netw[1] is not None) or (netw[2] is not None)):
+                if ((netw[1] is not None) or (netw[2] is not None)):
                     continue
 
             # All checks have been done, so add the network index to the list
@@ -648,7 +648,7 @@ class InventoryCache(object):
 
         """
 
-        if(self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
+        if (self.lastUpdated + datetime.timedelta(seconds=self.time2refresh) <
            datetime.datetime.now()):
             self.update()
 
@@ -702,7 +702,7 @@ class InventoryCache(object):
 
         for i in netsOK:
             # A normal network has pointers to first and last child
-            if((ptNets[i][1] is not None) and (ptNets[i][2] is not None)):
+            if ((ptNets[i][1] is not None) and (ptNets[i][2] is not None)):
                 list_of_children = range(ptNets[i][1], ptNets[i][2])
             # A virtual network has a list of children
             else:
@@ -914,8 +914,8 @@ class InventoryCache(object):
         # Filter and save indexes of stations in statsOK
         statsOK = self.__selectStations(params)
 
-        # The default dictionary is used to be able to count how many times the
-        # keys have been included
+        # The default dictionary is used to be able to count
+        # how many times the keys have been included.
         streamDict = defaultdict(int)
 
         # Browse the selected stations
@@ -1125,8 +1125,8 @@ class InventoryCache(object):
                                   ptNets[parent_net][8], ptNets[parent_net][9],
                                   ptNets[parent_net][10], loc_ch, restricted))
 
-        elif(latmin is not None and latmax is not None and lonmin is not None
-             and lonmax is not None):
+        elif (latmin is not None and latmax is not None and lonmin is not None
+              and lonmax is not None):
 
             # statsOK is a set and therefore, there will be no repetitions
             for st in statsOK:
@@ -1194,7 +1194,8 @@ class InventoryCache(object):
                             stats.append(('%s-%s-%s-%s%s%s' %
                                           (ptNets[parent_net][0],
                                            ptNets[parent_net][4],
-                                           ptNets[st][4], ptStats[st][8].year,
+                                           ptStats[st][4],
+                                           ptStats[st][8].year,
                                            ptStats[st][8].month,
                                            ptStats[st][8].day),
                                           ptNets[parent_net][0],

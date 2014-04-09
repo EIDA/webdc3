@@ -878,9 +878,9 @@ class Helpers(object):
           new list of objects, where the ith element is the result of
           applying the ith filter function to the ith element in row.
 
-        If filter[i] is None, no function is applied. --->  #   
+        If filter[i] is None, no function is applied.
         """
-        assert len(row) == len(filters) 
+        assert len(row) == len(filters)
         new_row = []
         for j in range(len(row)):
             #DEBUG print >>sys.stderr, j, filters[j], "applied to", row[j]
