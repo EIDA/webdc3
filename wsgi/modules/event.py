@@ -828,6 +828,11 @@ class EventWriterJSON(EventWriter):
 
 class EventData(object):
     """Container class for just the info we should output."""
+
+    column_names =  ("datetime", "magnitude", "magtype",
+                     "latitude", "longitude", "depth",
+                     "key", "region")
+
     def __init__(self, data=None):
         if data:
             self.data = [data]
@@ -847,6 +852,8 @@ class EventData(object):
 
     def column(self, col):
         """Return a 'column vector' of all items in column col."""
+        if isinstance(col, str):
+            col = self.column_names.index(col)  # ValueError if the value is not present.
         assert col >= 0
         t = []
         for event in self.data:
@@ -2586,7 +2593,7 @@ def bodyBadRequest(environ, msg, service="[event]"):
       string, page contents to be sent back to web client.
 
     """
-    return event_mod._EventsErrorTemplate % {'err_code': "400",
+    return WI_Module(None)._EventsErrorTemplate % {'err_code': "400",
                                     'err_desc': "Bad Request",
                                     'service': service,
                                     'details': msg,

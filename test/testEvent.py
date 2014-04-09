@@ -109,12 +109,12 @@ class TestTinyThings(unittest.TestCase):
 
             if len(ed.data) == 1:
                 dates = ed.column(0)
-                lats = ed.column(2)
-                lons = ed.column(3)
-                regions = ed.column(6)
+                lats = ed.column(3)
+                lons = ed.column("longitude")
+                regions = ed.column("region")
                 #for ev in range(len(lats)):
                 #    print "%3i | %s | %8.3g | %8.3g | %s" % (ev, dates[ev], lats[ev], lons[ev], regions[ev])
-                self.assertEqual(ed.data[0][6], "Southwestern Siberia, Russia")
+                self.assertEqual(ed.data[0][7], "Southwestern Siberia, Russia")
 
             else:
                 print "Didn't get exactly one event, check request parameters."
@@ -249,10 +249,10 @@ class TestDelAzi(unittest.TestCase):
 # ----------------------------------------------------------------------
 
 class TestEventData(unittest.TestCase):
-    test_rows = [['1999-05-05T12:00:00', 4.5, 30, 60, 10, 'p101', 'Earth Somewhere'],
-                 ['2001-01-01T12:00:00', 4, 15.0, 60, 10, 'p102', 'Europe'],
-                 ['2002-02-02T12:00:00', 3.5, 89, 0, 100, 'p103', "Santa's village"],
-                 ['2003-03-03T12:00:00', 3, -89, 180,  5, 'p104', 'South Pole']
+    test_rows = [['1999-05-05T12:00:00', 4.5, 'Mb', 30, 60, 10, 'p101', 'Earth Somewhere'],
+                 ['2001-01-01T12:00:00', 4, 'Mw', 15.0, 60, 10, 'p102', 'Europe'],
+                 ['2002-02-02T12:00:00', 3.5, 'M', 89, 0, 100, 'p103', "Santa's village"],
+                 ['2003-03-03T12:00:00', 3, 'Ml', -89, 180,  5, 'p104', 'South Pole']
                  ]
 
     def test_zero(self):
@@ -279,19 +279,31 @@ class TestEventData(unittest.TestCase):
         lim = 5
         body = ed.write_all('json', lim)
         self.assertEqual(count_json_obj(body), lim+1)       # header row
-        self.assertEqual(count_json_obj2(body), 7*(lim+1))  # 7 cols
+        self.assertEqual(count_json_obj2(body), len(ed.column_names)*(lim+1))  # 8 cols
         #DEBUGprint body
 
     def test_csv(self):
+        header = ','.join(('datetime', 'magnitude', 'magtype',
+                          'latitude', 'longitude', 'depth',
+                          'key', 'region'))
+
         ed = event.EventData()
         ed.append(self.test_rows[0])
         body = ed.write_all('csv', 10)
-        print "test_csv:\n", body
-
+        if test_verbosity > 0:
+            print "test_csv:\n", body
+        self.assertEqual(body.count('\n'), 3)
+        self.assertEqual(body.count(','), 2*(8-1))
+        self.assertEqual(body.split('\r')[0], header)
+                        
+                                   
     def test_json(self):
         ed = event.EventData(self.test_rows[0])
         body = ed.write_all('json', 10)
-        print "test_json:\n", body
+        if test_verbosity > 0:
+            print "test_json:\n", body
+        self.assertTrue(isinstance(body, str))
+        self.assertGreater(len(body), 8*2)  # Weak bound - body is a string.
 
     def test_json_loads(self):
         """Round-tripping via JSON string."""
@@ -299,12 +311,14 @@ class TestEventData(unittest.TestCase):
         for ev in self.test_rows:
             ed.append(ev)
         result = ed.write_all('json', len(self.test_rows))
-        print "len(result):", len(result)
+        self.assertEqual(len(result), 373)
 
         ed2 = event.EventData()
         ed2.json_loads(result)
-        print "data:", ed2.data
+        #print "data:", ed2.data
         self.assertEqual(len(ed2), len(self.test_rows))
+        for f in range(len(ed2)):
+            self.assertEqual(len(ed2.data[f]), 8)
 
     def test_unimplemented(self):
         """Unimplemented 'fmt' option raises KeyError.
@@ -675,18 +689,20 @@ class TestEventServiceOnline(unittest.TestCase):
 
         #print 'test_geofon_asia: len:', len(ed)
 
-        lats = ed.column(2)
-        self.assertTrue(min(lats) >= region['minlat'])
-        self.assertTrue(max(lats) <= region['maxlat'])
+        lats = ed.column('latitude')
+        self.assertGreaterEqual(min(lats), region['minlat'])
+        self.assertLessEqual(max(lats), region['maxlat'])
 
         # The following assertions about longitude DO NOT hold if
         # the region crosses the Date Line:
-        longs = ed.column(3)
-        self.assertTrue(min(longs) >= region['minlon'])
-        self.assertTrue(max(longs) <= region['maxlon'])
+        longs = ed.column('longitude')
+        self.assertGreaterEqual(min(longs), region['minlon'])
+        self.assertLessEqual(max(longs), region['maxlon'])
 
     def test_geofon_circle_north(self):
-        """A circular region of interest."""
+        """A circular region of interest.
+        FAILS 2014-04-09: Returns events including Laptev Sea
+        """
         region = {'lat': 80, 'lon': 90, 'maxradius': 5}
         env = {'PATH_INFO': 'event/geofon',
                'QUERY_STRING': '&'.join(['start=2012-06-01',
@@ -701,6 +717,7 @@ class TestEventServiceOnline(unittest.TestCase):
         for line in body[0].splitlines():
             if line.startswith('#'):
                 continue
+            print "test_geofon_circle_north:", line
             self.assertTrue(line.endswith('Severnaya Zemlya') or line.endswith('region'))
 
     def test_geofon_dateline(self):
@@ -719,7 +736,7 @@ class TestEventServiceOnline(unittest.TestCase):
         ed = event.EventData()
         ed.json_loads(body[0])
 
-        longs = ed.column(3)
+        longs = ed.column(4)
         #print "longs (sorted):", sorted(longs)
         westlongs = []
         eastlongs = []
@@ -731,8 +748,8 @@ class TestEventServiceOnline(unittest.TestCase):
 
         # The following assertions about longitude DO NOT hold if the
         # region crosses both the Date Line AND the Prime Meridian:
-        self.assertTrue(min(eastlongs) >= region['minlon'])
-        self.assertTrue(max(westlongs) <= region['maxlon'])
+        self.assertGreaterEqual(min(eastlongs), region['minlon'])
+        self.assertLessEqual(max(westlongs), region['maxlon'])
 
     def test_depth_ranges(self):
         """Use depth filtering with the GEOFON eqinfo service."""
@@ -946,7 +963,7 @@ class TestEventServiceEMSC(unittest.TestCase):
         #print "JSON objects:", count_json_obj(body[0])
         self.assertEqual(count_json_obj(body[0]), 6)  # Header row, +limit objects
         #print "test_emsc_default_json: JSON sub-objects:", count_json_obj2(body[0])
-        self.assertEqual(count_json_obj2(body[0]), 6*7)  # (Header row, +limit objects)*7 cols
+        self.assertEqual(count_json_obj2(body[0]), 6*8)  # (Header row, +limit objects)*8 cols
 
 
 class TestCompareServicesOnline(unittest.TestCase):
@@ -982,7 +999,7 @@ class TestCompareServicesOnline(unittest.TestCase):
         deg2km = math.pi*a/180.0
         c = 4.0  # km/sec
         lat_scale = deg2km/c
-        phi = 0.5*(ev1[2] + ev2[2])
+        phi = 0.5*(ev1[3] + ev2[3])  # latitudes
         lon_scale = math.cos(phi)*lat_scale
         #      time, mag,  lat,       lon,    depth
         scales = [1, 0.2, lat_scale, lon_scale, 10]
@@ -995,9 +1012,9 @@ class TestCompareServicesOnline(unittest.TestCase):
         
         return sum([ (time_delta/scales[0])**2,
                     ((ev1[1] - ev2[1])/scales[1])**2,
-                    ((ev1[2] - ev2[2])/scales[2])**2,
-                    ((ev1[3] - ev2[3])/scales[3])**2,
-                    ((ev1[4] - ev2[4])/scales[4])**2  ])
+                    ((ev1[3] - ev2[3])/scales[2])**2,
+                    ((ev1[4] - ev2[4])/scales[3])**2,
+                    ((ev1[5] - ev2[5])/scales[4])**2  ])
                 
     def testJune(self):
         qs = "&".join(self.params_0)
@@ -1036,7 +1053,9 @@ class TestCompareServicesOnline(unittest.TestCase):
         print "Matched %i/%i GEOFON events to %i ComCat events." % (len(matched),
                                                                     len(ed['geofon'].data),
                                                                     len(ed['comcat'].data))
-      
+        self.assertEqual(len(ed['geofon'].data), 15)
+        self.assertEqual(len(ed['comcat'].data), 17)
+        self.assertEqual(len(matched), 12)
 
 # ----------------------------------------------------------------------
 
@@ -1271,6 +1290,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             print "Start = %s; qs='%s'; num=%d" % (start_date, qs, num_new)
             self.assertGreaterEqual(num_new, num)
             num = num_new
+            time.sleep(1)
 
     def test_events_minmag(self):
         """As we increase minmag, number of events must not increase"""
@@ -1311,7 +1331,7 @@ if __name__ == '__main__':
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestTinyThings)
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestAreaCircle)
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestCompareServicesOnline)
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestEventServiceFDSN)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(TestEventServiceFDSN)
     if suite:
         result = unittest.TextTestRunner(verbosity=2).run(suite)
     else:
