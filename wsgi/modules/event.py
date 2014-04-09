@@ -1251,7 +1251,7 @@ Service version:
         pairs.append(self.extra_params)
         url = self.service_url + '?' + '&'.join(pairs)
         logs.info("Service '%s' fetching URL: %s" % (self.id, url))
-        print >>sys.stderr, "Service '%s' fetching URL: %s" % (self.id, url)
+        #print >>sys.stderr, "Service '%s' fetching URL: %s" % (self.id, url)
 
         dryrun = False  # Not implemented yet.
         if dryrun:
