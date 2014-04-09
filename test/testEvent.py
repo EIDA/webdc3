@@ -88,7 +88,7 @@ class TestTinyThings(unittest.TestCase):
         ed = event.EventData()
         ed.json_loads(body[0])
         #print ed.data
-        self.assertEqual(ed.data[0][6], "Chelyabinsk")
+        self.assertEqual(ed.data[0][7], "Chelyabinsk")
 
     def test_region_lookup_empty(self):
         """Passes if lookupIfEmpty == True. Requires SC3 look-up.
@@ -921,7 +921,7 @@ class TestEventServiceMeteor(unittest.TestCase):
         env = {'PATH_INFO': 'event/meteor', 'QUERY_STRING': 'format=json'}
         body = mod.getEvents(env, start_response)
         self.assertEqual(count_lines(body), 0)
-        self.assertEqual(count_json_obj2(body[0]), 7*2)  # Header + 1 event.
+        self.assertEqual(count_json_obj2(body[0]), 8*2)  # Header + 1 event.
 
 
 class TestEventServiceEMSC(unittest.TestCase):
@@ -1311,7 +1311,7 @@ if __name__ == '__main__':
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestTinyThings)
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestAreaCircle)
     #suite = unittest.TestLoader().loadTestsFromTestCase(TestCompareServicesOnline)
-    #suite = unittest.TestLoader().loadTestsFromTestCase(TestEventServiceFDSN)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestEventServiceFDSN)
     if suite:
         result = unittest.TextTestRunner(verbosity=2).run(suite)
     else:

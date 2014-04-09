@@ -28,6 +28,7 @@ conf['service']['emsc'] = {
         'extraParams': 'filter=yes&export=csv',
         }
 conf['service']['ingv'] = {
+        'handler': 'fdsnws',
         'description': 'INGV',
         'baseURL': 'http://webservices.rm.ingv.it/fdsnws/event/1/query',
         'extraParams': 'format=text&user=webinterface',

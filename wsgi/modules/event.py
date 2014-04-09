@@ -10,6 +10,8 @@
 """
 Interface to various event services.
 
+(c) 2013, 2014 GEOFON team, GFZ Potsdam
+
 Provides a thin wrapper to event services.
 Implemented as part of a WSGI application.
 
@@ -21,6 +23,12 @@ Simple usage:
 
 Create new event services by subclassing the EventService class
 and registering them in the catalog.
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version. For more information, see http://www.gnu.org/
 
 """
 
@@ -36,11 +44,8 @@ import re
 import sys
 import urllib2
 
-sys.path.append('..')  # for wsgicomm
-
+sys.path.append('..')  # for wsgicomm...
 import wsgicomm
-#from eventconfig import conf as config  # TEMP, until configuration works
-import eventconfig # for standalone testing below
 
 tempdir = tempfile.gettempdir()
 
@@ -120,6 +125,9 @@ Service version:
 
     def __init__(self, wi):
 
+        known_handlers = ('comcat', 'emsc', 'fdsnws', 'geofon', 'meteor', 'neic', 'parser')
+
+        abort = False
         config = wi.getConfigTree('event')
 
         self.verbose = int(config['verbosity'])
@@ -135,12 +143,22 @@ Service version:
 
         self.services = dict.fromkeys(config['catalogs']['ids'], {})
         for k in config['service'].keys():
-                self.services[k] = config['service'][k]
+            self.services[k] = config['service'][k]
+            h = self.services[k].get('handler', None)
+            # Exception for old config files:
+# FIXME - unneeded??
+            if (h == None) and (k in known_handlers):
+                h = k
+##            # Assign a handler if none was provided in configuration
+# #           if not self.services[k].has_key('handler'):
+##                self.services[k]['handler'] = h  ## better: make this a function handle.
+
         self._EventServiceCatalog = {}
         for s in self.services:
             description = self.services[s].get('description', None)
+            handler = self.services[s].get('handler', None)
             if description:
-                self._EventServiceCatalog[s] = (description, )
+                self._EventServiceCatalog[s] = (description, handler)
         self._EventServicePreferred = config['catalogs']['preferred']
         self.registeredonly = False  # For testing; for production, set to True
         logs.info("Only serve registered event services: %s" % (self.registeredonly))
@@ -157,8 +175,9 @@ Service version:
         # Trick to get all defined catalogs registered:
         for service in self._EventServiceCatalog:
             wi.registerAction("/event/%s" % (service), self.query)
-        # And one more, just for testing:
+        # And some more, just for testing:
         wi.registerAction("/event/meteor", self.query)
+        wi.registerAction("/event/dumpconfig", self.dumpConfig)
 
         # Create handlers for all services:
         # Should these options apply to *all* services from this server??
@@ -176,27 +195,66 @@ Service version:
 
             start_time = datetime.datetime.now()
 
-            if s == 'geofon':
+            # April 2014: A handler specification in the configuration
+            # file is now mandatory:
+            #   event.service.{servicename}.handler = {handler}
+            #
+            # except for the following "legacy" services, for which
+            # we allow the handler name to be the service name.
+            # This exception means users don't have to update their
+            # old webinterface.cfg. It should be removed in future.
+            #
+            if s in known_handlers:
+                h = s
+                logs.notice("Assuming handler '%s'; you should set this explicitly in webinterface.cfg with:" % h)
+                logs.notice("  event.service.%s.handler = '%s'" % (s, h))
+            else:
+                try:
+                    h = props["handler"]
+                    if not h in known_handlers:
+                        logs.warning("Unknown handler '%s' configured for service '%s', but continuing anway!" % (h, s))
+                        continue
+                except KeyError:
+                    logs.error("No handler configured for service '%s', aborting!" % s)
+                    abort = True
+                    continue
+##            ##try:
+##            h = props.get('handler', s)   ## Or raise if no handler set?
+##            ##except KeyError:
+##            ##    logs.error("No event service handler was set for service '%s'; fix in webinterface.cfg." % (s))
+##            ##    h = s
+            logs.debug("Handler for service id=%s is '%s'" % (s, h))
+
+            # All known handlers:
+            if h == 'geofon':
+                print >>sys.stderr, "TEST Creating an ESGeofon for", s, props
                 es = ESGeofon(s, options, props['baseURL'], props['extraParams'])
-            elif s == 'comcat':
+            elif h == 'comcat':
                 es = ESComcat(s, options, props['baseURL'], props['extraParams'])
-            elif s == 'emsc':
+            elif h == 'emsc':
                 es = ESEMSC(s, options,   props['baseURL'], props['extraParams'])
-            elif s == 'ingv':
+            elif h == 'fdsnws':
                 es = ESINGV(s, options,   props['baseURL'], props['extraParams'])
-            elif s == 'meteor':
+            elif h == 'meteor':
                 es = ESMeteor(s, options)
-            elif s == 'neic':
+            elif h == 'neic':
                 es = ESNeic(s)
-            elif s == 'parser':
+            elif h == 'parser':
                 es = ESFile(s, options)
+            else:
+                raise SyntaxError, "Uncaught handler %s" % h
             self.es[s] = es
 
             end_time = datetime.datetime.now()
             #Python 2.7: logs.debug("Created new event service '%s' in %g s" % (s, (end_time-start_time).total_seconds()))
-            logs.debug("Created new event service '%s's" % (s))
-            for p in ('baseURL', 'extraParams'):
+            logs.notice("Created new event service '%s', handler %s" % (s, h))
+            for p in ('handler', 'baseURL', 'extraParams'):
                 logs.debug('%24s: %s' % (p, props.get(p)))
+
+        if (abort): raise SyntaxError, "Configuration problem(s), see the logs."
+        
+    def dumpConfig(self, envir, params):
+        return ("Event services configuration at %s\n" % str(datetime.datetime.now()) + str(self),)
 
     def catalogs(self, envir, params):
         return self.getEventsCatalog()
@@ -217,24 +275,28 @@ Service version:
         Not configurable, which is inconvenient.
 
         """
+        handler_capabilities_default = {"hasDate": True,
+                        "hasRectangle": True,
+                        "hasCircle": False,
+                        "hasDepth": False,
+                        "hasMagnitude": True,
+                        "description": None}
+        
         d = dict.fromkeys(self._EventServiceCatalog.keys())
         for k in d.keys():
-            # default capability values:
-            d[k] = {"hasDate": True,
-                    "hasRectangle": True,
-                    "hasCircle": False,
-                    "hasDepth": False,
-                    "hasMagnitude": True,
-                    "description": self._EventServiceCatalog[k][0]}
+            d[k] = dict(handler_capabilities_default)
+            d[k]["description"] = self._EventServiceCatalog[k][0]
+            handler = self._EventServiceCatalog[k][1]
 
-        if d.has_key('geofon'):
-            d["geofon"]["hasCircle"] = True
-            d["geofon"]["hasDepth"] = True
-        if d.has_key('comcat'):
-            d["comcat"]["hasDepth"] = True
-        if d.has_key('emsc'):
-            d["emsc"]["hasDepth"] = True
-            d["emsc"]["hasMag"] = True
+            # These are capabilities of the *handler type* not the id.
+            if handler == "geofon":
+                d[k]["hasCircle"] = True
+                d[k]["hasDepth"] = True
+            if handler == "comcat":
+                d[k]["hasDepth"] = True
+            if handler == "emsc":
+                d[k]["hasDepth"] = True
+                d[k]["hasMag"] = True
 
         # A hack here to force the preferred key to come first:
         indent = None
@@ -254,6 +316,23 @@ Service version:
         return tmp
         ##return json.dumps(self._EventServiceCatalog)
 
+    def __str__(self):
+        """Report what is known about catalogs. This is for
+        debugging/maintenance, and should not be exposed across the
+        web server.
+
+        """
+        s = ""
+        s += "Verbosity: %i\n" % (self.verbose)
+        s += "Registered services:\n"
+        for k in sorted(self.services):
+            s += "Service '%s'\t%s\n" % (k, self.services[k])
+        s += "Preferred: %s\n" % self._EventServicePreferred
+        for k in self._EventServiceCatalog:
+            s += "Service '%s': %s\n" % (k, str(self._EventServiceCatalog[k]))
+        s += "Registered only? " + str(self.registeredonly) + "\n"
+        return s
+
     def parseUserTextFile(self, envir, params):
         """Parse a user-supplied catalog.
 
@@ -271,7 +350,7 @@ Service version:
         es = self.es['parser'] # Re-use existing service ##es = ESFile("file", options)
         for name in params.keys():
             if name not in params_white_list:
-                return [bodyBadRequest(envir, "Unknown parameter name supplied")]
+                return [bodyBadRequest(envir, 'Unknown parameter name supplied', 'parser')]
 
         return es.handler(envir, params)
 
@@ -627,7 +706,7 @@ def floatordash(arg):
 
 
 class EventWriter(object):
-    """Output methods for the EventData container.
+    """Output methods for serializing the EventData container.
 
     Constructor requires a pointer to the data held in the container.
     This class is subclassed to provide different formats:
@@ -640,7 +719,6 @@ class EventWriter(object):
     output_header = ('datetime', 'magnitude', 'magtype', 'latitude', 'longitude', 'depth', 'key', 'region')
 
     def __init__(self, data):
-        #print "EventWriter::init (generic) says hello world!"
         self.data = data
 
     def write_begin(self, limit):
@@ -700,6 +778,7 @@ class EventWriterCSV(EventWriter):
         #TMPFILE self.fid = open('local.csv', 'wb')
         self.fid = tempfile.TemporaryFile('w+b')
         self.writer = csv.writer(self.fid)
+#*****USE self.output_header?
         header = ("Event Time", "Mag", "Lat", "Lon", "ID", "Depth", "Region")
         self.writer.writerow(self.output_header)
         return ''  ### self.delimiter.join(self.output_header) + self.lineterminator
@@ -709,7 +788,6 @@ class EventWriterCSV(EventWriter):
         if self.data and index >= 0 and index < len(self.data):
             self.count += 1
             ev = self.data[index]
-            #print '<' + str(ev) + '>'
             self.writer.writerow(ev)
 
             #UNUSED new_row = self.helper.filtercols(ev, self.filters)
@@ -737,6 +815,8 @@ class EventWriterJSON(EventWriter):
     The row columns are defined in 'output_header'. For JSON
     output to the webinterface front end the column ordering and
     types of values must conform to what webinterface expects.
+    NOTE: It is assumed/hoped the eventwriter object's data is already
+    safe enough for out as HTML. i.e. was validated on input.
 
     """
     def write_all(self, limit):
@@ -811,8 +891,8 @@ class EventData(object):
     def write_begin(self, fmt, limit):
         return self.handlers[fmt].write_begin(limit)
 
-    def write_one(self, fmt, limit):
-        return self.handlers[fmt].write_one(limit)
+    def write_one(self, fmt, index):
+        return self.handlers[fmt].write_one(index)
 
     def write_events(self, fmt, start, limit):
         return self.handlers[fmt].write_events(limit)
@@ -1050,8 +1130,9 @@ class EventResponse(object):
 
         prefix - string, used to make ids like "{prefix}{nnn}"
                  where nnn is the row number.
-        keyIfGiven - boolean, replace key even when there is one already
-                     present for an event.
+
+        keyIfGiven - boolean, replace id even when there is
+                     one already present for an event.
 
         """
         num_rows = len(self.ed.data)
@@ -1062,7 +1143,7 @@ class EventResponse(object):
         col = self.cols['id']
         for row in range(num_rows):
             ev = self.ed.data[row]
-            if len(ev[col]) == 0 or ((len(ev[col]) > 0) and keyIfGiven):
+            if len(ev[col]) == 0 or keyIfGiven:
                 ev[col] = prefix + seq_fmt % (row)
 
     def fill_regions(self):
@@ -1596,7 +1677,7 @@ class ESFile(EventService):
 
         >>> opts = {'defaultLimit': 10}
         >>> ESFile('', opts).column_map(['latitude', 'longitude', 'time', 'ignore', 'depth'])
-        (2, None, 0, 1, 4, None, None)
+        (2, None, None, 0, 1, 4, None, None)
 
         """
         cols = 8*[None]
@@ -1838,15 +1919,15 @@ class ESMeteor(EventService):
     csv_dialect = meteor_dialect
 
     def __init__(self, name, options):
-        self.name = name
+        self.id = name
         self.options = options
 
     def handler(self, environ, parameters):
 
-        columns='''"Event ID";"F-E Region";Magnitude;Status;"Origin time";Latitude;Longitude;"Depth (km)";Flags'''.split(';')
+        columns='''"Event ID";"F-E Region";Magnitude;MagType;Status;"Origin time";Latitude;Longitude;"Depth (km)";Flags'''.split(';')
         sep = '|'
         allrows = sep.join(columns) + "\n"
-        allrows += (sep.join(['ev123abc','Chelyabinsk',str(2.0),'M','2013-04-01T00:00:00Z', str(55.15), str(61.41), str(-5.0), 'xxl']) + "\n")
+        allrows += (sep.join(['ev123abc','Chelyabinsk',str(2.0),'Mw','M','2013-04-01T00:00:00Z', str(55.15), str(61.41), str(-5.0), 'xxl']) + "\n")
         fmt = str(parameters.get('format', ['raw'])[0])
         if verbosity > 2:
             logs.error("Meteor::handler(): fmt=%s map=%s" % (fmt, str(self.column_map)))
@@ -2494,19 +2575,20 @@ class ESINGV(EventService):
     #### ------------------------------------------------------ ###
 
 
-def bodyBadRequest(environ, msg):
+def bodyBadRequest(environ, msg, service="[event]"):
     """A text/plain message in case of trouble before reaching getEvents().
 
     Input:
       environ - WSGI environment
       msg - string, description of what went wrong.
+      service - string, what service called this, if known.
     Returns:
       string, page contents to be sent back to web client.
 
     """
     return event_mod._EventsErrorTemplate % {'err_code': "400",
                                     'err_desc': "Bad Request",
-                                    'service': '[event]',
+                                    'service': service,
                                     'details': msg,
                                     'url': _urlString(environ),
                                     'date_time': str(datetime.datetime.utcnow()),
@@ -2597,90 +2679,12 @@ def start_response(arg1, arg2):
 # Code beyond here is to have standalone event functionality for testing
 # and debugging.
 
-class WebInterface(object):
-    def __init__(self, appName):
-        self.__action_table = {}
-
-    def registerAction(self, name, func, *multipar):
-        self.__action_table[name] = (func, set(multipar))
-        #DEBUGprint "Action Table:", self.__action_table
-
-    def getAction(self, name):
-        return self.__action_table.get(name)
-
-    def getConfigTree(self, prefix):
-        return eventconfig.conf
-
-wi = WebInterface(__name__)
-event_mod = WI_Module(wi)
-
-def application(environ, start_response):
-    """A WSGI application.
-
-    Inputs:
-        environ - dict, the WSGI environment
-        start_response - function required by WSGI
-
-    Returns:
-        string, body of the content to be returned to the web client.
-
-    NOTE: This function is not called as part of the normal
-    webinterface operation, only when the event functions are
-    being tested.
-
-    # It's the leading component of path which defines what we
-    # should do here.
-
-    """
-    path = environ.get('PATH_INFO', '').lstrip('/')
-    logs.info('path: %s' % path)
-    command = path.split('/', 2)[0].lower()
-
-    if not command in ('event'):
-        start_response('404 Not Found', [('Content-Type', 'text/plain')])
-        return [event_mod._EventsErrorTemplate % {'err_code': "404",
-                                        'err_desc': "Not found",
-                                        'service': '',
-                                        'details': "No method '%s' here" % (command),
-                                        'url': _urlString(environ),
-                                        'date_time': str(datetime.datetime.utcnow()),
-                                       }]
-
-    parameters = environ.get('QUERY_STRING', '')
-    parameters = cgi.parse_qs(parameters)
-    logs.info('event::application parameters: %s' % parameters)
-
-    try:
-        service = path.split('/', 2)[1].lower()
-    except IndexError as e:
-        start_response('500 Error', [('Content-Type', 'text/plain')])
-        return ["Oops, IndexError:" + e]
-
-    action = wi.getAction("/event/" + service)
-    logs.debug('action func: %s' % str(action[0]))
-    if not action:
-        start_response('404 Not Found', [('Content-Type', 'text/plain')])
-        return ["Oops, no action for service='%s'" % service]
-
-    if service == "catalogs":
-        start_response('200 OK', [('Content-Type', 'text/plain')])
-        func = action[0]
-        return func(environ, start_response)
-    else:
-        action = wi.getAction("/event/" + service)
-        start_response('200 OK', [('Content-Type', 'text/plain')])
-        func = action[0]
-        return func(environ, start_response)
-
-    raise Exception, "There must be some kind of way out of here."
-
-
 if __name__ == '__main__':
 
         doctest.testmod()
 
-        print "About me:"
-        print str(wi)
+        #print "About me:"
+        #print str(wi)
 
         port = 8005
         hostport = 'localhost:%i' % port
@@ -2693,5 +2697,5 @@ if __name__ == '__main__':
 
         import wsgiref
         from wsgiref.simple_server import make_server
-        srv = make_server('localhost', port, application)
-        srv.serve_forever()
+        #srv = make_server('localhost', port, application)
+        #srv.serve_forever()
