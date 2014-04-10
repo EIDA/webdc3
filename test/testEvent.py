@@ -249,6 +249,10 @@ class TestDelAzi(unittest.TestCase):
 # ----------------------------------------------------------------------
 
 class TestEventData(unittest.TestCase):
+    columns = ('datetime', 'magnitude', 'magtype',
+               'latitude', 'longitude', 'depth',
+               'key', 'region')
+    header = ','.join(columns)
     test_rows = [['1999-05-05T12:00:00', 4.5, 'Mb', 30, 60, 10, 'p101', 'Earth Somewhere'],
                  ['2001-01-01T12:00:00', 4, 'Mw', 15.0, 60, 10, 'p102', 'Europe'],
                  ['2002-02-02T12:00:00', 3.5, 'M', 89, 0, 100, 'p103', "Santa's village"],
@@ -283,9 +287,6 @@ class TestEventData(unittest.TestCase):
         #DEBUGprint body
 
     def test_csv(self):
-        header = ','.join(('datetime', 'magnitude', 'magtype',
-                          'latitude', 'longitude', 'depth',
-                          'key', 'region'))
 
         ed = event.EventData()
         ed.append(self.test_rows[0])
@@ -293,9 +294,9 @@ class TestEventData(unittest.TestCase):
         if test_verbosity > 0:
             print "test_csv:\n", body
         self.assertEqual(body.count('\n'), 3)
-        self.assertEqual(body.count(','), 2*(8-1))
-        self.assertEqual(body.split('\r')[0], header)
-                        
+        self.assertEqual(body.count(','), 2*(len(self.columns)-1))
+        self.assertEqual(body.split('\r')[0], self.header)
+
                                    
     def test_json(self):
         ed = event.EventData(self.test_rows[0])
@@ -303,7 +304,7 @@ class TestEventData(unittest.TestCase):
         if test_verbosity > 0:
             print "test_json:\n", body
         self.assertTrue(isinstance(body, str))
-        self.assertGreater(len(body), 8*2)  # Weak bound - body is a string.
+        self.assertGreater(len(body), len(self.header)*2)  # Weak bound - body is a string.
 
     def test_json_loads(self):
         """Round-tripping via JSON string."""
@@ -319,6 +320,23 @@ class TestEventData(unittest.TestCase):
         self.assertEqual(len(ed2), len(self.test_rows))
         for f in range(len(ed2)):
             self.assertEqual(len(ed2.data[f]), 8)
+
+    def test_text(self):
+        """FDSN-style text output"""
+        fdsnws_header = "EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName"
+        ed = event.EventData()
+        for ev in self.test_rows:
+            ed.append(ev)
+        num_rows = len(self.test_rows)
+        result = ed.write_all('text', num_rows)
+        lines = result.split('\n')
+        for line in lines:
+            print line
+
+        self.assertEqual(len(lines), num_rows + 2)  # Why not +1?
+        self.assertEqual(lines[0].strip(), fdsnws_header)
+        self.assertEqual(result.count('|'), (num_rows+1)*fdsnws_header.count('|'))
+
 
     def test_unimplemented(self):
         """Unimplemented 'fmt' option raises KeyError.
@@ -845,6 +863,17 @@ class TestEventServiceOnline(unittest.TestCase):
         #print "Lines:", num_lines
         self.assertEqual(num_lines, 6)   # 4 + 2 for header
 
+    def test_select_geofon_format_text(self):
+        """Request fdsnws-event text output. FIXME: QS needs to be 'format=text'!"""
+        env = {'PATH_INFO': 'event/geofon',
+               'QUERY_STRING': 'start=2013-06-01&end=2013-06-16&minmag=6.0&limit=4&format=fdsnws-text'}
+        body = mod.getEvents(env, start_response)
+        num_lines = count_lines(body)
+        print "geofon_format_text: body:", body, "(%i)" % len(body[0])
+        #print "Lines:", num_lines
+        self.assertEqual(num_lines, 5)   # 4 + 1 for header
+        self.assertEqual(body[0].count('|'), num_lines*12)
+                         
     def test_select_geofon_format_bad(self):
         """Reject an unsupported format constraint.
 

@@ -826,6 +826,49 @@ class EventWriterJSON(EventWriter):
         return json.dumps([self.output_header] + self.data[0:last])
 
 
+class EventWriterFDSNText(EventWriter):
+    """Write some events as fdsnws-event format=text output.
+
+    The specification for this output is at
+    http://fdsn.org/FIXME
+
+    """
+    fdsnws_headers = ('EventID', 'Time', 'Latitude', 'Longitude',
+                      'Depth/km', 'Author', 'Catalog',
+                      'Contributor', 'ContributorID',
+                      'MagType', 'Magnitude', 'MagAuthor',
+                      'EventLocationName')
+
+    def write_one(self, index):
+        #DEBUG print "write_one", index, len(self.data)
+        if self.data and index >= 0 and index < len(self.data):
+            self.count += 1
+            ev = self.data[index]
+            self.writer.writerow(ev)
+
+            #UNUSED new_row = self.helper.filtercols(ev, self.filters)
+            #return self.delimiter.join(new_row) + self.lineterminator
+        return ''
+
+    def write_all(self, limit):
+        sep = '|'
+        crlf = '\r\n'
+
+        last = min(limit, len(self.data))
+
+        def rows(data, first, last):
+            buf = ""
+            mapping = (6, 0, 3, 4, 5, None, None, None, None, 2, 1, None, 7)
+            h = Helpers()
+            for r in range(first, last):
+                row = data[r]
+                buf += sep.join(str(x) for x in h.mapcols(row, mapping)) + crlf
+            return buf
+
+        h = sep.join(self.fdsnws_headers)
+        return h + crlf + rows(self.data, 0, last)
+
+
 class EventData(object):
     """Container class for just the info we should output."""
 
@@ -842,7 +885,8 @@ class EventData(object):
         # The following dictionary gives class names which handle each format:
         self.handlers = {'raw': EventWriter(self.data),
                          'csv': EventWriterCSV(self.data),
-                         'json': EventWriterJSON(self.data)}
+                         'json': EventWriterJSON(self.data),
+                         'fdsnws-text': EventWriterFDSNText(self.data)}
 
     def append(self, new_data):
         self.data.append(new_data)
@@ -1184,7 +1228,8 @@ class EventResponse(object):
             else:
                 return self.rows
 
-        elif fmt == 'csv' or fmt == 'json':
+        elif fmt in ('csv', 'json', 'fdsnws-text'):
+            ####REMOVE BEFORE CHCKreturn self.ed.write_all('csv', 14)
             return self.ed.write_all(fmt, limit)
 
         else:
@@ -1370,6 +1415,7 @@ Service version:
           rows - string containing the data, lines separated by '\n'
           limit - integer, maximum number of events to produce
           fmt - string, *output* format, one of [ 'raw', 'csv', 'text',
+              'fdsnws-text',
               'json' 'json-row-major', 'json-col-major',
               'quakeml' (in future), ... ]
 
@@ -1387,7 +1433,7 @@ Service version:
 
         er = EventResponse(self.csv_dialect, self.column_map, self.filter_table, self.options)
 
-        if fmt in ('csv', 'json'):
+        if fmt in ('csv', 'json', 'fdsnws-text'):
             er.load_csv(rows, limit, self.csv_dialect)
             er.fill_regions()
         else:
@@ -1412,12 +1458,13 @@ Service version:
           'raw'  - just what was received from the target service
           'text' - the same, but limited to 'limit' events?
           'csv'  - see EventWriterCSV
+          'fdsnws-text' - CSV as for fdsnws-event
           'json' - see EventWriterJSON: JSON table analogous to CSV
 
         """
         if fmt == 'json-row':
             fmt = 'json'
-        if fmt in ('raw', 'text', 'csv', 'json'):
+        if fmt in ('raw', 'text', 'csv', 'fdsnws-text', 'json'):
             return er.write(limit, fmt)
         else:
             raise SyntaxError("In EventService.write_response: Unimplemented output format")
@@ -2417,7 +2464,7 @@ class ESGeofon(EventService):
 
         fmt = hold_dict.get('format', 'text')  # ???
 
-        fmts_okay = ('raw', 'text', 'csv', 'json', 'json-row')
+        fmts_okay = ('raw', 'text', 'csv', 'fdsnws-text', 'json', 'json-row')
         if not fmt in fmts_okay:
             msg = "Supported output formats are %s" % (str(fmts_okay))
             self.raise_client_400(environ, msg)
@@ -2461,7 +2508,7 @@ class ESGeofon(EventService):
 ##            #print allrows
 ##            #print '\n\n'
 
-        if fmt.startswith("json") or fmt == "csv":
+        if fmt.startswith("json") or fmt == "csv" or fmt == "fdsnws-text":
             header = ""
         else:
             header = "# " + url + "\n"
