@@ -234,7 +234,7 @@ Service version:
             elif h == 'emsc':
                 es = ESEMSC(s, options,   props['baseURL'], props['extraParams'])
             elif h == 'fdsnws':
-                es = ESINGV(s, options,   props['baseURL'], props['extraParams'])
+                es = ESFdsnws(s, options,   props['baseURL'], props['extraParams'])
             elif h == 'meteor':
                 es = ESMeteor(s, options)
             elif h == 'neic':
@@ -252,7 +252,7 @@ Service version:
                 logs.debug('%24s: %s' % (p, props.get(p)))
 
         if (abort): raise SyntaxError, "Configuration problem(s), see the logs."
-        
+
     def dumpConfig(self, envir, params):
         return ("Event services configuration at %s\n" % str(datetime.datetime.now()) + str(self),)
 
@@ -281,7 +281,7 @@ Service version:
                         "hasDepth": False,
                         "hasMagnitude": True,
                         "description": None}
-        
+
         d = dict.fromkeys(self._EventServiceCatalog.keys())
         for k in d.keys():
             d[k] = dict(handler_capabilities_default)
@@ -2469,35 +2469,36 @@ class ESGeofon(EventService):
 
         return self.send_response(environ, start_response, header, allrows, limit, fmt)
 
-   
-# ------------------------------------------------------INGV ES ----------------------------------------- #
+# --------------------------- INGV ES --------------------------------
 
+class ESFdsnws(EventService):
+    """An event service for FDSN fdsnws-event web service
+    (e.g. running at INGV). This is based on its CSV output,
+    so requires "format=text" on the query strings sent to
+    the target web service.
 
-class ESINGV(EventService):
-    #### """An event service for INGV ws (FDSN) """
-   
-    class ingv_dialect(csv.excel):
+    Initial version contributed by Valentino Laucani, Massimo
+    Fares et al. at INGV. Many thanks!
+
+    """
+
+    class fdsnws_dialect(csv.excel):
         delimiter = '|'
-        
-    csv_dialect = ingv_dialect
-   
-    
-    #               
+
+    csv_dialect = fdsnws_dialect
+
+    #
     #   column_map -> field meaning & position :
     #    'datetime'-0, 'magnitude'-1,
-    #    'magtype' - 2
+    #    'magtype' - 2,
     #    'latitude'-3, 'longitude'-4, 'depth'-5, 'key'-6, 'region'-7
     #
-    
     column_map = (0, 1, 2, 3, 4, 5, 6, 7)
-    
+
     #
-    #    filter_table 
+    #    filter_table
     #
-    
-    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None) 
-   
-    
+    filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
 
     def __init__(self, name, options,service_url,extra_params):
         self.name = name
@@ -2506,42 +2507,40 @@ class ESINGV(EventService):
         self.service_url = service_url
         self.extra_params = extra_params
         self.defaultLimit = options['defaultLimit']
-      
-      
+
     def handler(self, environ, parameters):
-        
         paramMap = defaultParamMap
         paramMap['start'] = 'starttime'
         paramMap['end'] = 'endtime'
         paramMap['minlat'] = 'minlat'
         paramMap['maxlat'] = 'maxlat'
         paramMap['minlon'] = 'minlon'
-        paramMap['maxlon'] = 'maxlon'        
+        paramMap['maxlon'] = 'maxlon'
         paramMap['lat'] = 'lat'
         paramMap['lon'] = 'lon'
         paramMap['minradius'] = 'minradius'
         paramMap['maxradius'] = 'maxradius'
         paramMap['mindepth'] = 'mindepth'
-        paramMap['maxdepth'] = 'maxdepth'        
+        paramMap['maxdepth'] = 'maxdepth'
         paramMap['minmag'] = 'minmag'
         paramMap['maxmag'] = 'maxmag'
         paramMap['limit'] = 'limit'
-                
-        header = '' 
-       
+
+        header = ''
+
     	pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
-        
+
         limit = hold_dict.get('limit', self.defaultLimit)
         try:
             limit = int(limit) + 1
         except ValueError:
             self.raise_client_400("Parameter 'limit' must be an integer")
-        
+
         for k in range(len(pairs)):
             if pairs[k].startswith('limit'):
                 del pairs[k]
         pairs.append("limit=%s" % (limit))
-    
+
         # send a request
         try:
             allrows, url = self.send_request(pairs)
@@ -2549,37 +2548,36 @@ class ESINGV(EventService):
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
-        # Heuristic to identify "no data" from ingv
+        # Heuristic to identify "no data" from INGV service
         numrows = allrows.count('\n')
         if numrows <= 1 and allrows.count(self.csv_dialect.delimiter) > 1:
             self.raise_client_204(environ, 'No events returned')
-        
-        # check response for "no data" returned            
-        check_string = "Error 413"        
+
+        # check response for "no data" returned
+        check_string = "Error 413"
         if (check_string in allrows) or (len(allrows) < 5 ):
             self.raise_client_204(environ, 'No events returned')
-                   
+
         myallrow = allrows.split("\n")
         myallrow[0] = "#"+myallrow[0]
-        
+
         my_row_for_send =''
-        
+
         # rebuild the resultset
         for item in myallrow:
-            if(item):    
-                if(item[0]=="#"): 
+            if(item):
+                if(item[0]=="#"):
                     continue
-                            
-                this_row = item.split("|")                
+
+                this_row = item.split("|")
                 mytime = this_row[1].split(".")
                 my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[9]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
-   
-        fmt = str(parameters.get('format', ['text'])[0])
-             
-        return self.send_response(environ, start_response, header, my_row_for_send, limit, fmt)
-     
 
-    #### ------------------------------------------------------ ###
+        fmt = str(parameters.get('format', ['text'])[0])
+
+        return self.send_response(environ, start_response, header, my_row_for_send, limit, fmt)
+
+# --------------------------------------------------------------------
 
 
 def bodyBadRequest(environ, msg, service="[event]"):
