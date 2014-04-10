@@ -3,7 +3,7 @@
         <!-- Start of the webinterface module definition -->
         <module name="webinterface" category="Modules/Arclink" standalone="true">
                 <description>
-                        The webinterface module is an Arclink client for retrieving waveforms based on events or inventory.
+                        The webinterface module is an Arclink client for retrieving waveforms and metadata based on events or inventory. It can also be used as an event and station discovery tool.
                 </description>
                 <!-- Configuration section to describe configuration file parameters -->
                 <configuration>
@@ -49,7 +49,7 @@ seconds, for XXX requests?</description>
                                 </parameter>
                                 <group name="catalogs">
 				        <parameter name="ids" type="list" default="geofon, comcat, emsc, parser">
-                                             <description>List of all event services which will be enabled. Include 'parser' here to support file upload. For each service, there must be an EventService object with a handler method suitable for the service. There may be more than one instance of each EventService with different configuration parameters (e.g. different baseURL), in which case they are distinguished by the names here.</description>
+                                             <description>List of all event services which will be enabled. Include 'parser' here to support file upload. For each service, there must be an internal EventService object with a handler method suitable for the service. There may be more than one instance of each EventService with different configuration parameters (e.g. different baseURL), in which case they are distinguished by the names here. See event.service.*.handler below.</description>
                                         </parameter>
 					<parameter name="preferred" type="string" default="geofon">
                                                 <description>The preferred service appears first in the pull-down menu of event services.</description>
@@ -67,10 +67,14 @@ seconds, for XXX requests?</description>
                                              <description>If an event service *does* provide a region name (e.g. an F.-E. region) should we look it up anyway, and override what was supplied up?</description>
                                         </parameter>
                                 </group>
-                                <group name="service">
+                                <group name="service.*">
 				        <parameter name="description" type="string" default="">
                                              <description>Short description for this target event service. This is provided in the catalog (/event/catalogs). It is displayed in the presentation layer under XXX.</description>
                                         </parameter>
+                                        <parameter name="handler" type="string" default="">
+                                             <description>What event service handler is to be used internally for this target event service. Allowable values are defined in 'known_handlers' list in event.py. For some old service names ("comcat", "emsc", "geofon") this parameter is not required, and if absent, it is inferred from the service name. This behaviour may be removed in future; you should explicitly set a value in your configuration file.</description>
+                                        </parameter>
+
 					<parameter name="baseURL" type="string" default="">
                                              <description>URL of the target event service. In forming queries of service {name}, baseURL is followed by '?' and any parameters, followed by event.service.{name}.extraParams</description>
                                         </parameter>
