@@ -1061,12 +1061,12 @@ class TestCompareServicesOnline(unittest.TestCase):
 
 class TestEventServiceFDSN(unittest.TestCase):
     """
-    Tests of the fdsn-event handler, using the INGV implementation.
+    Tests of the fdsn-event handler.
     """
     #service_base_url = "http://eida.rm.ingv.it/webinterface/wsgi"
     service_base_url = "http://localhost:8008"  #  -- for manage.py
     catalog_url = service_base_url + "/event/catalogs"
-    fdsn_url = service_base_url + "/event/ingv"
+    fdsn_url = service_base_url + "/event/fdsnws"
 
     # Header contents must match what JavaScript (request.js) expects,
     # as defined in its _event_format structure.
@@ -1084,7 +1084,7 @@ class TestEventServiceFDSN(unittest.TestCase):
         self.assertGreater(len(response), 10)
 
         resp = json.loads(response)
-        self.assertTrue(resp.has_key('ingv'))
+        self.assertTrue(resp.has_key('fdsnws'))
 
     def test_events_no_qs(self):
         """Empty query string, should get SOMETHING.
