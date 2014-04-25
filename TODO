@@ -35,9 +35,7 @@ Things that need fixing in the short term
 * :event: Implement ISC catalog - example URL is
 http://www.isc.ac.uk/cgi-bin/web-db-v4?request=COMPREHENSIVE&out_format=CATCSV&searchshape=RECT&bot_lat=0&top_lat=50&left_lon=-30&right_lon=30&ctr_lat=&ctr_lon=&radius=&max_dist_units=deg&srn=&grn=&start_year=2013&start_month=2&start_day=28&start_time=00%3A00%3A00&end_year=2013&end_month=3&end_day=01&end_time=00%3A00%3A00&min_dep=&max_dep=&min_mag=&max_mag=&req_mag_type=Any&req_mag_agcy=Any&include_links=on
 
-* :event: Implement fdsnws handler (assuming CSV output?)
-
-* :event: Read QuakeML
+* :event: Read QuakeML e.g. from fdsnws-event
 
 * :event: Using parse for event catalog - depths are lost again.
 	- also show a pop-up/console warning if NOTHING was readable.
@@ -48,10 +46,6 @@ http://www.isc.ac.uk/cgi-bin/web-db-v4?request=COMPREHENSIVE&out_format=CATCSV&s
 	- can we use current openlayers with the webdc.html example?
 
 * Advanced stream filter - what???
-
-* Download button for the stations list.
-
-* Upload method for a stations list.
 
 * :event/station: Add/trim/filter already-chosen events/stations
 

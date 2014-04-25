@@ -64,3 +64,18 @@ v0.4 (2014-01-22)
   - Notes on customisation, and upgrading.
   - Notes on browser compatibility, bzip2 compression and response dictionaries.
   - "WebDC3" references; minor language improvements; lots of minor polish, spell-checking etc.
+
+v0.5 (2014-04-25)
+============================
+
+* Shifted to git repository at bitbucket.org
+* JS: support save and upload of station lists
+* JS: On submission, reselect between relative and absolute mode.
+* Events module: Handler for fdsnws-event, thanks to INGV. Support
+  multiple instances of a single handler type. The awful eventconfig.py is gone.
+  Prototype class EventWriterFDSNText, for output format=fdsnws-text (for now).
+* Metadata module: /metadata/import method added; changes for download
+* Cosmetic/style changes to Python code for PEP conformance
+* Improvements to testing code.
+* update-metadata.sh - added minimal help
+
