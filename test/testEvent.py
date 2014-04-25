@@ -12,6 +12,7 @@ import math
 import os
 import sys
 import tempfile
+import time
 import unittest
 import urllib
 
@@ -87,7 +88,7 @@ class TestTinyThings(unittest.TestCase):
         ed = event.EventData()
         ed.json_loads(body[0])
         #print ed.data
-        self.assertEqual(ed.data[0][6], "Chelyabinsk")
+        self.assertEqual(ed.data[0][7], "Chelyabinsk")
 
     def test_region_lookup_empty(self):
         """Passes if lookupIfEmpty == True. Requires SC3 look-up.
@@ -108,12 +109,12 @@ class TestTinyThings(unittest.TestCase):
 
             if len(ed.data) == 1:
                 dates = ed.column(0)
-                lats = ed.column(2)
-                lons = ed.column(3)
-                regions = ed.column(6)
+                lats = ed.column(3)
+                lons = ed.column("longitude")
+                regions = ed.column("region")
                 #for ev in range(len(lats)):
                 #    print "%3i | %s | %8.3g | %8.3g | %s" % (ev, dates[ev], lats[ev], lons[ev], regions[ev])
-                self.assertEqual(ed.data[0][6], "Southwestern Siberia, Russia")
+                self.assertEqual(ed.data[0][7], "Southwestern Siberia, Russia")
 
             else:
                 print "Didn't get exactly one event, check request parameters."
@@ -248,10 +249,14 @@ class TestDelAzi(unittest.TestCase):
 # ----------------------------------------------------------------------
 
 class TestEventData(unittest.TestCase):
-    test_rows = [['1999-05-05T12:00:00', 4.5, 30, 60, 10, 'p101', 'Earth Somewhere'],
-                 ['2001-01-01T12:00:00', 4, 15.0, 60, 10, 'p102', 'Europe'],
-                 ['2002-02-02T12:00:00', 3.5, 89, 0, 100, 'p103', "Santa's village"],
-                 ['2003-03-03T12:00:00', 3, -89, 180,  5, 'p104', 'South Pole']
+    columns = ('datetime', 'magnitude', 'magtype',
+               'latitude', 'longitude', 'depth',
+               'key', 'region')
+    header = ','.join(columns)
+    test_rows = [['1999-05-05T12:00:00', 4.5, 'Mb', 30, 60, 10, 'p101', 'Earth Somewhere'],
+                 ['2001-01-01T12:00:00', 4, 'Mw', 15.0, 60, 10, 'p102', 'Europe'],
+                 ['2002-02-02T12:00:00', 3.5, 'M', 89, 0, 100, 'p103', "Santa's village"],
+                 ['2003-03-03T12:00:00', 3, 'Ml', -89, 180,  5, 'p104', 'South Pole']
                  ]
 
     def test_zero(self):
@@ -278,19 +283,28 @@ class TestEventData(unittest.TestCase):
         lim = 5
         body = ed.write_all('json', lim)
         self.assertEqual(count_json_obj(body), lim+1)       # header row
-        self.assertEqual(count_json_obj2(body), 7*(lim+1))  # 7 cols
+        self.assertEqual(count_json_obj2(body), len(ed.column_names)*(lim+1))  # 8 cols
         #DEBUGprint body
 
     def test_csv(self):
+
         ed = event.EventData()
         ed.append(self.test_rows[0])
         body = ed.write_all('csv', 10)
-        print "test_csv:\n", body
+        if test_verbosity > 0:
+            print "test_csv:\n", body
+        self.assertEqual(body.count('\n'), 3)
+        self.assertEqual(body.count(','), 2*(len(self.columns)-1))
+        self.assertEqual(body.split('\r')[0], self.header)
 
+                                   
     def test_json(self):
         ed = event.EventData(self.test_rows[0])
         body = ed.write_all('json', 10)
-        print "test_json:\n", body
+        if test_verbosity > 0:
+            print "test_json:\n", body
+        self.assertTrue(isinstance(body, str))
+        self.assertGreater(len(body), len(self.header)*2)  # Weak bound - body is a string.
 
     def test_json_loads(self):
         """Round-tripping via JSON string."""
@@ -298,12 +312,31 @@ class TestEventData(unittest.TestCase):
         for ev in self.test_rows:
             ed.append(ev)
         result = ed.write_all('json', len(self.test_rows))
-        print "len(result):", len(result)
+        self.assertEqual(len(result), 373)
 
         ed2 = event.EventData()
         ed2.json_loads(result)
-        print "data:", ed2.data
+        #print "data:", ed2.data
         self.assertEqual(len(ed2), len(self.test_rows))
+        for f in range(len(ed2)):
+            self.assertEqual(len(ed2.data[f]), 8)
+
+    def test_text(self):
+        """FDSN-style text output"""
+        fdsnws_header = "EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName"
+        ed = event.EventData()
+        for ev in self.test_rows:
+            ed.append(ev)
+        num_rows = len(self.test_rows)
+        result = ed.write_all('text', num_rows)
+        lines = result.split('\n')
+        for line in lines:
+            print line
+
+        self.assertEqual(len(lines), num_rows + 2)  # Why not +1?
+        self.assertEqual(lines[0].strip(), fdsnws_header)
+        self.assertEqual(result.count('|'), (num_rows+1)*fdsnws_header.count('|'))
+
 
     def test_unimplemented(self):
         """Unimplemented 'fmt' option raises KeyError.
@@ -674,18 +707,20 @@ class TestEventServiceOnline(unittest.TestCase):
 
         #print 'test_geofon_asia: len:', len(ed)
 
-        lats = ed.column(2)
-        self.assertTrue(min(lats) >= region['minlat'])
-        self.assertTrue(max(lats) <= region['maxlat'])
+        lats = ed.column('latitude')
+        self.assertGreaterEqual(min(lats), region['minlat'])
+        self.assertLessEqual(max(lats), region['maxlat'])
 
         # The following assertions about longitude DO NOT hold if
         # the region crosses the Date Line:
-        longs = ed.column(3)
-        self.assertTrue(min(longs) >= region['minlon'])
-        self.assertTrue(max(longs) <= region['maxlon'])
+        longs = ed.column('longitude')
+        self.assertGreaterEqual(min(longs), region['minlon'])
+        self.assertLessEqual(max(longs), region['maxlon'])
 
     def test_geofon_circle_north(self):
-        """A circular region of interest."""
+        """A circular region of interest.
+        FAILS 2014-04-09: Returns events including Laptev Sea
+        """
         region = {'lat': 80, 'lon': 90, 'maxradius': 5}
         env = {'PATH_INFO': 'event/geofon',
                'QUERY_STRING': '&'.join(['start=2012-06-01',
@@ -700,6 +735,7 @@ class TestEventServiceOnline(unittest.TestCase):
         for line in body[0].splitlines():
             if line.startswith('#'):
                 continue
+            print "test_geofon_circle_north:", line
             self.assertTrue(line.endswith('Severnaya Zemlya') or line.endswith('region'))
 
     def test_geofon_dateline(self):
@@ -718,7 +754,7 @@ class TestEventServiceOnline(unittest.TestCase):
         ed = event.EventData()
         ed.json_loads(body[0])
 
-        longs = ed.column(3)
+        longs = ed.column(4)
         #print "longs (sorted):", sorted(longs)
         westlongs = []
         eastlongs = []
@@ -730,8 +766,8 @@ class TestEventServiceOnline(unittest.TestCase):
 
         # The following assertions about longitude DO NOT hold if the
         # region crosses both the Date Line AND the Prime Meridian:
-        self.assertTrue(min(eastlongs) >= region['minlon'])
-        self.assertTrue(max(westlongs) <= region['maxlon'])
+        self.assertGreaterEqual(min(eastlongs), region['minlon'])
+        self.assertLessEqual(max(westlongs), region['maxlon'])
 
     def test_depth_ranges(self):
         """Use depth filtering with the GEOFON eqinfo service."""
@@ -827,6 +863,17 @@ class TestEventServiceOnline(unittest.TestCase):
         #print "Lines:", num_lines
         self.assertEqual(num_lines, 6)   # 4 + 2 for header
 
+    def test_select_geofon_format_text(self):
+        """Request fdsnws-event text output. FIXME: QS needs to be 'format=text'!"""
+        env = {'PATH_INFO': 'event/geofon',
+               'QUERY_STRING': 'start=2013-06-01&end=2013-06-16&minmag=6.0&limit=4&format=fdsnws-text'}
+        body = mod.getEvents(env, start_response)
+        num_lines = count_lines(body)
+        print "geofon_format_text: body:", body, "(%i)" % len(body[0])
+        #print "Lines:", num_lines
+        self.assertEqual(num_lines, 5)   # 4 + 1 for header
+        self.assertEqual(body[0].count('|'), num_lines*12)
+                         
     def test_select_geofon_format_bad(self):
         """Reject an unsupported format constraint.
 
@@ -920,7 +967,7 @@ class TestEventServiceMeteor(unittest.TestCase):
         env = {'PATH_INFO': 'event/meteor', 'QUERY_STRING': 'format=json'}
         body = mod.getEvents(env, start_response)
         self.assertEqual(count_lines(body), 0)
-        self.assertEqual(count_json_obj2(body[0]), 7*2)  # Header + 1 event.
+        self.assertEqual(count_json_obj2(body[0]), 8*2)  # Header + 1 event.
 
 
 class TestEventServiceEMSC(unittest.TestCase):
@@ -945,7 +992,7 @@ class TestEventServiceEMSC(unittest.TestCase):
         #print "JSON objects:", count_json_obj(body[0])
         self.assertEqual(count_json_obj(body[0]), 6)  # Header row, +limit objects
         #print "test_emsc_default_json: JSON sub-objects:", count_json_obj2(body[0])
-        self.assertEqual(count_json_obj2(body[0]), 6*7)  # (Header row, +limit objects)*7 cols
+        self.assertEqual(count_json_obj2(body[0]), 6*8)  # (Header row, +limit objects)*8 cols
 
 
 class TestCompareServicesOnline(unittest.TestCase):
@@ -981,7 +1028,7 @@ class TestCompareServicesOnline(unittest.TestCase):
         deg2km = math.pi*a/180.0
         c = 4.0  # km/sec
         lat_scale = deg2km/c
-        phi = 0.5*(ev1[2] + ev2[2])
+        phi = 0.5*(ev1[3] + ev2[3])  # latitudes
         lon_scale = math.cos(phi)*lat_scale
         #      time, mag,  lat,       lon,    depth
         scales = [1, 0.2, lat_scale, lon_scale, 10]
@@ -994,9 +1041,9 @@ class TestCompareServicesOnline(unittest.TestCase):
         
         return sum([ (time_delta/scales[0])**2,
                     ((ev1[1] - ev2[1])/scales[1])**2,
-                    ((ev1[2] - ev2[2])/scales[2])**2,
-                    ((ev1[3] - ev2[3])/scales[3])**2,
-                    ((ev1[4] - ev2[4])/scales[4])**2  ])
+                    ((ev1[3] - ev2[3])/scales[2])**2,
+                    ((ev1[4] - ev2[4])/scales[3])**2,
+                    ((ev1[5] - ev2[5])/scales[4])**2  ])
                 
     def testJune(self):
         qs = "&".join(self.params_0)
@@ -1035,18 +1082,24 @@ class TestCompareServicesOnline(unittest.TestCase):
         print "Matched %i/%i GEOFON events to %i ComCat events." % (len(matched),
                                                                     len(ed['geofon'].data),
                                                                     len(ed['comcat'].data))
-      
+        self.assertEqual(len(ed['geofon'].data), 15)
+        self.assertEqual(len(ed['comcat'].data), 17)
+        self.assertEqual(len(matched), 12)
 
 # ----------------------------------------------------------------------
 
 class TestEventServiceFDSN(unittest.TestCase):
     """
-    Tests of the fdsn-event handler, using the INGV implementation.
+    Tests of the fdsn-event handler.
     """
     service_base_url = "http://eida.rm.ingv.it/webinterface/wsgi"
     #service_base_url = "http://localhost:8008"  #  -- for manage.py
     catalog_url = service_base_url + "/event/catalogs"
-    fdsn_url = service_base_url + "/event/ingv"
+    fdsn_url = service_base_url + "/event/fdsnws"
+
+    # Header contents must match what JavaScript (request.js) expects,
+    # as defined in its _event_format structure.
+    expected_header = ("datetime", "magnitude", "magtype", "latitude", "longitude", "depth", "key", "region")
 
     # Header contents must match what JavaScript (request.js) expects,
     # as defined in its _event_format structure.
@@ -1064,7 +1117,7 @@ class TestEventServiceFDSN(unittest.TestCase):
         self.assertGreater(len(response), 10)
 
         resp = json.loads(response)
-        self.assertTrue(resp.has_key('ingv'))
+        self.assertTrue(resp.has_key('fdsnws'))
 
     def test_events_no_qs(self):
         """Empty query string, should get SOMETHING.
@@ -1080,11 +1133,7 @@ class TestEventServiceFDSN(unittest.TestCase):
                 self.fail()
                 return
         response = fd.read()
-
-        # Probably CSV, 15 events? Or today's events?
-        # Looks like: time, mag, lat, lon, depth, event ID?, region
         self.assertGreater(len(response), 5)
-        print response
 
     def test_events_json(self):
         """Some unrestricted JSON output"""
@@ -1099,7 +1148,6 @@ class TestEventServiceFDSN(unittest.TestCase):
 
         response = fd.read()
         resp = json.loads(response)
-        print resp
         self.assertGreater(len(resp), 3)
 
         # Header contents must match what JavaScript (request.js) expects,
@@ -1219,7 +1267,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             qs = urllib.urlencode(params)
             print "qs:", qs
             response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-            print ; print response
+            #print "Response:\n", response
             resp = json.loads(response)
             self.assertEqual(resp[0][col], 'latitude')
             for ev in resp[1:]:
@@ -1240,7 +1288,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             qs = urllib.urlencode(params)
             print "qs:", qs
             response = urllib2.urlopen(self.fdsn_url + '?' + qs).read()
-            print ; print response
+            #print "Response:\n", response
             resp = json.loads(response)
             self.assertEqual(resp[0][col], 'longitude')
             for ev in resp[1:]:
@@ -1275,6 +1323,7 @@ class TestEventServiceFDSN(unittest.TestCase):
             print "Start = %s; qs='%s'; num=%d" % (start_date, qs, num_new)
             self.assertGreaterEqual(num_new, num)
             num = num_new
+            time.sleep(1)
 
     def test_events_minmag(self):
         """As we increase minmag, number of events must not increase"""

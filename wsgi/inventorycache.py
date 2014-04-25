@@ -13,7 +13,7 @@
 (c) 2013 GEOFON, GFZ Potsdam
 
 Encapsulate and manage the information of networks,
-stations, locations and streams read from an Arclink XML file inventory.
+stations, locations and streams read from an Arclink inventory XML file.
 
 
 This program is free software; you can redistribute it and/or modify it
@@ -64,7 +64,7 @@ class InventoryCache(object):
         self.cachefile = os.path.join(os.path.dirname(inventory),
                                       'webinterface-cache.bin')
 
-        # Set how often the Cache should be updated (in seconds)
+        # Set how often the cache should be updated (in seconds)
         self.time2refresh = 3600.0
 
         # Fake date to force an update the first time
@@ -160,7 +160,14 @@ class InventoryCache(object):
 
         # Look how old the two versions of inventory are.
         # First version: XML file
-        xml_time = os.path.getmtime(self.inventory)
+
+        try:
+            xml_time = os.path.getmtime(self.inventory)
+        except OSError as e:
+            logs.error('No inventory file! Bye.')
+            return  ### NOT SURE WHAT WE SHOULD DO HERE.
+
+
         # Second version: A pickle dump of the processed structures in memory
         try:
             pic_time = os.path.getmtime(self.cachefile)
@@ -995,7 +1002,7 @@ class InventoryCache(object):
         try:
             networktype = params.get('networktype')
 
-            if(networktype == 'all') or (networktype is None):
+            if (networktype == 'all') or (networktype is None):
                 networktype = None
             else:
                 for nettype in self.nettypes:
@@ -1270,4 +1277,3 @@ class InventoryCache(object):
             return result
 
         return None
-

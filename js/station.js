@@ -569,7 +569,7 @@ function StationSearchControl(htmlTagId) {
 		html += '<h3>Station Information</h3>';
 		html += '<div id="sscStationMode" align="center">';
 		html += '<input type="radio" value="Catalog" id="sscStationModeCatalog" name="sscStationMode" /><label for="sscStationModeCatalog">Browse Inventory</label>';
-		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">Supply List</label>';
+		html += '<input type="radio" value="File" id="sscStationModeFile" name="sscStationMode" /><label for="sscStationModeFile">User Supplied</label>';
 		html += '</div>';
 
 		html += '<div id="sscStationDiv">';
@@ -658,7 +658,7 @@ function StationSearchControl(htmlTagId) {
 		var importURL = configurationProxy.serviceRoot() + 'metadata/import';
 		html += '<form id="importForm" name="importForm" action="' + importURL + '" target="importIframe" method="post" enctype="multipart/form-data">';
 		html += '<input type="file" name="file" value="" class="wi-inline-full" />';
-		html += '<div style="padding: 8px; text-align: left;" class="wi-spacer"><br>You can upload files in one of the following two formats: <ul><li> * a list of stations previously saved in WebDC3 (by means of the button "Save Stations" in the "Event and Station List")</li><li> * a file retrieved from any FDSN compliant Station-Web Service in text format</li></ul></div><br>'
+		html += '<div style="padding: 8px; text-align: left;" class="wi-spacer"><br>You can upload <i>text</i> files in one of the following two formats:<ul><li>A list of stations previously saved here. (Use the "Save Stations"  button in the "Event and Station List").</li><li>A file retrieved from any FDSN compliant fdsnws-station Web Service in text format.</li></ul></div><br>'
 		html += '<input id="sscSendList" class="wi-inline" type="submit" value="Send List" />';
 		html += '</form>';
 		html += '<iframe name="importIframe" src="#" style="display: none;" ></iframe>';
@@ -685,7 +685,7 @@ function StationSearchControl(htmlTagId) {
 					}
 				},
 				error: function(){
-					wiConsole.log("Something went wrong with ajax");
+					wiConsole.notice("Something went wrong with AJAX");
 				}
 			});
 			return false;

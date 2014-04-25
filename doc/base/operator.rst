@@ -375,6 +375,7 @@ At a minimum, you will need to
   
 to something suitable for your site.
 Other options should be suitable for getting started.
+You may also wish to adjust the selection of event services.
 For full details of all configuration options, see `full-config-options`_.
 
 
@@ -407,6 +408,8 @@ Metadata options
 
 Events options
 ~~~~~~~~~~~~~~
+
+*FIXME: See options configuration section*
 
 * Event Search Control options::
 

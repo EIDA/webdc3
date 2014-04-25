@@ -43,7 +43,7 @@ arclink.networkXML = "eida.xml"
 
 # All event services which will be enabled.
 # Include 'parser' here to support file upload.
-event.catalogs.ids = geofon, comcat, emsc, parser, meteor
+event.catalogs.ids = geofon, comcat, emsc, fdsnws, parser, meteor
 # A service with no description will be hidden, that is requests to
 # "/event/{id}" will be handled, but not listed in the "Events Services"
 # dialog box. Only those services with a non-empty "description" attribute
@@ -62,16 +62,25 @@ event.verbosity = 2
 
 # Service URLs:
 event.service.geofon.description = GFZ
+event.service.geofon.handler = geofon
 event.service.geofon.baseURL = "http://geofon.gfz-potsdam.de/eqinfo/list.php"
 event.service.geofon.extraParams = "fmt=csv"
 
 event.service.comcat.description = USGS
+event.service.comcat.handler = comcat
 event.service.comcat.baseURL = "http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php"
 event.service.comcat.extraParams = "format=csv"
 
 event.service.emsc.description = EMSC
+event.service.emsc.handler = emsc
 event.service.emsc.baseURL = "http://www.emsc-csem.org/Earthquake/"
 event.service.emsc.extraParams = "filter=yes&export=csv"
+
+event.service.fdsnws.description = INGV
+event.service.fdsnws.handler = fdsnws
+event.service.fdsnws.baseURL = "http://webservices.rm.ingv.it/fdsnws/event/1/query"
+event.service.fdsnws.extraParams = "format=text&user=webinterface"
+
 # Maybe: column map
 # Maybe^2: filters
 
