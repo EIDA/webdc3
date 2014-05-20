@@ -32,7 +32,20 @@ assert( len(sb.intersection(sr) == 0 )
 
 EOF
 
+function test_export() {
+	local_url_base="http://localhost/webinterface"
+	wget -S "${local_url_base}/wsgi/metadata/export?streams=[[%22GE%22,%22UGM%22,%22BHZ%22,%22%22],[%22GE%22,%22APE%22,%22BHE%22,%22%22]]" -o foo.wget -O foo.dat
+	od -a foo.dat > 1
 
-wget -S "http://localhost/webinterface/wsgi/metadata/export?streams=[[%22GE%22,%22UGM%22,%22BHZ%22,%22%22],[%22GE%22,%22APE%22,%22BHE%22,%22%22]]" -o foo.wget -O foo.dat
-od -a foo.dat
+	cat >2 <<EOF
+0000000   G   E  sp   U   G   M  sp   -   -  sp   B   H   Z  nl   G   E
+0000020  sp   A   P   E  sp   -   -  sp   B   H   E  nl
+0000034
+EOF
+
+	diff 1 2
+	rm 1 2 foo.dat
+}
+
+test_export
 
