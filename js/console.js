@@ -262,7 +262,7 @@ $(document).ready(function(){
 		if (window.console.error === undefined)
 			window.console.error = wiConsole.error
 
-		window.wiConsole.info("Loading webinterface v0.5...")
+		window.wiConsole.info("Loading webinterface v0.6...")
 	}
 	catch (e) {
 		alert("console.js: " + e.message)

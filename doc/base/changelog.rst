@@ -79,3 +79,6 @@ v0.5 (2014-04-25)
 * Improvements to testing code.
 * update-metadata.sh - added minimal help
 
+v0.6 (2014-05-21)
+============================
+* EMSC service now uses fdsnws-event at seismicportal.eu.

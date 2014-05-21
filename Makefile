@@ -24,6 +24,13 @@ tools/manager.py:
 # with all the code we want, none we don't,
 # and the manual?
 #
+# Before doing a release, update the version number in 
+#  - doc/templates/conf.py
+#  - js/console.js
+# and update doc/base/changelog.rst
+# (e.g. find . -type f -exec grep --color 0\\.5 {} \; -print)
+# Then 'make documentation' and check that it looks right.
+#
 DATESTR:=$(shell date +%Y.%j)
 RELEASEFILE=webdc3-${DATESTR}.tgz
 # Ideally, release-yyyy.jjj.tgz
