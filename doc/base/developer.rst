@@ -108,7 +108,7 @@ box, but this means that the end parameter value required is
 Following the FDSN web services specification, this date-time may be
 abbreviated to `end=2013-07-01` i.e. the *start of the next day*.
 
-  .. example::
+  .. note::
      A query to a FDSN-style web service with ``start=2001-01-01&end=2001-01-02`` is used to obtain only events occurring on 1 January 2001.
 
 We were faced with two unpalatable choices:
