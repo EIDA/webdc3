@@ -204,7 +204,7 @@ Service version:
             # This exception means users don't have to update their
             # old webinterface.cfg. It should be removed in future.
             #
-            if s in known_handlers:
+            if s in known_handlers and props.get("handler", None) == None:
                 h = s
                 logs.notice("Assuming handler '%s'; you should set this explicitly in webinterface.cfg with:" % h)
                 logs.notice("  event.service.%s.handler = '%s'" % (s, h))
@@ -227,7 +227,6 @@ Service version:
 
             # All known handlers:
             if h == 'geofon':
-                print >>sys.stderr, "TEST Creating an ESGeofon for", s, props
                 es = ESGeofon(s, options, props['baseURL'], props['extraParams'])
             elif h == 'comcat':
                 es = ESComcat(s, options, props['baseURL'], props['extraParams'])

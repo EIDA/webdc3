@@ -72,9 +72,9 @@ event.service.comcat.baseURL = "http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/
 event.service.comcat.extraParams = "format=csv"
 
 event.service.emsc.description = EMSC
-event.service.emsc.handler = emsc
-event.service.emsc.baseURL = "http://www.emsc-csem.org/Earthquake/"
-event.service.emsc.extraParams = "filter=yes&export=csv"
+event.service.emsc.handler = fdsnws
+event.service.emsc.baseURL = "http://www.seismicportal.eu/fdsnws/event/1/query"
+event.service.emsc.extraParams = "format=text"
 
 event.service.fdsnws.description = INGV
 event.service.fdsnws.handler = fdsnws
