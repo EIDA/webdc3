@@ -8,6 +8,7 @@ clean:
 	(cd doc ; make clean)
 	(cd wsgi ; rm -f *.pyc ; rm -f */*.pyc)
 	(cd test ; rm -f *.pyc )
+	(cd tools ; rm -f manager.py)
 
 documentation:
 	(cd doc ; make install)
@@ -18,7 +19,11 @@ gitcheck:
 # FIXME: Now in medusa.git:
 # /tmp/gitlocal/medusa/src/arclink/libs/python/seiscomp/arclink/manager.py
 tools/manager.py:
-	svn export svn+ssh://st32/srv/svn/repos/medusa/trunk/src/arclink/libs/python/seiscomp/arclink/manager.py tools/manager.py
+	git archive --remote=ssh://st32/srv/git/medusa.git HEAD src/arclink/libs/python/seiscomp/arclink/manager.py | tar -x
+	mv src/arclink/libs/python/seiscomp/arclink/manager.py tools
+	-rm -r src/arclink
+	rmdir src
+
 
 # What's the right way to do a release
 # with all the code we want, none we don't,
