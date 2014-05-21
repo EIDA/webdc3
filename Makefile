@@ -30,7 +30,8 @@ tools/manager.py:
 # and update doc/base/changelog.rst
 # (e.g. find . -type f -exec grep --color 0\\.5 {} \; -print)
 # Then 'make documentation' and check that it looks right.
-#
+# Finally, 'make gitcheck', and when clean, 'make release'
+
 DATESTR:=$(shell date +%Y.%j)
 RELEASEFILE=webdc3-${DATESTR}.tgz
 # Ideally, release-yyyy.jjj.tgz
