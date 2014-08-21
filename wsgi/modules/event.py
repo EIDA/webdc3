@@ -1113,8 +1113,8 @@ class EventResponse(object):
 
         if verbosity > 3:
             logs.error("Header (%i cols): %s" % (len(header_cols), str(header_cols)))
-            logs.error("Mapping: %s" % (str(mapping)))
-            logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, mapping)))
+            logs.error("Mapping: %s" % (str(self.input_mapping)))
+            logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, self.input_mapping)))
         new_header = helper.mapcols(header_cols, self.input_mapping)
         #s += "|".join(new_header) + "\n"
 
@@ -2605,9 +2605,9 @@ class ESFdsnws(EventService):
             self.raise_client_204(environ, 'No events returned')
 
         myallrow = allrows.split("\n")
-        myallrow[0] = "#"+myallrow[0]
+        #myallrow[0] = "#"+myallrow[0]
 
-        my_row_for_send =''
+        my_row_for_send ='EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName\n'
 
         # rebuild the resultset
         for item in myallrow:
