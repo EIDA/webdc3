@@ -48,7 +48,7 @@ event.catalogs.ids = geofon, comcat, emsc, fdsnws, parser, meteor
 # "/event/{id}" will be handled, but not listed in the "Events Services"
 # dialog box. Only those services with a non-empty "description" attribute
 # will be displayed.
-event.catalogs.registeredonly = True  #??? NOT NEEDED NOW?
+event.catalogs.registeredonly = true  #??? NOT NEEDED NOW?
 
 # The preferred service will appear first in the pull-down menu of event
 # services.
@@ -85,10 +85,10 @@ event.service.fdsnws.extraParams = "format=text&user=webinterface"
 # Maybe^2: filters
 
 # Region lookup
-# If True, look up region names if they are not given.
-event.names.lookupIfEmpty = True
-# If True, replace existing region names.
-event.names.lookupIfGiven = False
+# If true, look up region names if they are not given.
+event.names.lookupIfEmpty = true
+# If true, replace existing region names.
+event.names.lookupIfGiven = false
 
 DEBUG        =           0
 SERVER_FOLDER =          "/var/www/webinterface/"

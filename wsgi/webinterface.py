@@ -146,6 +146,12 @@ class WebInterface(object):
     def getAction(self, name):
         return self.__action_table.get(name)
 
+    def getConfigBool(self, name, default):
+        try:
+            return self.__cfg.getBool(name)
+        except Exception, e:
+            return default
+
     def getConfigTree(self, prefix=''):
         """Helper function to construct a structure for config."""
         def _add_pv(d, p, v):

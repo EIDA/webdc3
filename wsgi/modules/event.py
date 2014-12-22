@@ -182,10 +182,10 @@ Service version:
         # Create handlers for all services:
         # Should these options apply to *all* services from this server??
         options = {}
-        cn = config['names']
-        options['lookupIfEmpty'] = cn.get('lookupIfEmpty', True)
-        options['lookupIfGiven'] = cn.get('lookupIfGiven', False)
-        options['defaultLimit'] = config.get('defaultLimit', 800)
+        options['lookupIfEmpty'] = wi.getConfigBool('event.names.lookupIfEmpty', True)
+        options['lookupIfGiven'] = wi.getConfigBool('event.names.lookupIfGiven', False)
+        options['defaultLimit'] = wi.getConfigInt('event.defaultLimit', 800)
+
         logs.info("Options:")
         for k in sorted(options):
             logs.info('%24s: %s' % (k, str(options[k])))
@@ -233,7 +233,7 @@ Service version:
             elif h == 'emsc':
                 es = ESEMSC(s, options,   props['baseURL'], props['extraParams'])
             elif h == 'fdsnws':
-                es = ESFdsnws(s, options,   props['baseURL'], props['extraParams'])
+                es = ESFdsnws(s, options, props['baseURL'], props['extraParams'])
             elif h == 'meteor':
                 es = ESMeteor(s, options)
             elif h == 'neic':
@@ -1156,7 +1156,8 @@ class EventResponse(object):
 
         Inputs:
             ev - an event row
-
+        Output:
+            ev - may be modified
         Calls to _lookup_region() might be expensive; avoid them if
         they aren't wanted.
 
@@ -2546,7 +2547,7 @@ class ESFdsnws(EventService):
     #
     filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
 
-    def __init__(self, name, options,service_url,extra_params):
+    def __init__(self, name, options, service_url, extra_params):
         self.name = name
         self.options = options
         self.id = name
@@ -2604,6 +2605,7 @@ class ESFdsnws(EventService):
         if (check_string in allrows) or (len(allrows) < 5 ):
             self.raise_client_204(environ, 'No events returned')
 
+        # PLE: I'm not sure whether we need to send the header row ourselves.
         myallrow = allrows.split("\n")
         #myallrow[0] = "#"+myallrow[0]
 
