@@ -293,9 +293,10 @@ Service version:
                 d[k]["hasDepth"] = True
             if handler == "comcat":
                 d[k]["hasDepth"] = True
-            if handler == "emsc":
+            elif handler == "emsc":
                 d[k]["hasDepth"] = True
-                d[k]["hasMag"] = True
+	    elif handler == "fdsnws":
+		d[k]["hasDepth"] = True
 
         # A hack here to force the preferred key to come first:
         indent = None
@@ -330,6 +331,9 @@ Service version:
         for k in self._EventServiceCatalog:
             s += "Service '%s': %s\n" % (k, str(self._EventServiceCatalog[k]))
         s += "Registered only? " + str(self.registeredonly) + "\n"
+        s += "defaultLimit: " + str(self.options['defaultLimit']) + "\n"
+        s += "lookupIfEmpty? " + str(self.options['lookupIfEmpty']) + "\n"
+        s += "lookupIfGiven? " + str(self.options['lookupIfGiven']) + "\n"
         return s
 
     def parseUserTextFile(self, envir, params):
@@ -829,7 +833,7 @@ class EventWriterFDSNText(EventWriter):
     """Write some events as fdsnws-event format=text output.
 
     The specification for this output is at
-    http://fdsn.org/FIXME
+    http://www.fdsn.org/webservices/FDSN-WS-Specifications-1.1.pdf
 
     """
     fdsnws_headers = ('EventID', 'Time', 'Latitude', 'Longitude',
