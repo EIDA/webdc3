@@ -10,7 +10,7 @@
 """
 Interface to various event services.
 
-(c) 2013, 2014 GEOFON team, GFZ Potsdam
+(c) 2013--2015 GEOFON team, GFZ Potsdam
 
 Provides a thin wrapper to event services.
 Implemented as part of a WSGI application.
@@ -103,12 +103,15 @@ except ImportError:
 
 class WI_Module(object):
 
+    _EventsVersion = "2015.035"
     # The basic structure of this template for errors (and the
     # HTTP error codes which should be used) is given in the
     # FDSN web services specification, so don't change this
     # without good reason.
-    # FIXME: Why does this now need defining *twice*?
     # Ref: <http://www.fdsn.org/webservices/>
+    #
+    # I think this has to go in WI_Module, not EventService,
+    # because it may be needed even when there is no service.
     _EventsErrorTemplate = """Error %(err_code)s: %(err_desc)s
 
 Service '%(service)s': %(details)s.
@@ -120,10 +123,12 @@ Request Submitted:
 %(date_time)s
 
 Service version:
-2.718
+%(version)s
 """
 
     def __init__(self, wi):
+        if wi == None:
+            return
 
         known_handlers = ('comcat', 'emsc', 'fdsnws', 'geofon', 'meteor', 'neic', 'parser')
 
@@ -160,7 +165,7 @@ Service version:
             if description:
                 self._EventServiceCatalog[s] = (description, handler)
         self._EventServicePreferred = config['catalogs']['preferred']
-        self.registeredonly = False  # For testing; for production, set to True
+        self.registeredonly = wi.getConfigBool('event.catalogs.registeredonly', True)
         logs.info("Only serve registered event services: %s" % (self.registeredonly))
         logs.info("Registered event service(s):")
         for s in sorted(self.services):
@@ -295,8 +300,8 @@ Service version:
                 d[k]["hasDepth"] = True
             elif handler == "emsc":
                 d[k]["hasDepth"] = True
-	    elif handler == "fdsnws":
-		d[k]["hasDepth"] = True
+            elif handler == "fdsnws":
+                d[k]["hasDepth"] = True
 
         # A hack here to force the preferred key to come first:
         indent = None
@@ -406,6 +411,7 @@ Service version:
 
         service = parts[1].lower()
         service = re.escape(service)
+        service = re.sub(r'([^a-zA-Z0-9-]+)', ' ', service)
 
         if len(parts) > 2:
             return [bodyBadRequest(environ, "Extra URL component after service name")]
@@ -415,7 +421,7 @@ Service version:
         # should not do that. Operators can configure which services they
         # offer.
         if self.registeredonly and not service in self._EventServiceCatalog:
-            return [bodyBadRequest(environ, "Unknown service name")]
+            return [bodyBadRequest(environ, "Unknown service name", service)]
 
         if service in self.services.keys():
             #NOT NEEDED?:
@@ -423,7 +429,7 @@ Service version:
             ##Should be: parameters = params
             return self.es[service].handler(environ, parameters)
         else:
-            return [bodyBadRequest(environ, "Unknown service name")]
+            return [bodyBadRequest(environ, "Unknown service name", service)]
 
 
 
@@ -1042,7 +1048,6 @@ class EventResponse(object):
                      'lat': 3, 'lon': 4, 'dep': 5,
                      'id': 6, 'region': 7}
         self.ed = EventData() #####
-
         self.lookupIfEmpty = options['lookupIfEmpty']
         self.lookupIfGiven = options['lookupIfGiven']
 
@@ -1277,24 +1282,7 @@ class EventService(object):
     filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
     csv_dialect = csv.excel
 
-    # The basic structure of this template for errors (and the
-    # HTTP error codes which should be used) is given in the
-    # FDSN web services specification, so don't change this
-    # without good reason.
-    # Ref: #REF#
-    _EventsErrorTemplate = """Error %(err_code)s: %(err_desc)s
-
-Service '%(service)s': %(details)s.
-
-Request:
-%(url)s
-
-Request Submitted:
-%(date_time)s
-
-Service version:
-2.718
-"""
+    _EventsErrorTemplate = WI_Module(None)._EventsErrorTemplate
 
     def __init__(self, name, options, service_url = '', extra_params = ''):
         self.id = name
@@ -2579,7 +2567,7 @@ class ESFdsnws(EventService):
 
         header = ''
 
-    	pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
+        pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
 
         limit = hold_dict.get('limit', self.defaultLimit)
         try:
@@ -2649,6 +2637,7 @@ def bodyBadRequest(environ, msg, service="[event]"):
                                     'details': msg,
                                     'url': _urlString(environ),
                                     'date_time': str(datetime.datetime.utcnow()),
+                                    'version': WI_Module(None)._EventsVersion,
                                     }
 
 

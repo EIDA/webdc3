@@ -48,7 +48,7 @@ event.catalogs.ids = geofon, comcat, emsc, fdsnws, parser, meteor
 # "/event/{id}" will be handled, but not listed in the "Events Services"
 # dialog box. Only those services with a non-empty "description" attribute
 # will be displayed.
-event.catalogs.registeredonly = true  #??? NOT NEEDED NOW?
+event.catalogs.registeredonly = true
 
 # The preferred service will appear first in the pull-down menu of event
 # services.
