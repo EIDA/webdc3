@@ -116,7 +116,8 @@ map to produce. Can be one of: wms, google, osm.</description>
 				        <description>These parameters are used in forming the Event Search Control.</description>
                                          <parameter name="date_startoffset" type="string" default="-7d">
                                                 <description>Relative time for setting the default 'start' field in the Event Search Control. Use `d`, `w`, `m`, `y` for days, weeks, months or years; this value is interpreted by the jQueryUI datepicker .</description>
-                                        </parameter>                                        <parameter name="magnitudes_minimum" type="float" default="3.0">
+                                        </parameter>
+                                        <parameter name="magnitudes_minimum" type="float" default="3.0">
                                                 <description>Default lower magnitude limit for events</description>
                                         </parameter>
                                          <parameter name="depth_minimum" type="float" default="0">
