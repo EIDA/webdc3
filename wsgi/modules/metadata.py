@@ -616,7 +616,7 @@ class WI_Module(object):
                                 start_time = ev_time + datetime.timedelta(
                                     seconds=tt.time + startoffset * 60)
                                 break
-                        elif (startphase == 'OT')
+                        elif (startphase == 'OT'):
                             start_time = ev_time + datetime.timedelta(seconds=startoffset * 60)
                         else:
                             msg = 'Wrong startphase received! Only "P", ' + \
@@ -638,7 +638,7 @@ class WI_Module(object):
                                 end_time = ev_time + datetime.timedelta(
                                     seconds=tt.time + endoffset * 60)
                                 break
-                        elif (endphase == 'OT')
+                        elif (endphase == 'OT'):
                                 end_time = ev_time + datetime.timedelta(seconds=endoffset * 60)
                         else:
                             msg = 'Wrong endphase received! Only "P", ' + \

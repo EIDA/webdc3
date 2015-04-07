@@ -476,7 +476,7 @@ function EventSearchControl(htmlTagId) {
 		html += '<div class="wi-control-item">';
 		html += '<div class="wi-spacer">Date Interval (yyyy-mm-dd):</div>';
 		html += '<input style="position: relative; z-index: 100" class="wi-inline" type="text" id="escStart"  title="Start date in yyyy-mm-dd format."/>';
-		html += 'to<input style="position: relative; z-index: 100" class="wi-inline" type="text" id="escEnd" title="End date in yyyy-mm-dd format."/>';
+		html += '&ndash;<input style="position: relative; z-index: 100" class="wi-inline" type="text" id="escEnd" title="End date in yyyy-mm-dd format."/>';
 		html += '</div>';
 
 		html += '<div class="wi-control-item">';
