@@ -8,9 +8,10 @@
 # ----------------------------------------------------------------------
 
 
-"""Metadata module for the ArcLink web interface
+"""
+Metadata module for the ArcLink web interface
 
-(c) 2013, 2014 GEOFON team, GFZ Potsdam
+(c) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Exports the functions needed by the Javascript running in the web-browser.
 All the functions must be called via an URL with the following format
@@ -491,6 +492,7 @@ class WI_Module(object):
         # on 14.08.2013
         # The case of P and a distance larger than 120 deg must be checked
         # outside this function as we do not have this information here.
+        # March/April 2014: Phase "OT" contributed by Carlo Cauzzi, ETHZ.
         if phase == 'P':
             if ttphase in ('P', 'Pg', 'Pb', 'Pn', 'Pdif', 'Pdiff'):
                 return True
@@ -499,9 +501,11 @@ class WI_Module(object):
             if ((ttphase in ('S', 'Sg', 'Sb', 'Sn', 'Sdif', 'Sdiff')) or
                     ttphase.startswith('SKS')):
                 return True
+        elif phase =='OT': # Oh well, it's not a phase but better to be consistent with what we have #Carlo
+            return True
 
         else:
-            msg = 'Wrong phase received! Only "P" and "S" are implemented.'
+            msg = 'Wrong phase received! Only "P", "S" and "OT" are implemented.'
             raise wsgicomm.WIClientError, msg
 
         return False
@@ -612,10 +616,11 @@ class WI_Module(object):
                                 start_time = ev_time + datetime.timedelta(
                                     seconds=tt.time + startoffset * 60)
                                 break
-
+                        elif (startphase == 'OT')
+                            start_time = ev_time + datetime.timedelta(seconds=startoffset * 60)
                         else:
-                            msg = 'Wrong startphase received! Only "P" ' + \
-                                ' and "S" are implemented.'
+                            msg = 'Wrong startphase received! Only "P", ' + \
+                                '"S" and "OT" are implemented.'
                             raise wsgicomm.WIClientError, msg
 
                     for tt in ttlist:
@@ -633,10 +638,11 @@ class WI_Module(object):
                                 end_time = ev_time + datetime.timedelta(
                                     seconds=tt.time + endoffset * 60)
                                 break
-
+                        elif (endphase == 'OT')
+                                end_time = ev_time + datetime.timedelta(seconds=endoffset * 60)
                         else:
-                            msg = 'Wrong endphase received! Only "P" and ' + \
-                                '"S" are implemented.'
+                            msg = 'Wrong endphase received! Only "P", ' + \
+                                '"S" and "OT" are implemented.'
                             raise wsgicomm.WIClientError, msg
 
                 except Exception, e:

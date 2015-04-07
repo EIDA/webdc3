@@ -94,7 +94,8 @@ class InventoryCache(object):
                           ('SM', 'Strong motion'),
                           ('OBS', 'Ocean bottom seismometer')]
 
-        self.phases = [('P', 'P/Pdiff'),
+        self.phases = [('OT','Origin Time'),
+                       ('P', 'P/Pdiff'),
                        ('S', 'S/Sdiff')]
 
         # Create/load the cache the first time that we start
