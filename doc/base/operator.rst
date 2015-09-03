@@ -133,20 +133,25 @@ Requirements
 Download
 ========
 
-Download the tar file / source from the GEOFON web page at http://geofon.gfz-potsdam.de/software.
-[Eventually it may be included in the SeisComP distribution.]
+The code can be downloaded in a tar file from the GEOFON web page at
+http://geofon.gfz-potsdam.de/software. Nightly builds can be downloaded from
+Github at [https://github.com/EIDA/webdc3].
 
-.. note ::
-    Nightly builds can be downloaded from Bitbucket at [URL TBD].
-
-Untar into a suitable directory visible to the web server,
-such as `/var/www/webinterface`::
+If you downloaded the compressed file, untar it into a suitable directory
+visible to the web server, such as `/var/www/webinterface`::
 
   cd /var/www/webinterface
   tar xvzf /path/to/tarfile.tgz
 
 This location will depend on the location of the root (in the file system)
  for your web server.
+
+If you want to clone it from Github, do it in a suitable directory as explained
+in the previous point.::
+
+  cd /var/www
+  git clone https://github.com/EIDA/webdc3 webinterface
+
 
 .. _oper_installation-on-apache:
 
