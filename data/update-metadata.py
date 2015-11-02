@@ -72,7 +72,7 @@ operating with an EIDA default configuration.
     logging.debug(tn.read_until('OK', 5))
     tn.write('request inventory\n')
     logging.debug(tn.read_until('OK', 5))
-    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 GE APE * *\nEND\n' % (datetime.datetime.now().year + 1))
+    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 * * * *\nEND\n' % (datetime.datetime.now().year + 1))
 
     reqID = 0
     while not reqID:
