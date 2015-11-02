@@ -284,7 +284,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
     Then, get initial metadata in the `data` directory by running the ``update-metadata.sh`` script in that directory.::
 
       # cd /var/www/webinterface/data
-      # ./update-metadata.sh
+      # ./update-metadata.py
 
  #. It is important to check the permissions of the `data` directory
     and the files in it, as webinterface caches metadata there.
@@ -314,7 +314,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
     Something like the following lines will be needed in your crontab::
 
       # Daily metadata update for webinterface:
-      52 03 * * * /var/www/webinterface/data/update-metadata.sh
+      52 03 * * * /var/www/webinterface/data/update-metadata.py
 
 Installation problems
 ---------------------
@@ -351,7 +351,7 @@ should show you something like this::
 Configuration options
 ---------------------
 
-Configuration follows the SeisComP 3 pattern. Configuration is read from files using a 'dotted' notation e.g.::
+Configuration follows the SeisComP3 pattern. Configuration is read from files using a 'dotted' notation e.g.::
 
   js.wms.server = "http://myserver.org/wms/vmap0"
 
@@ -372,7 +372,7 @@ Remember that $HOME is for the *user running webinterface*, which might be the s
 It may be helpful to make a symbolic link from one of these locations to a file in the
 webinterface directory e.g.::
 
-  cd /var/www/.seiscomp3 ; ln -s /path/to/webinterface/wsgi/webinterface.cfg .
+  cd /var/www/webinterface; ln -s /path/to/webinterface/wsgi/webinterface.cfg .
 
 At a minimum, you will need to
 
@@ -488,7 +488,7 @@ There may be some temporary files to clean up from time to time.
 These should be in Python's default temporary directory e.g. ``/tmp``.
 
 Metadata may need updating after changes in Arclink inventory - you
-can safely run the ``update-metadata.sh`` script at any time to do that.
+can safely run the ``update-metadata.py`` script at any time to do that.
 Webinterface creates a processed version of the Arclink XML, but this
 will be automatically updated each time webinterface notices a
 new inventory XML file.
@@ -505,5 +505,5 @@ Then reinstall from scratch, as in the :ref:`installation instructions <oper_ins
 Your web server configuration should need no modification.
 At Steps 4-6, re-use your previous versions of ``webdc2.wsgi`` and ``webinterface.cfg``::
 
-    cp ../webinterface.old/wsgi/webdc2.wsgi wsgi/webdc3.wsgi
+    cp ../webinterface.old/wsgi/webdc3.wsgi wsgi/webdc3.wsgi
     cp ../webinterface.old/wsgi/webinterface.cfg wsgi/webinterface.cfg

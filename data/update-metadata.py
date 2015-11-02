@@ -63,14 +63,13 @@ operating with an EIDA default configuration.
 
     """
 
-    logging.basicConfig(level='DEBUG')
     tn = telnetlib.Telnet(arclinkserver, arclinkport)
     tn.write('HELLO\n')
     # FIXME The institution should be detected here. Shouldn't it?
     logging.info(tn.read_until('GFZ', 5))
     tn.write('user webinterface@eida\n')
     logging.debug(tn.read_until('OK', 5))
-    tn.write('request inventory\n')
+    tn.write('request inventory instruments=true\n')
     logging.debug(tn.read_until('OK', 5))
     tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 * * * *\nEND\n' % (datetime.datetime.now().year + 1))
 
@@ -101,9 +100,6 @@ operating with an EIDA default configuration.
         return
 
     tn.write('download %s\n' % reqID)
-    invData= tn.read_until('END', 5)
-    start = invData.find('<')
-    logging.info('Length: %s\n' % invData[:start])
 
     here = os.path.dirname(__file__)
     try:
@@ -112,7 +108,26 @@ operating with an EIDA default configuration.
         pass
 
     with open(os.path.join(here, '%s.download' % foutput), 'w') as fout:
-        fout.write(invData[invData.find('<'):-3])
+        start = None
+        expectedLength = 1000
+        totalBytes = 0
+        while totalBytes < expectedLength:
+            buffer = tn.read_until('END', 5)
+            if start is None:
+                start = buffer.find('<')
+                expectedLength = int(buffer[:start])
+                logging.info('Inventory length: %s\n' % expectedLength)
+            else:
+                start = 0
+
+            if totalBytes + len(buffer) - start > expectedLength:
+                endData = len(buffer) - 3
+            else:
+                endData = len(buffer)
+
+            totalBytes += endData - start
+            logging.debug('%d of %d' % (totalBytes, expectedLength))
+            fout.write(buffer[start:endData])
 
     try:
         os.rename(os.path.join(here, './%s' % foutput),
@@ -144,7 +159,8 @@ def main():
                         help='Increase the verbosity level')
     args = parser.parse_args()
 
-    lvl = 30 - args.verbosity * 10
+    verbNum = 3 if args.verbosity >= 3 else args.verbosity
+    lvl = 40 - args.verbosity * 10
     logging.basicConfig(level=lvl)
 
     downloadInventory(ARCLINKSERVER, ARCLINKPORT, args.output)
