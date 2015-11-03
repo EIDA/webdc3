@@ -435,7 +435,7 @@ Network:
     4          Start year      int               Start year of operation.
     5          End year        int               End year of operation.
     6          Description     string
-    7          Restricted      boolean           True if the network has restricted data.
+    7          Restricted      int               1: restricted; 2: open.
     8          Class           char              'p' for permanent and 't' for temporary.
     9          Archive         string            Archiving node, 'GFZ', 'RESIF', 'INGV', etc.
    10          Institutions    string            Network operators.
@@ -459,6 +459,7 @@ Station:
     8         Start date      datetime         Start date and time of operation.
     9         End date        datetime         End date and time of operation.
    10         Elevation       float
+   11         Restricted      int              1: restricted; 2: open.
   ==========  ==============  =============   ===================================================
 
 
@@ -489,6 +490,7 @@ Stream:
     5         Datalogger        string
     6         Start date        datetime        Start date and time of operation.
     7         End date          datetime        End date and time of operation.
+    8         Restricted        int             1: restricted; 2: open.
    ========   ==============   ============    =====================================================
 
 .. _dev-mapping-module:
