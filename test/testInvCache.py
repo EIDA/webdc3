@@ -69,13 +69,13 @@ class InvCacheTests(unittest.TestCase):
 
     def testNumberOfStationsCreated(self):
         "number of stations created"
-        self.assertTrue( self.stations > len(self.__class__.ic.stations), 'More stations created (%d) than the ones present in the inventory (%d).' % (len(self.__class__.ic.stations), self.stations) )
+        self.assertEqual(self.stations, len(self.__class__.ic.stations), 'More stations created (%d) than the ones present in the inventory (%d).' % (len(self.__class__.ic.stations), self.stations) )
         self.assertTrue( (self.stations-len(self.__class__.ic.stations)) < 10, '%d stations skipped from inventory. Check for stations with only auxStreams in the sensors.' % (self.stations-len(self.__class__.ic.stations)) )
 
 
     def testNumberOfLocationsCreated(self):
         "number of locations created"
-        self.assertTrue( self.locations > len(self.__class__.ic.sensorsLoc), 'More sensors created (%d) than the ones present in the inventory (%d).' % (len(self.__class__.ic.sensorsLoc), self.locations) )
+        self.assertEqual(self.locations, len(self.__class__.ic.sensorsLoc), 'More sensors created (%d) than the ones present in the inventory (%d).' % (len(self.__class__.ic.sensorsLoc), self.locations) )
         self.assertTrue( (self.locations-len(self.__class__.ic.sensorsLoc)) < 10, '%d sensors skipped from inventory. Check for sensors with only auxStreams.' % (self.locations-len(self.__class__.ic.sensorsLoc)) )
 
 
@@ -150,7 +150,7 @@ class InvCacheTests(unittest.TestCase):
                 self.assertEqual(type(netw[6]), type(''), 'Seventh column of networks is not a string. (Index: %d)' % idx)
 
                 if netw[7] is not None:
-                    self.assertEqual(type(netw[7]), type(True), 'Eighth column of networks is not a boolean. (Index: %d)' % idx)
+                    self.assertEqual(type(netw[7]), type(1), 'Eight column of networks is not an integer. (Index: %d)' % idx)
 
                 if netw[8] is not None:
                     self.assertEqual(type(netw[8]), type(''), 'Ninth column of networks is not a string. (Index: %d)' % idx)
