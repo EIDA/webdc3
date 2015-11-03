@@ -1,0 +1,4 @@
+*.xml
+*.bin
+doc/build-doc/
+*.pyc
