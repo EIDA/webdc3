@@ -281,10 +281,60 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
       arclink.address=eida.gfz-potsdam.de:18002
 
-    Then, get initial metadata in the `data` directory by running the ``update-metadata.sh`` script in that directory.::
+    Then, get initial metadata in the `data` directory by running the ``update-metadata.py`` script in that directory.
+    The meaning and use of the general parameters are the following: ::
 
-      # cd /var/www/webinterface/data
-      # ./update-metadata.py
+      $ cd /var/www/webinterface/data
+      $ ./update-metadata.py -h
+      usage: update-metadata.py [-h] [-a ADDRESS] [-p PORT] [-o OUTPUT] [-v]
+                                {eida,singlenode} ...
+      
+      Script to update the metadata for the usage of WebDC3
+      
+      positional arguments:
+        {eida,singlenode}
+          eida                Get master table from EIDA
+          singlenode          Create master table based on local inventory. Type
+                              "update-metadata.py singlenode -h" to get detailed
+                              help.
+      
+      optional arguments:
+        -h, --help            show this help message and exit
+        -a ADDRESS, --address ADDRESS
+                              Address of the Arclink Server.
+        -p PORT, --port PORT  Port of the Arclink Server.
+        -o OUTPUT, --output OUTPUT
+                              Filename where inventory should be saved.
+        -v, --verbosity       Increase the verbosity level
+
+    In case that WebDC3 must be deployed at an EIDA node, there are not many other parameters. ::
+
+      $ ./update-metadata.py eida -h
+      usage: update-metadata.py eida [-h]
+      
+      optional arguments:
+        -h, --help  show this help message and exit
+
+    And the case of a deployment at a single datacentre not participating in any federation
+    of datacentres like EIDA requires more information. Namely, the details about the
+    datacentre, contact person, etc. ::
+
+      $ ./update-metadata.py singlenode -h
+      usage: update-metadata.py singlenode [-h] [-c CONTACT] [-e EMAIL] [-n NAME]
+                                           dcid
+      
+      positional arguments:
+        dcid                  Short ID of the Datacentre. Up to 5 letters, no
+                              spaces.
+      
+      optional arguments:
+        -h, --help            show this help message and exit
+        -c CONTACT, --contact CONTACT
+                              Name of the responsible of WebDC3.
+        -e EMAIL, --email EMAIL
+                              Email address of the responsible of WebDC3.
+        -n NAME, --name NAME  Official name of Datacentre.
+
 
  #. It is important to check the permissions of the `data` directory
     and the files in it, as webinterface caches metadata there.
