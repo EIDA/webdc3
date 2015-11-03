@@ -270,7 +270,7 @@ function EventSearchControl(htmlTagId) {
 		var minlon=checkNumber(_controlDiv.find('#escLongitudeMin').val(),-180,180);
 		var maxlon=checkNumber(_controlDiv.find('#escLongitudeMax').val(),-180,180);
 
-		var options = buildQueryURL(catalog, start, end, 6.0, 12.0, mindepth, maxdepth, minlat, maxlat, minlon, maxlon, 10);
+		var options = buildQueryURL(catalog, start, end, 6.0, 10.0, mindepth, maxdepth, minlat, maxlat, minlon, maxlon, 10);
 		if (typeof options === "undefined") return;
 
 		wiService.event.query(function(data, statustext, jqxhr) {
@@ -300,8 +300,8 @@ function EventSearchControl(htmlTagId) {
 		var minlon=checkNumber(_controlDiv.find('#escLongitudeMin').val(),-180,180);
 		var maxlon=checkNumber(_controlDiv.find('#escLongitudeMax').val(),-180,180);
 
-		// Since the Page does not implement a maxmag we hardcode a value of 12
-		var options = buildQueryURL(catalog, start, end, minmag, 12.0, mindepth, maxdepth, minlat, maxlat, minlon, maxlon, null);
+		// Since the Page does not implement a maxmag we hardcode a value of 10. Bugfix: a value of 12 or 11 crashes everthing (JQ)
+		var options = buildQueryURL(catalog, start, end, minmag, 10.0, mindepth, maxdepth, minlat, maxlat, minlon, maxlon, null);
 		if (typeof options === "undefined") return;
 
 		// So far no event query depends on the selected station list
