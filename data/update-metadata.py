@@ -41,10 +41,10 @@ try:
 except ImportError:
     import urllib2 as ul
 
+
 def getNetworks(arclinkserver, arclinkport):
     """Connects via telnet to an Arclink server to get inventory information.
-The data is saved in the file specified by thethird parameter. Generally used to start
-operating with an EIDA default configuration.
+The data is returned as a string.
 
     """
 
@@ -56,7 +56,8 @@ operating with an EIDA default configuration.
     logging.debug(tn.read_until('OK', 5))
     tn.write('request inventory\n')
     logging.debug(tn.read_until('OK', 5))
-    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 *\nEND\n' % (datetime.datetime.now().year + 1))
+    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 *\nEND\n' %
+             (datetime.datetime.now().year + 1))
 
     reqID = 0
     while not reqID:
@@ -87,7 +88,7 @@ operating with an EIDA default configuration.
     tn.write('download %s\n' % reqID)
 
     networksXML = ''
-    
+
     start = None
     expectedLength = 1000
     totalBytes = 0
@@ -111,7 +112,7 @@ operating with an EIDA default configuration.
 
     toDel = glob.glob('./webinterface-cache.*')
     for f2d in toDel:
-        os.remove(os.path.join(here, f2d))
+        os.remove(f2d)
     logging.info('Inventory read from Arclink!\n')
 
     return networksXML
@@ -122,7 +123,7 @@ def genRoutingTable(networksXML, **kwargs):
         context = ET.iterparse(StringIO(networksXML),
                                events=("start", "end"))
     except IOError:
-        msg = 'Error: %s could not be parsed. Skipping it!' % fileName
+        msg = 'Error: %s could not be parsed. Skipping it!' % networksXML
         logging.error(msg)
 
     # turn it into an iterator
@@ -139,7 +140,7 @@ def genRoutingTable(networksXML, **kwargs):
     if root.tag[-len('inventory'):] != 'inventory':
         logging.debug(root)
         msg = '%s seems not to be an inventory file (XML). Skipping it!\n' \
-            % fname
+            % networksXML
         logging.error(msg)
 
     # Extract the namespace from the root node
@@ -148,7 +149,8 @@ def genRoutingTable(networksXML, **kwargs):
     header = """<?xml version="1.0" ?>
 <arclink-network>
   <node address="%s" contact="%s" dcid="%s" email="%s" name="%s" port="%s">
-""" % (kwargs.get('address', 'ARCLINKADDRESS'), kwargs.get('contact', 'No Name'),
+""" % (kwargs.get('address', 'ARCLINKADDRESS'),
+       kwargs.get('contact', 'No Name'),
        kwargs.get('dcid', 'NODCID'), kwargs.get('email', 'noreply@localhost'),
        kwargs.get('name', 'NN Datacentre'),
        kwargs.get('port', '18001'))
@@ -200,6 +202,7 @@ def genRoutingTable(networksXML, **kwargs):
 
         fout.write('  </node>\n</arclink-network>\n')
 
+
 def getMasterTable(foutput):
     u = ul.urlopen('http://eida.gfz-potsdam.de/arclink/table?group=eida')
     with open('%s.download' % foutput, 'w') as fo:
@@ -217,10 +220,10 @@ def getMasterTable(foutput):
     except:
         pass
 
+
 def downloadInventory(arclinkserver, arclinkport, foutput):
     """Connects via telnet to an Arclink server to get inventory information.
-The data is saved in the file specified by thethird parameter. Generally used to start
-operating with an EIDA default configuration.
+The data is saved in the file specified by the third parameter.
 
     """
 
@@ -232,7 +235,8 @@ operating with an EIDA default configuration.
     logging.debug(tn.read_until('OK', 5))
     tn.write('request inventory instruments=true\n')
     logging.debug(tn.read_until('OK', 5))
-    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 * * * *\nEND\n' % (datetime.datetime.now().year + 1))
+    tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 * * * *\nEND\n' %
+             (datetime.datetime.now().year + 1))
 
     reqID = 0
     while not reqID:
@@ -309,8 +313,8 @@ operating with an EIDA default configuration.
 
 
 def main():
-    parser = argparse.ArgumentParser(description=\
-        'Script to update the metadata for the usage of WebDC3')
+    desc = 'Script to update the metadata for the usage of WebDC3'
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-a', '--address', default='eida.gfz-potsdam.de',
                         help='Address of the Arclink Server.')
     parser.add_argument('-p', '--port', default='18002',
@@ -321,16 +325,18 @@ def main():
                         help='Increase the verbosity level')
 
     subparsers = parser.add_subparsers()
-    
+
     # create the parser for the "eida" command
     parser_e = subparsers.add_parser('eida',
                                      help='Get master table from EIDA')
 
     # create the parser for the "singlenode" command
-    parser_s = subparsers.add_parser('singlenode',
-                                     help='Create master table based on local inventory.\nType "%(prog)s singlenode -h" to get detailed help.')
+    singlehelp = 'Create master table based on local inventory.\n' + \
+        'Type "%(prog)s singlenode -h" to get detailed help.'
+    parser_s = subparsers.add_parser('singlenode', help=singlehelp)
 
-    parser_s.add_argument('dcid', help='Short ID of the Datacentre. Up to 5 letters, no spaces.')
+    dcidhelp = 'Short ID of the Datacentre. Up to 5 letters, no spaces.'
+    parser_s.add_argument('dcid', help=dcidhelp)
     parser_s.add_argument('-c', '--contact', default='No Name',
                           help='Name of the responsible of WebDC3.')
     parser_s.add_argument('-e', '--email', default='noreply@localhost',
@@ -341,7 +347,7 @@ def main():
 
     # Limit the maximum verbosity to 3 (DEBUG)
     verbNum = 3 if args.verbosity >= 3 else args.verbosity
-    lvl = 40 - args.verbosity * 10
+    lvl = 40 - verbNum * 10
     logging.basicConfig(level=lvl)
 
     # Check for spaces in DCID
