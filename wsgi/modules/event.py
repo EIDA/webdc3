@@ -1494,7 +1494,7 @@ class EventService(object):
                                             'details': str(message),
                                             'url': _urlString(environ),
                                             'date_time': str(datetime.datetime.utcnow()),
-                                            }
+                                            'version': WI_Module(None)._EventsVersion}
 
     def raise_client_error(self, environ, response_code, message = "Unspecified"):
         """Use this for error pages to be delivered to the client.
