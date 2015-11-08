@@ -2,3 +2,4 @@
 *.bin
 doc/build-doc/
 *.pyc
+*.cfg
