@@ -102,7 +102,7 @@ class InvCacheTests(unittest.TestCase):
                 self.assertEqual(type(nett[0]), type(''), 'First column of nettype is not a string.')
                 self.assertEqual(type(nett[1]), type(''), 'Second column of nettype is not a string.')
                 self.assertTrue( (type(nett[2]) == type(True)) or (type(nett[2]) == type(None)), 'Third column of nettype is not a boolean.')
-                self.assertTrue( (type(nett[3]) == type(True)) or (type(nett[3]) == type(None)), 'Fourth column of nettype is not a boolean.')
+                self.assertTrue( (type(nett[3]) == type(1)) or (type(nett[3]) == type(None)), 'Fourth column of nettype is not an integer.')
 
 
     def testNetworksType(self):
@@ -204,7 +204,7 @@ class InvCacheTests(unittest.TestCase):
         errors = set()
         if hasattr(self.__class__.ic, 'networks'):
             for netw in self.__class__.ic.networks:
-                if not (netw[7] in [True, False]):
+                if not (netw[7] in [1, 2]):
                     errors.add(netw[9] + '.' + netw[0])
         self.assertTrue( len(errors) == 0, 'Restricted attribute without information. Code(s): %s' % sorted(list(errors)))
 
@@ -265,7 +265,7 @@ class InvCacheTests(unittest.TestCase):
 
         if hasattr(self.__class__.ic, 'stations'):
             for stat in self.__class__.ic.stations:
-                self.assertEqual(len(stat), 11, 'An instance of stations does not have 11 columns.')
+                self.assertEqual(len(stat), 12, 'An instance of stations does not have 12 columns.')
 
 
     def testStationsCol1(self):
@@ -442,7 +442,7 @@ class InvCacheTests(unittest.TestCase):
         "number of columns in every stream"
         if hasattr(self.__class__.ic, 'streams'):
             for stre in self.__class__.ic.streams:
-                self.assertEqual(len(stre), 8, 'An instance of streams does not have 8 columns.')
+                self.assertEqual(len(stre), 9, 'An instance of streams does not have 9 columns.')
 
 
     def testStreamsCol1(self):
