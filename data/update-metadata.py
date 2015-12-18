@@ -34,6 +34,7 @@ from cStringIO import StringIO
 import xml.etree.cElementTree as ET
 from time import sleep
 import logging
+import socket
 import argparse
 
 try:
@@ -44,15 +45,20 @@ except ImportError:
 
 def getNetworks(arclinkserver, arclinkport):
     """Connects via telnet to an Arclink server to get inventory information.
-The data is returned as a string.
+    The data is returned as a string.
 
     """
 
     tn = telnetlib.Telnet(arclinkserver, arclinkport)
     tn.write('HELLO\n')
     # FIXME The institution should be detected here. Shouldn't it?
+    # Yes, it should -PLE.
+    try:
+        myhostname = socket.getfqdn()
+    except:
+        myhostname= "eida.invalid"
     logging.info(tn.read_until('GFZ', 5))
-    tn.write('user webinterface@eida\n')
+    tn.write('user webinterface@%s\n' % myhostname)
     logging.debug(tn.read_until('OK', 5))
     tn.write('request inventory\n')
     logging.debug(tn.read_until('OK', 5))
@@ -223,7 +229,7 @@ def getMasterTable(foutput):
 
 def downloadInventory(arclinkserver, arclinkport, foutput):
     """Connects via telnet to an Arclink server to get inventory information.
-The data is saved in the file specified by the third parameter.
+    The data is saved in the file specified by the third parameter.
 
     """
 
@@ -338,9 +344,9 @@ def main():
     dcidhelp = 'Short ID of the Datacentre. Up to 5 letters, no spaces.'
     parser_s.add_argument('dcid', help=dcidhelp)
     parser_s.add_argument('-c', '--contact', default='No Name',
-                          help='Name of the responsible of WebDC3.')
+                          help='Name of the person responsible for this instance of WebDC3.')
     parser_s.add_argument('-e', '--email', default='noreply@localhost',
-                          help='Email address of the responsible of WebDC3.')
+                          help='Email address of the person responsible for this instance of WebDC3.')
     parser_s.add_argument('-n', '--name', default='Name of Datacentre',
                           help='Official name of Datacentre.')
     args = parser.parse_args()

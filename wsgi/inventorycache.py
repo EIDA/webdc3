@@ -10,7 +10,7 @@
 
 """InventoryCache for the Arclink web interface
 
-(c) 2013 GEOFON, GFZ Potsdam
+Copyright (c) 2013, 2015 GEOFON, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Encapsulate and manage the information of networks,
 stations, locations and streams read from an Arclink inventory XML file.
@@ -198,14 +198,14 @@ class InventoryCache(object):
         dataloggers = {}
         stationsDict = {}
 
-        # Parse the inventory file
-        # Two steps parser is defined. In the first one, a dictionary of
+        # Parse the inventory file.
+        # There are two steps in parsing. In the first, a dictionary of
         # sensors and dataloggers is constructed. In the second one, the
         # networks/stations/sensors/streams tree structure is built.
         try:
             invfile = open(self.inventory)
         except IOError:
-            msg = 'Error: Arclink-inventory.xml could not be opened.'
+            msg = 'Error: could not open the inventory file ' + self.inventory
             logs.error(msg)
             raise wsgicomm.WIInternalError, msg
 
@@ -217,7 +217,7 @@ class InventoryCache(object):
                 invfile.seek(0)
                 context = ET.iterparse(invfile, events=("start", "end"))
             except IOError:
-                msg = 'Error while trying to parse Arclink-inventory.xml.'
+                msg = 'Error: could not parse the inventory file ' + self.inventory
                 logs.error(msg)
                 raise wsgicomm.WIInternalError, msg
 
