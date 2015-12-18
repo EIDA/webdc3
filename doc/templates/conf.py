@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'WebDC3 web interface'
-copyright = u'2013--2014, The GEOFON Team, GFZ Potsdam'
+copyright = u'2013--2015, The GEOFON Team, GFZ German Research Center for Geosciences, Potsdam'
 authors = u'M. Bianchi, P. Evans, A. Heinloo, J. Quinteros'
 
 # The version info for the project you're documenting, acts as replacement for

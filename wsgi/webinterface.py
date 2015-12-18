@@ -10,7 +10,7 @@
 
 """ArcLink web interface
 
-(c) 2013 GEOFON, GFZ Potsdam
+Copyright (c) 2013-2015 GEOFON, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Exports the functions needed by the JavaScript running in the
 web browser. All the functions must be called via an URL with the

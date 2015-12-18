@@ -11,7 +11,7 @@
 """
 Metadata module for the ArcLink web interface
 
-(c) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+Copyright (C) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Exports the functions needed by the Javascript running in the web-browser.
 All the functions must be called via an URL with the following format
@@ -35,8 +35,13 @@ The list of functions exported by this module is:
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
+the Free Software Foundation; either version 3, or (at your option)
 any later version. For more information, see http://www.gnu.org/
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
 """
 

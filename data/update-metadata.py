@@ -14,7 +14,12 @@
    :Copyright:
        GEOFON, GFZ Potsdam <geofon@gfz-potsdam.de>
    :License:
-       To be decided!
+       GNU General Public License
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation; either version 2, or (at your option) any later
+   version. For more information, see http://www.gnu.org/
 
 .. moduleauthor:: Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, GFZ Potsdam
 """
