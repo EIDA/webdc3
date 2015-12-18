@@ -350,17 +350,18 @@ def main():
     lvl = 40 - verbNum * 10
     logging.basicConfig(level=lvl)
 
-    # Check for spaces in DCID
-    if len(args.dcid) > 5:
-        logging.error('DCID too long')
-        parser_s.print_help()
-        return
+    if 'dcid' in args:
+        # Check for spaces in DCID
+        if len(args.dcid) > 5:
+            logging.error('DCID too long')
+            parser_s.print_help()
+            return
 
-    dcid = args.dcid.upper().replace(' ', '')
-    if not all(c.isalpha() for c in dcid):
-        logging.error('Only letters are allowed in DCID')
-        parser_s.print_help()
-        return
+        dcid = args.dcid.upper().replace(' ', '')
+        if not all(c.isalpha() for c in dcid):
+            logging.error('Only letters are allowed in DCID')
+            parser_s.print_help()
+            return
 
     downloadInventory(args.address, args.port, args.output)
 
