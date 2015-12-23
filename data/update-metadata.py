@@ -291,7 +291,14 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
             buffer = tn.read_until('END', 5)
             if start is None:
                 start = buffer.find('<')
-                expectedLength = int(buffer[:start])
+                try:
+                    expectedLength = int(buffer[:start])
+                except:
+                    logging.error('Unable to parse answer from Arclink: %s'
+                                  % buffer)
+                    raise ValueError('Unable to parse answer from Arclink: %s'
+                                     % buffer)
+
                 logging.info('Inventory length: %s\n' % expectedLength)
             else:
                 start = 0
