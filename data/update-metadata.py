@@ -215,7 +215,11 @@ def genRoutingTable(networksXML, **kwargs):
 
 
 def getMasterTable(foutput):
-    u = ul.urlopen('http://eida.gfz-potsdam.de/arclink/table?group=eida')
+    try:
+        u = ul.urlopen('http://eida.gfz-potsdam.de/arclink/table?group=eida')
+    except:
+        raise Exception('Error trying to download the master table from EIDA!')
+
     with open('%s.download' % foutput, 'w') as fo:
         fo.write(u.read())
 
