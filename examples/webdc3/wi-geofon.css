@@ -63,18 +63,18 @@
  * positioning so it sets the height of the "wi-short-div".
  */
 .wi-short-div {
-    position: relative;
+	position: relative;
 }
 
 .wi-short-spacer {
-    margin: 0 0 0.5em 0;
-    width: 48%;
+	margin: 0 0 0.5em 0;
+	width: 48%;
 }
 
 .wi-short-right {
-    position: absolute;
-    width: 48%;
-    top: 0px;
-    right: 0px;
+	position: absolute;
+	width: 48%;
+	top: 0px;
+	right: 0px;
 }
 
