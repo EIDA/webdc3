@@ -110,7 +110,6 @@ Requirements
 ============
 
  * SeisComP(reg) 3 provides useful functions for configuration, geometry, travel time computation.
-   If you use the :program:`update-metadata.sh` script, you will need :program:`arclink_fetch`, either included in the SeisComP distribution, or standalone [http://www.seiscomp3.org/wiki/doc/applications/arclink_fetch].
 
  * Seiscomp Python library (`$SEISCOMP_ROOT/lib/python/seiscomp`), including a
    recent version of `manager.py`
@@ -126,7 +125,7 @@ Requirements
 
  * Finally, users' web browsers need to run JavaScript.
 
- * The ``update-metadata.sh`` script uses `wget`.
+ * Some testing/setup scripts use `wget`.
 
 .. _download:
 
