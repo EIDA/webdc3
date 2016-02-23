@@ -259,9 +259,22 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
       cp examples/webdc2012/webdc.html index.html
 
-    Or even (but *don't adopt GFZ's corporate design*, unless you're at GFZ)::
+    Or even (but *don't adopt GFZ's corporate design* [#fcorpdesign]_ , unless you're at GFZ)::
 
       cp examples/webdc3/*.html .
+
+    .. [#fcorpdesign] For more guidance:
+        (1) You may not use GFZ logos.
+        (2) Please do
+        not change the footer text "WebDC3 Interface &copy (2013--)
+        Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ" and
+        the DOI or similar which appears in the `index.html` pages in the
+        `examples` directory.
+        (3) We would appreciate citation of WebDC3 by its
+        doi:10.5880/GFZ.2.4/2016.001 when this is appropriate. Beyond that,
+        you have great freedom. You may find the examples under "WebDC3
+        users" on the GEOFON software page,
+        http://geofon.gfz-potsdam.de/software/webdc3/ helpful.
 
  #. Start/restart the web server e.g. as root. In **OpenSUSE**::
 
