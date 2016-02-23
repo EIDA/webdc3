@@ -405,8 +405,8 @@ Station metadata module
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The information related to the inventory is first retrieved and updated from
-an Arclink server by means of a script (`data/update-metadata.sh`) installed
-in a crontab. The update interval can be configured according to the needs of
+an Arclink server by means of a script (`data/update-metadata.py`) run from
+a crontab. The update interval can be configured according to the needs of
 the operator. As this information is does not change frequently over time, an
 update interval of 24 hours is the suggested value.
 
