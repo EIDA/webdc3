@@ -508,7 +508,7 @@ class InventoryCache(object):
             try:
                 os.remove(lockfile)
             except:
-                logs.error(('Error by removing lockfile (%s). Remove it' +
+                logs.error(('Error while removing lockfile (%s). Remove it' +
                             ' manually or the pickle version will be always' +
                             ' skipped.') % lockfile)
 

@@ -1,9 +1,10 @@
+#! not a real script yet!
 
 # replace with python urllib2.open()
-pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=perm" -O eida-perm.json
-pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permo" -O eida-permo.json
-pevans@sec24c106:test> wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permr" -O eida-permr.json
-pevans@sec24c106:test> python <<EOF
+wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=perm" -O eida-perm.json
+wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permo" -O eida-permo.json
+wget "eida.gfz-potsdam.de/webdc3/wsgi/metadata/query?start=1980&end=2013&station=all&networktype=permr" -O eida-permr.json
+python <<EOF
 a = json.load(open('eida-perm.json', 'r'));
 b = json.load(open('eida-permo.json', 'r'));
 r = json.load(open('eida-permr.json', 'r'));
