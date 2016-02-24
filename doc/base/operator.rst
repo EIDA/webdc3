@@ -184,7 +184,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
         sudo service apache2 start
 
     If the module was added succesfully you should see the following two links in
-    ``/etc/apache2/mods-enable``::
+    ``/etc/apache2/mods-enabled``::
 
         wsgi.conf -> ../mods-available/wsgi.conf
         wsgi.load -> ../mods-available/wsgi.load
@@ -205,6 +205,9 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
             Order allow,deny
             Allow from all
         </Directory>
+
+    You may be able to use the provided file `webdc3.conf.sample`: copy it to
+    `/etc/apache2/conf-available` and symlink from `/etc/apache2/conf-enabled`.
 
     Change `/var/www/webinterface` to suit your own web server's needs.
     You may also need to add a section like::

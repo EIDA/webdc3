@@ -1,0 +1,19 @@
+#
+# Apache2 configuration for the WebDC3 web interface.
+# This is typical for Unbuntu-style distributions, but
+# may require path changes for your site.
+#
+WSGIScriptAlias /webinterface/wsgi /var/www/webinterface/wsgi/webdc3.wsgi
+<Directory /var/www/webinterface/wsgi/>
+	Order allow,deny
+	Allow from all
+</Directory>
+
+#
+# You may also need to add a section like:
+#
+##<Directory /var/www/webinterface/>
+##	Order allow,deny
+##	Allow from all
+##</Directory>
+
