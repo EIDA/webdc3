@@ -97,6 +97,13 @@ Hinted-at features (2013-09-06)
 
 * Warn if the 800 event limit is hit.
 
+Features, might be nice (2016)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+(Feb 2016) Upload an event XML file, and use the pick information
+contained in it to select stations (and their time windows,
+or use WebDC3's travel time computations).
+  
 Important in the medium term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -179,3 +186,5 @@ Some event-related things that still need doing:
 
 * Oops: QUERY_STRING parameters get re-ordered from original request!  :unimportant:
 * :NOTE: obspy.neries and obspy.(iris fdsn ws) exist !
+
+
