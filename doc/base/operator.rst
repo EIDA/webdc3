@@ -262,9 +262,22 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
       cp examples/webdc2012/webdc.html index.html
 
-    Or even (but *don't adopt GFZ's corporate design*, unless you're at GFZ)::
+    Or even (but *don't adopt GFZ's corporate design* [#fcorpdesign]_ , unless you're at GFZ)::
 
       cp examples/webdc3/*.html .
+
+    .. [#fcorpdesign] For more guidance:
+        (1) You may not use GFZ logos.
+        (2) Please do
+        not change the footer text "WebDC3 Interface &copy (2013--)
+        Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ" and
+        the DOI or similar which appears in the `index.html` pages in the
+        `examples` directory.
+        (3) We would appreciate citation of WebDC3 by its
+        doi:10.5880/GFZ.2.4/2016.001 when this is appropriate. Beyond that,
+        you have great freedom. You may find the examples under "WebDC3
+        users" on the GEOFON software page,
+        http://geofon.gfz-potsdam.de/software/webdc3/ helpful.
 
  #. Start/restart the web server e.g. as root. In **OpenSUSE**::
 
@@ -319,14 +332,14 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
     And the case of a deployment at a single datacentre not participating in any federation
     of datacentres like EIDA requires more information. Namely, the details about the
-    datacentre, contact person, etc. ::
+    data centre, a contact person, etc. ::
 
       $ ./update-metadata.py singlenode -h
       usage: update-metadata.py singlenode [-h] [-c CONTACT] [-e EMAIL] [-n NAME]
                                            dcid
       
       positional arguments:
-        dcid                  Short ID of the Datacentre. Up to 5 letters, no
+        dcid                  Short ID of your data centre. Up to 5 letters, no
                               spaces.
       
       optional arguments:
@@ -337,6 +350,9 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
                               Email address of the responsible of WebDC3.
         -n NAME, --name NAME  Official name of Datacentre.
 
+    At this stage you should have an XML file, typically called `eida.xml`
+    in your `data` directory. Once WebDC3 has run, you will also have the
+    cache file `webinterface-cache.bin` there.
 
  #. It is important to check the permissions of the `data` directory
     and the files in it, as webinterface caches metadata there.
@@ -462,7 +478,19 @@ Metadata options
   are either `VBB` or `BB`, while `OBS` will select only the ones that match
   this value.
 
-* Arclink nodes configuration file: this is an XML file [or a URL?]. This option enables you to give a list of Arclink servers which can be checked for status of requests. Generally this list should be those servers which are included in the routing table provided by your Arclink server. For an EIDA node, this should be the EIDA master table. 
+* Arclink server address::
+
+    arclink.address="eida.gfz-potsdam.de:18002"
+
+  The server to connect to, given as hostname:port. Change this to your local
+  Arclink server.
+
+* Arclink nodes configuration file::
+
+    arclink.networkXML = "eida.xml"
+
+  This is an XML file [or a URL?].
+  This option enables you to give a list of Arclink servers which can be checked for status of requests. Generally this list should be those servers which are included in the routing table provided by your Arclink server. For an EIDA node, this should be the EIDA master table. 
 
 Events options
 ~~~~~~~~~~~~~~

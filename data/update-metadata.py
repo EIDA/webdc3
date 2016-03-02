@@ -12,13 +12,14 @@
    :Platform:
        Linux
    :Copyright:
-       GEOFON, GFZ Potsdam <geofon@gfz-potsdam.de>
+       GEOFON, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+       <geofon@gfz-potsdam.de>
    :License:
-       GNU General Public License
+       GNU General Public License, Version 3, 29 June 2007
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2, or (at your option) any later
+   Software Foundation; either version 3, or (at your option) any later
    version. For more information, see http://www.gnu.org/
 
 .. moduleauthor:: Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, GFZ Potsdam
@@ -357,7 +358,7 @@ def main():
         'Type "%(prog)s singlenode -h" to get detailed help.'
     parser_s = subparsers.add_parser('singlenode', help=singlehelp)
 
-    dcidhelp = 'Short ID of the Datacentre. Up to 5 letters, no spaces.'
+    dcidhelp = 'Short ID of your data centre. Up to 5 letters, no spaces.'
     parser_s.add_argument('dcid', help=dcidhelp)
     parser_s.add_argument('-c', '--contact', default='No Name',
                           help='Name of the person responsible for this instance of WebDC3.')
