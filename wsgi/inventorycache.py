@@ -445,7 +445,8 @@ class InventoryCache(object):
                             start_year = netw.get('start')
                             start_year = int(start_year[:4])
                         except:
-                            start_year = None
+                            # 2016: Quick workaround for virtual network with no start date; seems to break getStations()
+                            start_year = 1900 # None
 
                         # Extract the year from end
                         try:
