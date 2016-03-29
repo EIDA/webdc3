@@ -200,7 +200,7 @@ class InventoryCache(object):
 
         # Parse the inventory file.
         # There are two steps in parsing. In the first, a dictionary of
-        # sensors and dataloggers is constructed. In the second one, the
+        # sensors and dataloggers is constructed. In the second step, the
         # networks/stations/sensors/streams tree structure is built.
         try:
             invfile = open(self.inventory)
@@ -490,7 +490,7 @@ class InventoryCache(object):
         if not os.path.exists(lockfile):
             try:
                 lck = open(lockfile, 'w')
-                os.chmod(lockfile, 0666)
+                os.chmod(lockfile, 0664)
                 lck.close()
             except:
                 logs.warning(('Error while attempting to create a lockfile' +
@@ -501,7 +501,7 @@ class InventoryCache(object):
                 return
 
             with open(self.cachefile, 'wb') as cache:
-                os.chmod(self.cachefile, 0666)
+                os.chmod(self.cachefile, 0664)
                 pickle.dump((ptNets, ptStats, ptSens, ptStre, self.streamidx),
                             cache)
 
