@@ -1388,7 +1388,9 @@ class EventService(object):
             rows = ''
         else:
             try:
-                response = urllib2.urlopen(url)
+                ua = 'Python-urllib/%i.%i (webdc3)' % (sys.version_info[0:2])
+                req = urllib2.Request(url, headers={'User-Agent': ua})
+                response = urllib2.urlopen(req)
                 rows = response.read()
             except urllib2.URLError as e:
                 logs.error("Errors fetching from URL: %s" % (url))
@@ -2606,7 +2608,7 @@ class ESFdsnws(EventService):
         myallrow = allrows.split("\n")
         #myallrow[0] = "#"+myallrow[0]
 
-        my_row_for_send ='EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName\n'
+        my_row_for_send = 'EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName\n'
 
         # rebuild the resultset
         for item in myallrow:
