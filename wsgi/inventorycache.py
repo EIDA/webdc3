@@ -445,7 +445,7 @@ class InventoryCache(object):
                             start_year = netw.get('start')
                             start_year = int(start_year[:4])
                         except:
-                            # 2016: Quick workaround for virtual network with no start date; seems to break getStations()
+                            # March 2016: Quick workaround for virtual network with no start date; seems to break getStations()
                             start_year = 1900 # None
 
                         # Extract the year from end
@@ -462,11 +462,18 @@ class InventoryCache(object):
                         for statRef in netw.findall(statRefXml):
                             virtualStations.append(statRef.get('stationID'))
 
+                        # April 2016: Quick heuristic: GFZ virtual networks start with...
+                        # Long-term fix might be to use the master table.
+                        netArchive = ''
+                        if netw.get('code').startswith("_G"):
+                                netArchive = 'GFZ'
+
+                        netInstitutes = netArchive  # not used?
                         # Virtual networks are always permanent
                         ptNets.append([netw.get('code'), None, None,
                                        virtualStations, start_year, end_year,
                                        netw.get('description'), False, 'p',
-                                       'GFZ', 'GFZ'])
+                                       netArchive, netInstitutes])
 
                         netw.clear()
 
@@ -517,8 +524,8 @@ class InventoryCache(object):
     def __selectNetworks(self, params):
         """Select networks filtered by the input parameters.
 
-        A list of indexes is returned. These indexes indicate the networks that
-        satisfy the constraints indicated by the input parameters.
+        A list of indices is returned. These indices indicate the networks
+        that satisfy the constraints indicated by the input parameters.
 
         """
 
