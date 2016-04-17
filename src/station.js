@@ -8,16 +8,11 @@
  *
  */
 
-/*
- * Page-wide variable to provides the configuration proxy to all modules
- */
-var stationSearchControl = undefined;
-
 var persistentNetwork = undefined;
 var persistentStation = undefined;
 
 /*
- * Configuration proxy Object implementation
+ * Implementation of the stationSearchControl
  */
 function StationSearchControl(htmlTagId) {
 	//
@@ -40,7 +35,7 @@ function StationSearchControl(htmlTagId) {
 		if (typeof networktype && networktype !== null) options.networktype=networktype;
 
 		return { url: _url_networks, options: options }
-	};
+	}
 
 	function buildStationURL(start, end, networktype, network) {
 		var options = { };
@@ -50,7 +45,7 @@ function StationSearchControl(htmlTagId) {
 		if (typeof network && network !== null) options.network=network;
 
 		return { url: _url_stations, options: options};
-	};
+	}
 
 	function buildStreamURL(start, end, networktype, network, station) {
 		var options = { };
@@ -61,7 +56,7 @@ function StationSearchControl(htmlTagId) {
 		if (typeof station && station !== null) options.station=station;
 
 		return { url: _url_streams, options: options};
-	};
+	}
 
 	// Loaders
 	function loadNetworkTypes() {
@@ -73,7 +68,7 @@ function StationSearchControl(htmlTagId) {
 			fillNetworkType(data);
 			loadNetworkList();
 		}, null, true, {});
-	};
+	}
 
 	function loadSensorType() {
 		if (_dont_trigger) return;
@@ -81,7 +76,7 @@ function StationSearchControl(htmlTagId) {
 
 		makeGenericSelect(_controlDiv.find("#sscSensorTypeDiv"), "sscSensorType", "Loading ... ");
 		wiService.metadata.sensortypes(fillSensorType, null, true, {});
-	};
+	}
 
 	function loadStreamList() {
 		if (_dont_trigger) return;
@@ -129,7 +124,7 @@ function StationSearchControl(htmlTagId) {
 			makeGenericSelect(_controlDiv.find("#sscStationListDiv"), "sscStationList", "Failed to load data !");
 			makeMultiGenericSelect(_controlDiv.find("#sscStreamListDiv"), "sscStreamList", '100px', "Failed to load data !");
 		}, true, start, end, networktype, network);
-	};
+	}
 
 	function loadNetworkList() {
 		if (_dont_trigger) return;
@@ -164,7 +159,7 @@ function StationSearchControl(htmlTagId) {
 			makeMultiGenericSelect(_controlDiv.find("#sscStreamListDiv"), "sscStreamList", '100px', "Failed to load data !");
 		}, true, start, end, networktype);
 
-	};
+	}
 
 	// Selects
 	function makeMultiGenericSelect(container, id, height, message) {
@@ -179,7 +174,7 @@ function StationSearchControl(htmlTagId) {
 		_controlDiv.find("#" + id).remove();
 		var html = '<select multiple="multiple" id="' + id + '" style="width: 100%;" height: ' + height + ';">';
 		var first = 'selected="selected"';
-		for(key in data) {
+		for(var key in data) {
 			var item = data[key];
 			if (typeof(item) === "string" ) {
 				html += '<option ' + first + ' value="' + item + '">' + item + '</option>';
@@ -191,7 +186,7 @@ function StationSearchControl(htmlTagId) {
 		html += "</select>";
 		container.append(html);
 	}
-	
+
 	function makeSelectFromArray(data, container, id) {
 		// We return a list of IDS loaded into the select
 		var ids = Array();
@@ -203,7 +198,7 @@ function StationSearchControl(htmlTagId) {
 		var html = '';
 		var first = 'selected="selected"';
 		html += "<select style='font-family: monospace; width: 100%;' id='" + id + "'>";
-		for(key in data) {
+		for(var key in data) {
 			// item = data[key]; // Fails in IE8 but not others.
 			var item = data[key];
 
@@ -232,7 +227,7 @@ function StationSearchControl(htmlTagId) {
 
 		// Put it in
 		container.append(html);
-	};
+	}
 
 	// Fillers
 	function fillNetworkType(data) {
@@ -255,7 +250,7 @@ function StationSearchControl(htmlTagId) {
 		});
 
 		return;
-	};
+	}
 
 	function fillSensorType(data) {
 		if (_controlDiv === null) return;
@@ -272,7 +267,7 @@ function StationSearchControl(htmlTagId) {
 		makeSelectFromArray(_sensor_types, div, "sscSensorType");
 
 		return;
-	};
+	}
 
 	function fillNetworkList(data) {
 		if (_controlDiv === null) return;
@@ -297,7 +292,7 @@ function StationSearchControl(htmlTagId) {
 		});
 
 		return;
-	};
+	}
 
 	function fillStationList(data) {
 		if (_controlDiv === null) return;
@@ -324,7 +319,7 @@ function StationSearchControl(htmlTagId) {
 		});
 
 		return;
-	};
+	}
 
 	function fillStreamList(data) {
 		if (_controlDiv === null) return;
@@ -338,7 +333,7 @@ function StationSearchControl(htmlTagId) {
 
 		makeMultiSelectFromArray(_stream_list, div, "sscStreamList", '100px');
 		_controlDiv.find('#sscStreamList option').attr('selected', 'selected');
-	};
+	}
 
 	function reselectNetworkList() {
 		if (_controlDiv === null) return;
@@ -349,7 +344,7 @@ function StationSearchControl(htmlTagId) {
 		var currentStationNet = currentStation.substr(0,12);
 
 		_controlDiv.find("#sscNetworkList").val(currentStationNet);
-	};
+	}
 
 	function query() {
 		if ( _controlDiv === null ) return;
@@ -435,7 +430,7 @@ function StationSearchControl(htmlTagId) {
 				if (! requestControl.hasEvent()) {
 					wiConsole.notice("Request has no events associated.");
 					return;
-				};
+				}
 
 				// Find the events lines associated (and selected) with 
 				// the current package.
@@ -445,15 +440,15 @@ function StationSearchControl(htmlTagId) {
 				if (events.length === 0) { 
 					wiConsole.notice("Request has no events lines selected.");
 					return;
-				};
+				}
 
 				// to JSON string for submission
 				events = JSON.stringify(events);
 			} catch (e) {
 				wiConsole.error(e.message);
 				return;
-			};
-		};
+			}
+		}
 
 		// One query for each selected package
 		wiService.metadata.query(function(data, statustext, jqxhr) {
@@ -469,7 +464,7 @@ function StationSearchControl(htmlTagId) {
 				preferredsps, streams, minlat, maxlat, minlon,
 				maxlon, minradius, maxradius, minazimuth, 
 				maxazimuth, events);
-	};
+	}
 
 	// Reseters
 	function resetCoordinates() {
@@ -490,7 +485,7 @@ function StationSearchControl(htmlTagId) {
 
 		// Enable trigger again
 		_dont_trigger = false;
-	};
+	}
 
 	function resetControl() {
 		if ( _controlDiv === null ) return;
@@ -526,7 +521,7 @@ function StationSearchControl(htmlTagId) {
 
 		// Restore sensor Type
 		loadSensorType();
-	};
+	}
 
 	// Parsers & Utils (sometimes replicates methods on other classes
 	function validateCoordinates() {
@@ -538,24 +533,24 @@ function StationSearchControl(htmlTagId) {
 		if (Number(bottom) >= Number(top)) {
 			alert("Invalid latitude interval.");
 			return;
-		};
+		}
 
 		// Update the map
 		if (mapControl.enabled()) mapControl.setSelect(bottom, left, top, right);
-	};
+	}
 
 	function checkNumber(value, min, max) {
 		if (value === "") return null;
 
 		value = Number(value);
-		
+
 		if (isNaN(value)) return null;
-	
+
 		if (value < min) return null;
 		if (value > max) return null;
-		
+
 		return value;
-	};
+	}
 
 	// Main toolbar render
 	function buildControl() {
@@ -575,7 +570,7 @@ function StationSearchControl(htmlTagId) {
 		html += '<div id="sscStationDiv">';
 		html += '<div style="padding: 8px;" id="sscStationCatalogDiv"></div>';
 		html += '<div style="padding: 8px; text-align: center;" id="sscStationFileDiv"></div>';
-		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';	
+		html += '<div style="padding: 8px; text-align: center; background: pink;" id="sscStationPresetDiv">[CLICK HERE!]</div>';
 		html += '</div>';
 
 		_controlDiv.append(html);
@@ -774,7 +769,7 @@ function StationSearchControl(htmlTagId) {
 		});
 
 		// Year Slider
-		today = new Date();
+		var today = new Date();
 		_controlDiv.find("#sscYear").slider({
 			range: true,
 			min: 1980,
@@ -859,7 +854,7 @@ function StationSearchControl(htmlTagId) {
 		// Control Buttons
 		_controlDiv.find("#sscReset").button().bind("click", resetControl);
 		_controlDiv.find("#sscSearch").button().bind("click", query);
-	};
+	}
 
 	function load(htmlTagId) {
 		var control = $(htmlTagId);
@@ -888,11 +883,11 @@ function StationSearchControl(htmlTagId) {
 				_controlDiv.find("#sscStationSelectionRegionDiv").show();
 
 			});
-		};
+		}
 
 		// Reset
 		resetControl();
-};
+	}
 
 	//
 	// Public
@@ -905,18 +900,21 @@ function StationSearchControl(htmlTagId) {
 }
 
 /*
- * Bind the StationSearchControl to the document.ready method so that it
- * is automatically loaded when this JS file in imported (by the loader).
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		stationSearchControl = new StationSearchControl("#wi-StationSearchControl");
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("station.js: " + e.message);
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.stationSearchControl = new StationSearchControl("#wi-StationSearchControl");
+			resolve();
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("station.js: " + e.message);
 
-		wiConsole.error("station.js: " + e.message, e);
-	}
-});
+			wiConsole.error("station.js: " + e.message, e);
+			reject();
+		}
+	});
+}
 

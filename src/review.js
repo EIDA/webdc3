@@ -9,8 +9,6 @@
  *
  */
 
-"use strict"
-
 /*
  * Implementation of the wiRequestReviewControl
  */
@@ -99,7 +97,7 @@ function WIRequestReviewControl(htmlTagId) {
 				$.each(sta.ch, function(k, v) {
 					var sk = v.loc_code + v.cha_code.substr(0, 2)
 
-					if(sk in sta.str)
+					if (sk in sta.str)
 						sta.str[sk].push(v.loc_code + v.cha_code)
 					else
 						sta.str[sk] = [v.loc_code + v.cha_code]
@@ -409,20 +407,21 @@ function WIRequestReviewControl(htmlTagId) {
 }
 
 /*
- * Bind the creation of controls to the document.ready method so that they are
- * automatically loaded when this JS file is imported (by the loader).
- * Note that in javascript "strict mode" we have to use "window" rather than
- * just create a global variable.
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		window.wiRequestReviewControl = new WIRequestReviewControl("#wi-RequestReviewControl")
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("review.js: " + e.message)
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.wiRequestReviewControl = new WIRequestReviewControl("#wi-RequestReviewControl")
+			resolve()
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("review.js: " + e.message)
 
-		wiConsole.error("review.js: " + e.message, e)
-	}
-})
+			wiConsole.error("review.js: " + e.message, e)
+			reject()
+		}
+	})
+}
 

@@ -10,20 +10,8 @@
  */
 
 /*
- * Page wide variable to provide the configuration proxy to all modules
- */
-var requestControl = undefined;
-
-/*
  * Configuration proxy Object implementation
  */
-function RequestError(message) {
-	this.message = message;
-//	this.name = "RequestErrorException";
-};
-
-RequestError.prototype = new WIError;
-
 function Pack(id) {
 	// See <http://javascript.crockford.com/private.html>
 	var that = this;
@@ -52,11 +40,11 @@ function Pack(id) {
 	// Private Cell data formaters
 	function fmtGeneric(rowid, value) {
 		return value;
-	};
+	}
 
 	function fmtCoordinate(rowid, value) {
 		return Number(value).toFixed(2);
-	};
+	}
 
 	function fmtStreams(rowid, value) {
 		// Produce a <table>, each row is a group like "BHE, BHN, BHZ"
@@ -81,7 +69,7 @@ function Pack(id) {
 		}
 
 		return html;
-	};
+	}
 
 	function fmtRestricted(rowid, value) {
 		if (Number(value) === 1) {
@@ -92,20 +80,20 @@ function Pack(id) {
 			return '<span style="color: black;">O/</span><span style="color: red;">R</span>';
 		} else {
 			return '??';
-		};
-	};
+		}
+	}
 
 	function fmtId(rowid, value) {
 		return '<input class="toggle" title="' + value + '" checked="checked" type="checkbox" value="' + rowid + '"/>';
-	};
+	}
 
 	function fmtCheckbox(rowid, value) {
 		var checked = (value === true) ? 'checked="checked"' : "";
 		return '<input class="toggle" title="' + rowid + '" ' + checked + ' type="checkbox" value="' + rowid + '"/>';
-	};
+	}
 
 	function fmtDepth(rowid, value) {
-                // Where those NaNs came from??
+		// Where those NaNs came from??
 		return Number(value).toFixed(1);
 	}
 
@@ -195,16 +183,16 @@ function Pack(id) {
 					if (typeof samplings[sampling] === "undefined") samplings[sampling] = true;
 					if (typeof gains[gain] === "undefined") gains[gain] = true;
 					if (typeof orientations[orientation] === "undefined") orientations[orientation] = true;
-				};
-			};
-		};
+				}
+			}
+		}
 
 		// Store the final results
 		_locations_index = locations;
 		_samplings_index = samplings;
 		_gains_index = gains;
 		_orientations_index = orientations;
-	};
+	}
 
 	// PLE Aug 2013: Can't the following four functions be combined?
 	// They modify global variables - either _event_list or _station_list
@@ -215,7 +203,7 @@ function Pack(id) {
 		_event_list = _sorted_list;
 
 		that.renderEvent();
-	};
+	}
 
 	function sortEventDown(arrow) {
 		var column = _event_format.names.indexOf($(arrow.target).parents("th").prop("id"));
@@ -223,21 +211,21 @@ function Pack(id) {
 		_event_list = _sorted_list;
 
 		that.renderEvent();
-	};
+	}
 
 	function sortStationUp(arrow) {
 		var column = _station_format.names.indexOf($(arrow.target).parents("th").prop("id"));
 		var _sorted_list = _station_list.sort(sortFn(column,false));
 		_station_list = _sorted_list;
 		that.renderStation();
-	};
+	}
 
 	function sortStationDown(arrow) {
 		var column = _station_format.names.indexOf($(arrow.target).parents("th").prop("id"));
 		var _sorted_list = _station_list.sort(sortFn(column,true));
 		_station_list = _sorted_list;
 		that.renderStation();
-	};
+	}
 
 	function render_header(format) {
 		var html = '<tr class="wi-table-header">';
@@ -253,11 +241,11 @@ function Pack(id) {
 				html += '<th class="wi-table-header-cell" id="' + format.names[key] + '">' + format.shortnames[key] + arrows + '</th>';
 			} else {
 				html += '<th class="wi-table-header-cell" id="' + format.names[key] + '">' + format.shortnames[key] + '</th>';
-			};
-		};
+			}
+		}
 		html += '</tr>';
 		return html;
-	};
+	}
 
 	function render_row(format, rowkey, data) {
 		// From 'data', build table content as a string of <tr>s.
@@ -269,7 +257,7 @@ function Pack(id) {
 
 		// This is a "static" variable from a JS point of view (remember 
 		// that each function is an object - sound confusing :s)
-		rowclass = (typeof rowclass === "undefined") ? "wi-odd" : rowclass;
+		var rowclass = (typeof rowclass === "undefined") ? "wi-odd" : rowclass;
 
 		// We switch the last used style
 		rowclass = (rowclass === "wi-odd") ? "wi-even" : "wi-odd";
@@ -284,7 +272,7 @@ function Pack(id) {
 
 		// Return the results from the render
 		return html;
-	};
+	}
 
 	function connectEvent() {
 		// This is a speed-up access to the methods created here
@@ -315,7 +303,7 @@ function Pack(id) {
 		 */
 		_current_event_div.find(".wi-arrow-up").bind("click", sortEventUp);
 		_current_event_div.find(".wi-arrow-down").bind("click", sortEventDown);
-	};
+	}
 
 	function connectStation() {
 		// This is a speed-up access to the methods created here
@@ -332,7 +320,7 @@ function Pack(id) {
 
 		_current_station_div.find("table").find(".toggle").bind("change", function(item){
 			var obj = $(item.target);
-			
+
 			var stline = _station_dictionary[obj.val()];
 			stline[skey] = obj.is(':checked');
 
@@ -347,7 +335,7 @@ function Pack(id) {
 		 */
 		_current_station_div.find(".wi-arrow-up").bind("click", sortStationUp);
 		_current_station_div.find(".wi-arrow-down").bind("click", sortStationDown);
-		
+
 		/*
 		 * Connect the Stream filters
 		 */
@@ -399,7 +387,7 @@ function Pack(id) {
 				}
 			})(key))
 		}
-	};
+	}
 
 	function applyStreamFilter() {
 		var stri = _station_format.names.indexOf('streams')
@@ -466,8 +454,8 @@ function Pack(id) {
 			// mapControl.addEvent(line[idi], line[loni], line[lati], line[depi], line[magi], line[regi], line[dati]);
 			mapControl.removeStation(line[idi]);
 			mapControl.addStation(line[idi], line[neti], line[stai], line[loni], line[lati], line[arci], line[resi], line[typi], line[stri], line[selected]);
-		};
-	};
+		}
+	}
 
 	function mapEvent(id) {
 		if (!mapControl.enabled()) return;
@@ -494,8 +482,8 @@ function Pack(id) {
 			// mapControl.addEvent(line[idi], line[loni], line[lati], line[depi], line[magi], line[regi], line[dati]);
 			mapControl.removeEvent(line[idi]);
 			mapControl.addEvent(line[idi], line[loni], line[lati], line[depi], line[magi], line[regi], line[dati], line[selected]);
-		};
-	};
+		}
+	}
 
 	function renderStationFilter(fieldname, table) {
 		var html = '';
@@ -511,7 +499,7 @@ function Pack(id) {
 			html += '</div>';
 		}
 		return html;
-	};
+	}
 
 	function renderStationFilters(format) {
 		var html = '';
@@ -546,7 +534,7 @@ function Pack(id) {
 		html += '</td></tr>';
 
 		return html;
-	};
+	}
 
 	// Public
 	this.toggleEvent = function (id) {
@@ -559,9 +547,9 @@ function Pack(id) {
 		if (!_station_list) return;
 		var checkbox = _current_station_div.find("table").find(".toggle[value="+id+"]")
 		checkbox.prop('checked', !checkbox.prop('checked')).change();
-        };
+	};
 
-        this.saveStation = function() {
+	this.saveStation = function() {
 		// Prepare a JSON object containing
 		// the stream codes, and POST to back end
 		// which prepares a file for downloading.
@@ -580,7 +568,7 @@ function Pack(id) {
 		for (var k in _station_list) {
 			if (_station_list[k][seli] === false) {
 				continue;
-			};
+			}
 			var loccha = _station_list[k][fstreamsi];
 			if (typeof loccha !== "undefined" && loccha.length > 0) {
 				var loc_list = Array();
@@ -597,8 +585,8 @@ function Pack(id) {
 						      cha_list[i],
 						      loc_list[i]);
 					streams.push(t);
-				};
-			};
+				}
+			}
 		}
 		var streams_json = JSON.stringify(streams);
 
@@ -624,11 +612,11 @@ function Pack(id) {
 			alert('Data length:' + data.length);
 		} else {
 			alert('Data is null');
-		};
+		}
 		var count = 0;
 		var count_checked = 0;
 		var new_data = Array();
-		for (key in data) {
+		for (var key in data) {
 			var row = data[key];
 			count += 1;
 			var checked = row[7]; // should be looked up in index
@@ -637,8 +625,8 @@ function Pack(id) {
 				new_data.push(row);
 				console.log('Added ' + row);
 				alert('Added ' + count + ':' + row);
-			};
-		};
+			}
+		}
 
 		_event_list = new_data;
 		alert('Checked: ' + count_checked + '/' + count);
@@ -660,7 +648,7 @@ function Pack(id) {
 
 		// Strip and check header
 		var header = datacopy.shift();
-		for(key in header) {
+		for(var key in header) {
 			if (header[key] !== _event_format.names[key])
 				console.error("request.js: Event header " + header[key] + " format does not match current implementation.");
 		}
@@ -675,7 +663,7 @@ function Pack(id) {
 			if ( evline.length !== _event_format.names.length ) {
 				throw new RequestError("Shut down!");
 			}
-			for(key2 in evline) {
+			for(var key2 in evline) {
 				if (typeof evline[key2] === "object")
 					throw new RequestError("Shut down! -- " + _event_format.names[key2] + " it is a object");
 			}
@@ -711,7 +699,7 @@ function Pack(id) {
 		for(var key in header) {
 			if (header[key] !== _station_format.names[key])
 				wiConsole.error("request.js: Station header " + header[key] + " format does not match current implementation.");
-		};
+		}
 
 		/*
 		 * Check for duplicates
@@ -730,7 +718,7 @@ function Pack(id) {
 				wiConsole.error("request.js: Ignoring duplicate station item ID" + stline[ eidkey ])
 				duplicates.push(key);
 			}
-		};
+		}
 
 		/*
 		 * Remove the dupplicates array
@@ -785,7 +773,7 @@ function Pack(id) {
 		for (var key in _event_list) {
 			var checked = _event_list[key][7];  // should be looked up in the event table index
 			if (checked) { n += 1; }
-		};
+		}
 		return n;
 	};
 
@@ -799,7 +787,7 @@ function Pack(id) {
 
 	this.eventLines = function() {
 		var lines = Array();
-		
+
 		var latitude  = _event_format.names.indexOf("latitude");
 		var longitude = _event_format.names.indexOf("longitude");
 		var depth = _event_format.names.indexOf("depth");
@@ -819,7 +807,7 @@ function Pack(id) {
 
 	this.stationLines = function() {
 		var lines = Array();
-		
+
 		var networkKey = _station_format.names.indexOf("netcode");
 		var stationKey = _station_format.names.indexOf("statcode");
 		// 
@@ -838,13 +826,13 @@ function Pack(id) {
 			var items = Array();
 			for(var key in line[streamKey]) {
 				if (items.indexOf(line[streamKey][key]) === -1) items.push(line[streamKey][key]);
-			};
+			}
 
 			for(var key in items) {
 				var location = items[key].split(".")[0];
 				var stream = items[key].split(".")[1];
 				lines.push( [line[networkKey], line[stationKey], stream, location] )
-			};
+			}
 		}
 
 		return lines;
@@ -899,7 +887,7 @@ function Pack(id) {
 
 		if (_current_event_div)
 			_current_event_div.empty();
-		
+
 		if (div)
 			_current_event_div = div;
 
@@ -960,7 +948,7 @@ function Pack(id) {
 				if (line[seli])
 					_event_list_frozen.push(line)
 			}
-			
+
 			_event_list = _event_list_frozen
 
 			this.renderEvent(div.find("#" + id + "-events-div"), div.find("#" + id + "-events-count"));
@@ -1000,7 +988,7 @@ function RequestControl(htmlTagId) {
 		html += '<div id="requestControlControls"></div>';
 		html += '<div id="requestControlTables"></div>';
 		_controlDiv.append(html);
-	};
+	}
 
 	function load(htmlTagId) {
 		var control = $(htmlTagId);
@@ -1015,29 +1003,29 @@ function RequestControl(htmlTagId) {
 
 		// Build
 		buildControl();
-	};
+	}
 
 	function generate_id() {
 		var timestamp = (new Date()).getTime();
 		return timestamp;
-	};
+	}
 
-	function new_package() {
+	function newPackage() {
 		var package_id = generate_id();
 		_data = new Pack(package_id);
-		return package();
-	};
+		return getPackage();
+	}
 
-	function package() {
+	function getPackage() {
 		if ( (typeof _data === "undefined") ) {
 			throw new RequestError("request.js: No Request to return.");
-		};
+		}
 		return _data;
-	};
+	}
 
 	function remove(id) {
 		try {
-			var datapack = package();
+			var datapack = getPackage();
 
 			/*
 			 * Ask the pack to remove Events and Stations
@@ -1057,8 +1045,8 @@ function RequestControl(htmlTagId) {
 
 		} catch (e) {
 			wiConsole.error("No request to remove.");
-		};
-	};
+		}
+	}
 
 	function connect(id) {
 		_controlDiv.find('#' + id + '-delete-events').button().bind("click", function(item){
@@ -1066,7 +1054,7 @@ function RequestControl(htmlTagId) {
 			var pkg = null;
 
 			try {
-				pkg = package();
+				pkg = getPackage();
 			} catch (e) {
 				return;
 			}
@@ -1091,7 +1079,7 @@ function RequestControl(htmlTagId) {
 			var pkg = null;
 
 			try {
-				pkg = package();
+				pkg = getPackage();
 			} catch (e) {
 				return;
 			}
@@ -1115,7 +1103,7 @@ function RequestControl(htmlTagId) {
 			var pkg = null;
 
 			try {
-				pkg = package();
+				pkg = getPackage();
 			} catch (e) {
 				return;
 			}
@@ -1133,14 +1121,14 @@ function RequestControl(htmlTagId) {
 			var pkg = null;
 
 			try {
-				pkg = package();
+				pkg = getPackage();
 			} catch (e) {
 				return;
 			}
 
 			pkg.freeze($(item.target).parent("div"));
 		});
-	};
+	}
 
 	function render() {
 		// This is to help on the rendering of the events.
@@ -1156,7 +1144,7 @@ function RequestControl(htmlTagId) {
 		var size = 150; // Default size for tables ?
 		var datapack = undefined;
 		try {
-			datapack = package();
+			datapack = getPackage();
 		} catch (e) {
 			wiConsole.error("request.js: No request loaded to render.");
 		}
@@ -1258,9 +1246,9 @@ function RequestControl(htmlTagId) {
 		var node = null;
 
 		try {
-			node = package();
+			node = getPackage();
 		} catch (e) {
-			node = new_package();
+			node = newPackage();
 		}
 		if (!node) throw new RequestError("request.js: Cannot create a new request.");
 
@@ -1275,9 +1263,9 @@ function RequestControl(htmlTagId) {
 	this.appendStation = function(station_data) {
 		var node = null;
 		try {
-			node = package();
+			node = getPackage();
 		} catch (e) {
-			node = new_package();
+			node = newPackage();
 		}
 		if (!node) throw new RequestError("request.js: Cannot create a new request.")
 
@@ -1290,27 +1278,27 @@ function RequestControl(htmlTagId) {
 	};
 
 	this.hasEvent = function() {
-		return package().hasEvent();
+		return getPackage().hasEvent();
 	};
 
 	this.hasStation = function() {
-		return package().hasStation();
+		return getPackage().hasStation();
 	};
 
 	this.eventLines = function() {
-		return package().eventLines();
+		return getPackage().eventLines();
 	};
 
 	this.stationLines = function() {
-		return package().stationLines();
+		return getPackage().stationLines();
 	};
 
 	this.toggleEvent = function(id) {
-		return package().toggleEvent(id);
+		return getPackage().toggleEvent(id);
 	};
 
 	this.toggleStation = function(id) {
-		return package().toggleStation(id);
+		return getPackage().toggleStation(id);
 	};
 
 	/*
@@ -1318,7 +1306,7 @@ function RequestControl(htmlTagId) {
 	 */
 	this.submit = function(submit_info) {
 		// Check that timewindow mode fits packages ...
-		var pkg = package();
+		var pkg = getPackage();
 
 		// Reject package without stations
 		if ( ! pkg.hasStation() ) {
@@ -1344,7 +1332,7 @@ function RequestControl(htmlTagId) {
 		// Add events only if needed
 		if (submit_info.mode === "Relative") {
 			info.timewindow.events  = JSON.stringify(pkg.eventLines());
-		};
+		}
 
 		// Add request description. This will be used for:
 		// * status list item;
@@ -1362,11 +1350,11 @@ function RequestControl(htmlTagId) {
 
 	this.bind = function(name, method) {
 		var valid = [ "onAddEvents", "onAddStations", "onDeleteEvents", "onDeleteStations", "onSaveStations" ]
-		
+
 		// The functions registered here will be called when the user 
 		if (valid.indexOf(name) === -1) {
 			throw new WIError("Invalid callback name " + name);
-		};
+		}
 
 		if (typeof _callbacks[name] === "undefined") _callbacks[name] = [];
 
@@ -1376,22 +1364,31 @@ function RequestControl(htmlTagId) {
 	function getCallbacks(name) {
 		if (typeof _callbacks[name] === "undefined" ) return [];
 		return _callbacks[name];
-	};
+	}
 
 };
 
 /*
- * Bind the RequestControl to the document.ready method so that it is
- * automatically loaded when this JS file is imported (by the loader).
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		requestControl = new RequestControl("#wi-RequestManagerControl");
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("request.js: " + e.message);
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.RequestError = function(message) {
+				this.message = message;
+			//	this.name = "RequestErrorException";
+			};
 
-		wiConsole.error("request.js: " + e.message, e);
-	}
-});
+			window.RequestError.prototype = new WIError;
+			window.requestControl = new RequestControl("#wi-RequestManagerControl");
+			resolve();
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("request.js: " + e.message);
+
+			wiConsole.error("request.js: " + e.message, e);
+			reject();
+		}
+	});
+}

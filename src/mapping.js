@@ -9,11 +9,6 @@
  */
 
 /*
- * Page wide variable to provides the mapping to all other modules.
- */
-var mapControl = undefined;
-
-/*
  * Map Object implementation
  */
 function MapControl(htmlTagId) {
@@ -48,7 +43,7 @@ function MapControl(htmlTagId) {
 			_map.zoomToMaxExtent();
 		else
 			_map.zoomToExtent(bounds, true);
-	};
+	}
 
 	function makeWMSlayer(serverURL, layerName) {
 		if (! serverURL) return;
@@ -61,7 +56,7 @@ function MapControl(htmlTagId) {
 			  maxResolution: 'auto'}
 		);
 		return layer;
-	};
+	}
 
 	function makeGoogleLayer(layerName) {
 		if (! layerName) return;
@@ -81,19 +76,19 @@ function MapControl(htmlTagId) {
 
 		var layer = new OpenLayers.Layer.Google(layerName, options);
 		return layer;
-	};
+	}
 
 	function makeOSMLayer(layerName) {
 		if (! layerName) return;
 		return new OpenLayers.Layer.OSM(layerName);
-	};
+	}
 
 	// Rounding is used to make the coordinates shown in the
 	// selection box pleasant, but also to obscure the true
 	// locations of the the stations for casual observers.
 	function roundLatLon(x) {
 		return Math.round(x * 100) / 100;
-	};
+	}
 
 
 	function makeMousePosition(digits) {
@@ -113,7 +108,7 @@ function MapControl(htmlTagId) {
 	function getCallbacks(name) {
 		if (typeof _callbacks[name] === "undefined" ) return [];
 		return _callbacks[name];
-	};
+	}
 
 	function makeSelector() {
 		var control = new OpenLayers.Control({
@@ -144,27 +139,27 @@ function MapControl(htmlTagId) {
 			}
 		});
 		return control;
-	};
+	}
 
 	function makeLimitBox() {
 		var layer = new OpenLayers.Layer.Vector("Selection Limit");
 		layer.setOpacity(0.3);
 		return layer;
-	};
+	}
 
 	function disableMouseWheel() {
 		var controls = _map.getControlsByClass('OpenLayers.Control.Navigation');
 		for(var i = 0; i < controls.length; ++i) {
 			controls[i].disableZoomWheel();
 		}
-	};
+	}
 
 	function legendItem(flag, text) {
 		var html = '';
 		console.error(eidaCSSSource);
 		html += '<td><img src="' + eidaCSSSource + "/" + flag+ '.png" title="' + text + '" width="15" height="15"></td><td>' + text + '</td>';
 		return html;
-	};
+	}
 
 	function legend() {
 		var html = '';
@@ -330,7 +325,7 @@ function MapControl(htmlTagId) {
 		 * Make coordinates more visible, at TR corner.
 		 * FIXME Wrong way to set style - should be in a style sheet
 		 */
-		loc = _controlDiv.find(".olControlMousePosition");
+		var loc = _controlDiv.find(".olControlMousePosition");
 		loc.css('color', '#00589C'); /* GFZ dark blue */
 		loc.css('background-color', '#aaaaaa80');
 		loc.css('height', '1.4em');
@@ -346,7 +341,7 @@ function MapControl(htmlTagId) {
 		 * Activate the selectors
 		 */
 		_itsel.activate();
-	};
+	}
 
 	function probemap(){
 		if (_controlDiv.width() === 0) {
@@ -354,7 +349,7 @@ function MapControl(htmlTagId) {
 			return;
 		}
 		makeMap();
-	};
+	}
 
 	function load(htmlTagId) {
 		var control = $(htmlTagId);
@@ -366,14 +361,14 @@ function MapControl(htmlTagId) {
 
 		// Save the main control div
 		_controlDiv = control;
-		
+
 		// Because the map div has no width when the page is first
 		// loaded we have to keep on trying until it is set to its
 		// correct size. This is done on the probemap method.
 		setTimeout(probemap, 500);
 
 		return;
-	};
+	}
 
 	/*
 	 * Those are related to the creation of the styles 
@@ -406,7 +401,7 @@ function MapControl(htmlTagId) {
 		}
 
 		return _station_styles[stname];
-	};
+	}
 
 	function findEventStyle(id, lon, lat, depth, mag, region, date, selected) {
 		var stname = undefined;
@@ -433,7 +428,7 @@ function MapControl(htmlTagId) {
 					style.fillOpacity = 0.5;
 					style.fillColor = "#ffa000";
 					break;
-				
+
 				case "evbig_uns":
 					style.strokeWidth = 2;
 					style.strokeDashstyle = "dashed";
@@ -441,7 +436,7 @@ function MapControl(htmlTagId) {
 					style.fillOpacity = 0.2;
 					style.fillColor = "#000000";
 					break;
-				
+
 				case "evdefault":
 					style.strokeWidth = 1;
 					style.strokeColor = "#ee9900";
@@ -462,7 +457,7 @@ function MapControl(htmlTagId) {
 		}
 
 		return _event_styles[stname];
-	};
+	}
 
 	function createEventFeature(id, lon, lat, depth, mag, region, date, selected) {
 		var pt = new OpenLayers.Geometry.Point(Number(lon), Number(lat));
@@ -478,7 +473,7 @@ function MapControl(htmlTagId) {
 		};
 		var style = findEventStyle(id, lon, lat, depth, mag, region, date, selected);
 		return new OpenLayers.Feature.Vector(pt, ats, style);
-	};
+	}
 
 	function createStationFeature(id, net, sta, lon, lat, archive, restricted, type, streams, selected) {
 		var pt = new OpenLayers.Geometry.Point(Number(lon), Number(lat));
@@ -487,7 +482,7 @@ function MapControl(htmlTagId) {
 
 		var streamtypes = {}
 		for (var n in streams) {
-			m = streams[n].match('(.[HLNG]).$')
+			var m = streams[n].match('(.[HLNG]).$')
 			if (m)
 				streamtypes[m[1]] = true;
 		}
@@ -502,7 +497,7 @@ function MapControl(htmlTagId) {
 		var style = findStationStyle(id, net, sta, lon, lat, archive, restricted, type, selected);
 
 		return new OpenLayers.Feature.Vector(pt, ats, style);
-	};
+	}
 
 	/*
 	 * Those are the callbacks for the pop-ups
@@ -517,7 +512,7 @@ function MapControl(htmlTagId) {
 				null, true, null);
 		feature.popup = popup;
 		_map.addPopup(feature.popup);
-	};
+	}
 
 	function onStationSelect(feature) {
 		var button = "<div style='text-align: center; padding: 10px 5px 5px 5px;'><input type='button' id='" + feature.attributes.key + "' value='" + (feature.attributes.selected? "Unselect": "Select") + "' onclick=mapControl.toggleItem(this)></div>";
@@ -528,24 +523,24 @@ function MapControl(htmlTagId) {
 				null, true, null);
 		feature.popup = popup;
 		_map.addPopup(popup);
-	};
+	}
 
 	function onItemUnselect(item) {
 		closePopup(item.feature);
-	};
+	}
 
 	function onItemSelect(item) {
 		if (item.feature.attributes.evst === "ev") return onEventSelect(item.feature);
 		if (item.feature.attributes.evst === "st") return onStationSelect(item.feature);
 
 		throw new WIError("mapping.js: Invalid feature");
-	};
+	}
 
 	function closePopup(feature) {
 		_map.removePopup(feature.popup);
 		feature.popup.destroy();
 		delete feature.popup;
-	};
+	}
 
 	/*
 	 * This is used by the removeStation/removeEvent 
@@ -558,22 +553,22 @@ function MapControl(htmlTagId) {
 			var items = _items.getFeaturesByAttribute('evst', evst);
 			_items.destroyFeatures(items);
 			return;
-		};
+		}
 
 		var item = _items.getFeaturesByAttribute('key', id);
 		_items.destroyFeatures(item);
-	};
+	}
 
 	function findFeature(id) {
 		var features = _items.getFeaturesByAttribute('key', id);
 		if (features.length !== 1) throw new WIError("mapping.js: found more than one feature with id " + id);
 		return features[0];
-	};
+	}
 
 	// Public
 	this.showHelp = function() {
 		var html = '';
-		
+
 		html += '<div>';
 		html += '<h1>Map Control Usage</h1>';
 		html += '<br/>';
@@ -668,7 +663,7 @@ function MapControl(htmlTagId) {
 		} catch (e) {
 			var f = createStationFeature(id, net, sta, lon, lat, archive, restricted, type, streams, selected);
 			_items.addFeatures( [ f ] );
-		};
+		}
 	};
 
 	this.removeStation = function(id){
@@ -731,7 +726,7 @@ function MapControl(htmlTagId) {
 			if (typeof _callbacks[name] === "undefined") _callbacks[name] = [];
 			_callbacks[name].push(method);
 			return;
-		};
+		}
 
 		throw new WIError("Invalid callback name " + name);
 	};
@@ -741,17 +736,20 @@ function MapControl(htmlTagId) {
 }
 
 /*
- * Bind the loader to the document.ready method so that it is automatically 
- * loaded when this JS file in imported.
+ * Export for main.js
  */
-$(document).ready(function () {
-	try {
-		mapControl = new MapControl("#wi-MappingControl");
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("mapping.js: " + e.message);
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.mapControl = new MapControl("#wi-MappingControl");
+			resolve();
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("mapping.js: " + e.message);
 
-		wiConsole.error("mapping.js: " + e.message, e);
-	}
-});
+			wiConsole.error("mapping.js: " + e.message, e);
+			reject();
+		}
+	});
+}

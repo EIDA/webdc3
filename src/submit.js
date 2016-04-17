@@ -10,11 +10,6 @@
  */
 
 /*
- * Page wide variable to provides the submit to all modules.
- */
-var submitControl = undefined;
-
-/*
  * Implementation of the submitControl
  */
 function SubmitControl(htmlTagId) {
@@ -27,7 +22,6 @@ function SubmitControl(htmlTagId) {
 		 */
 		wiService.request.types(function(data) {
 			fillRequesttype(_controlDiv.find('#scType'), data);
-			_controlDiv.find("input[name=scType][id=scType-MSEED]").prop('checked', true);
 		}, null, true, {});
 
 		/*
@@ -43,14 +37,14 @@ function SubmitControl(htmlTagId) {
 		if (value === "") return null;
 
 		value = Number(value);
-		
+
 		if (isNaN(value)) return null;
-	
+
 		if (min && value < min) return null;
 		if (max && value > max) return null;
-		
+
 		return value;
-	};
+	}
 
 	function seconds2time(seconds) {
 		var value = new Date("2010-01-01T00:00:00Z");
@@ -99,21 +93,45 @@ function SubmitControl(htmlTagId) {
 		html += '<br/>';
 
 		html += '<h3>Request Information:</h3>';
-		html += "<div class='wi-control-item-first'>";
-		html += '<div class="wi-spacer">Request type:</div>';
-		html += '<div style="padding-left: 20px;" id="scType"></div>';
-		html += '</div>';
+		html += '<div id="scType"></div>';
 
-		html += "<div class='wi-control-item'>";
+		if (typeof wiFDSNWS_Control.submitRequest !== 'undefined') {
+			html += '<div id="scLevel">';
+			html += '<div id="scLevelRespBlock" style="display:none">';
+			html += '<div class="wi-control-item">';
+			html += '<div class="wi-spacer"><a title="This will determine the amount of info returned.">Metadata level?</a></div>';
+			html += '<div style="padding-left: 20px;">';
+			html += '<input type="radio" value="station" id="scLevelResp-station" name="scLevel" />&nbsp;<label for="scLevelResp-station">Station</label>';
+			html += '<input type="radio" value="channel" id="scLevelResp-channel" name="scLevel" />&nbsp;<label for="scLevelResp-channel">Channel</label>';
+			html += '<input type="radio" value="response" id="scLevelResp-response" name="scLevel" />&nbsp;<label for="scLevelResp-response">Response</label>';
+			html += '</div>';
+			html += '</div>';
+			html += '</div>';
+
+			html += '<div id="scLevelNoRespBlock" style="display:none">';
+			html += '<div class="wi-control-item">';
+			html += '<div class="wi-spacer"><a title="This will determine the amount of info returned.">Metadata level?</a></div>';
+			html += '<div style="padding-left: 20px;">';
+			html += '<input type="radio" value="station" id="scLevelNoResp-station" name="scLevel" />&nbsp;<label for="scLevelNoResp-station">Station</label>';
+			html += '<input type="radio" value="channel" id="scLevelNoResp-channel" name="scLevel" />&nbsp;<label for="scLevelNoResp-channel">Channel</label>';
+			html += '</div>';
+			html += '</div>';
+			html += '</div>';
+			html += '</div>';
+		}
+
+		html += '<div id="scCompressBlock">';
+		html += '<div class="wi-control-item">';
 		html += '<div class="wi-spacer"><a title="This will apply bzip2 compression.">Use compression?</a></div>';
 		html += '<div style="padding-left: 20px;" id="scCompress">';
 		html += '<input type="radio" value="yes" id="scCompress-yes" name="scCompress" />&nbsp;<label for="scCompress-yes">Yes</label>';
 		html += '<input type="radio" value="no" id="scCompress-no" name="scCompress" />&nbsp;<label for="scCompress-no">No</label>';
 		html += '</div>';
 		html += '</div>';
+		html += '</div>';
 
 		html += '<div id="scResponseBlock">';
-		html += "<div class='wi-control-item'>";
+		html += '<div class="wi-control-item">';
 		html += '<div class="wi-spacer"><a title="This will include SEED blockettes 4X in the generated volume.">Use response dictionary?</a></div>';
 		html += '<div style="padding-left: 20px;" id="scResponse">';
 		html += '<input type="radio" value="yes" id="scResponse-yes" name="scResponse" />&nbsp;<label for="scResponse-yes">Yes</label>';
@@ -122,10 +140,20 @@ function SubmitControl(htmlTagId) {
 		html += '</div>';
 		html += '</div>';
 
-		html += "<div class='wi-control-item'>";
-		html += '<div class="wi-spacer">Your e-mail address:</div>';
-		html += '<input type="text" class="wi-inline-full" id="scUser" /><br/>';
-		html += '<input type="checkbox" id="scUserKeep"> Remember me?';
+		html += '<h3>Authentication:</h3>';
+
+		if (typeof wiFDSNWS_Control.submitRequest !== 'undefined') {
+			html += '<div class="wi-control-item">';
+			html += '<div id="sbtAuthMode" align="center">';
+			html += '<input type="radio" value="Email" id="sbtAuthModeEmail" name="sbtAuthMode" /><label for="sbtAuthModeEmail">ArcLink</label>';
+			html += '<input type="radio" value="Token" id="sbtAuthModeToken" name="sbtAuthMode" /><label for="sbtAuthModeToken">FDSNWS</label>';
+			html += '</div>';
+		}
+
+		html += '<div id="sbtAuthDiv">';
+		html += '<div style="padding: 10px;" id="sbtAuthEmailDiv"></div>';
+		html += '<div style="padding: 10px;" id="sbtAuthTokenDiv"></div>';
+		html += '</div>';
 		html += '</div>';
 
 		/* Final row of buttons */
@@ -136,7 +164,7 @@ function SubmitControl(htmlTagId) {
 	 	html += '<br/>';
 
 		html += '<div class="wi-control-item-last">';
-                html += '<input id="scReview" class="wi-inline" type="button" value="Review"/>';
+		html += '<input id="scReview" class="wi-inline" type="button" value="Review"/>';
 		html += '<input id="scSubmit" class="wi-inline" type="button" value="Submit"/>';
 		html += '</div>';
 
@@ -213,6 +241,29 @@ function SubmitControl(htmlTagId) {
 		html += "</div>";
 		_controlDiv.find("#sbtTimeAbsoluteDiv").append(html);
 
+		/*
+		 * E-mail auth definition
+		 */
+		html = '<div class="wi-control-item">';
+		html += '<div class="wi-spacer">Your e-mail address:</div>';
+		html += '<input type="text" class="wi-inline-full" id="scUser" /><br/>';
+		html += '<input type="checkbox" id="scUserKeep"> Remember me?';
+		html += '</div>';
+		_controlDiv.find("#sbtAuthEmailDiv").append(html);
+
+		/*
+		 * Token auth definition
+		 */
+		if (typeof wiFDSNWS_Control.submitRequest !== 'undefined') {
+			html = '<div class="wi-control-item">';
+			html += '<div>Current ID: <span id="scAuthUser"/></div>'
+			html += '<div>Valid until: <span id="scAuthValid"/></div>'
+			html += '<input id="scTokenSelect" type="file" style="visibility:hidden"/>';
+			html += '<input id="scTokenLoad" class="wi-inline" type="button" value="Load Token"/>';
+			html += '<input id="scTokenRemove" class="wi-inline" type="button" value="Remove Token"/>';
+			html += '</div>';
+			_controlDiv.find("#sbtAuthTokenDiv").append(html);
+		}
 
 		// Basic button set for mode
 		_controlDiv.find("#sbtTimeMode").buttonset();
@@ -321,13 +372,20 @@ function SubmitControl(htmlTagId) {
 			$(obj.target).val(seconds2time(_controlDiv.find('#sbtEndSlider').slider('value')));
 		});
 
+		// Basic button set for auth
+		_controlDiv.find("#sbtAuthMode").buttonset();
+		_controlDiv.find("#sbtAuthMode").change(function(item) {
+			_controlDiv.find("#sbtAuthDiv").children("div").hide();
+			_controlDiv.find("#sbtAuth" + ($(item.target).val()) + 'Div').show();
+		});
+
 		// username 
 		_controlDiv.find("#scUser").bind("change", function(item) {
 			if ( ! _controlDiv.find("#scUserKeep").is(":checked") ) return;
 
 			var value = $(item.target).val();
 
-			if(value) {
+			if (value) {
 				$.cookie('scUser', value, { expires: 30 });
 			} else {
 				$.removeCookie('scUser');
@@ -341,6 +399,49 @@ function SubmitControl(htmlTagId) {
 			}
 		});
 
+		function resetTokenSelect(event) {
+			var div = _controlDiv.find("#scTokenSelect");
+			div.wrap('<form>').closest('form').get(0).reset();
+			div.unwrap();
+			event.stopPropagation();
+			event.preventDefault();
+		}
+
+		_controlDiv.find("#scTokenSelect").button().bind("change", function(event) {
+			var f = event.target.files[0];
+			var r = new FileReader();
+			r.readAsText(f);
+			r.onload = function(event) {
+				resetTokenSelect(event);
+				window.wiFDSNWS_Control.setAuthToken(event.target.result);
+				var authInfo = window.wiFDSNWS_Control.getAuthInfo();
+
+				if (authInfo) {
+					_controlDiv.find("#scAuthUser").text(authInfo.userId);
+					_controlDiv.find("#scAuthValid").text(authInfo.validUntil.toString());
+				}
+			};
+
+			r.onabort = function(event) {
+				resetTokenSelect(event);
+			}
+
+			r.onerror = function(event) {
+				resetTokenSelect(event);
+			}
+		})
+
+		_controlDiv.find("#scTokenLoad").button().bind("click", function() {
+			_controlDiv.find("#scTokenSelect").click();
+		})
+
+		_controlDiv.find("#scTokenRemove").button().bind("click", function(event) {
+			resetTokenSelect(event);
+			wiFDSNWS_Control.setAuthToken(null);
+			_controlDiv.find("#scAuthUser").text("Anonymous");
+			_controlDiv.find("#scAuthValid").text("N/A");
+		})
+
 		_controlDiv.find("#scReset").button().bind("click", resetControl);
 		_controlDiv.find("#scReview").button().bind("click", function() { submit(true) });
 		_controlDiv.find("#scSubmit").button().bind("click", function() { submit(false) });
@@ -348,9 +449,20 @@ function SubmitControl(htmlTagId) {
 		requestControl.bind("onDeleteEvents", reselect);
 		requestControl.bind("onAddEvents", reselect);
 
+		var authInfo = wiFDSNWS_Control.getAuthInfo();
+
+		if (authInfo) {
+			_controlDiv.find("#scAuthUser").text(authInfo.userId);
+			_controlDiv.find("#scAuthValid").text(authInfo.validUntil.toString());
+		}
+		else {
+			_controlDiv.find("#scAuthUser").text("Anonymous");
+			_controlDiv.find("#scAuthValid").text("N/A");
+		}
+
 		// trigger cookie refresh
 		_controlDiv.find("#scUser").change();
-	};
+	}
 
 	function reselect() {
 		var mode = null;
@@ -362,25 +474,62 @@ function SubmitControl(htmlTagId) {
 		_controlDiv.find("#" + mode).click();
 	}
 
-	function fillRequesttype(div,data) {
+	function fillRequesttype(div, data) {
 		var html = '';
 		div.empty();
+
+		if ( typeof wiFDSNWS_Control.submitRequest !== 'undefined' ) {
+			html += "<div class='wi-control-item-first'>";
+			html += '<div class="wi-spacer">FDSNWS request type:</div>';
+			html += '<div style="padding-left: 20px;">';
+			html += '<input id="scType-FDSNWS-dataselect" name="scType" type="radio" value="FDSNWS-dataselect" />&nbsp;<label for="scType-FDSNWS-dataselect">Waveform (Mini-SEED)</label><br/>';
+			html += '<input id="scType-FDSNWS-station-xml" name="scType" type="radio" value="FDSNWS-station-xml" />&nbsp;<label for="scType-FDSNWS-station-xml">Metadata (StationXML)</label><br/>';
+			html += '<input id="scType-FDSNWS-station-text" name="scType" type="radio" value="FDSNWS-station-text" />&nbsp;<label for="scType-FDSNWS-station-text">Metadata (Text)</label><br/>';
+			html += '</div>';
+			html += '</div>';
+		}
+
+		html += "<div class='wi-control-item-first'>";
+		html += '<div class="wi-spacer">ArcLink request type:</div>';
+		html += '<div style="padding-left: 20px;">';
+
 		for(var i in data) {
 			var id = data[i][0];
 			var idl   = 'scType-' + id;
 			var label = data[i][1];
 			html += '<input id="' + idl + '" name="scType" type="radio" value="' + id + '" />&nbsp;<label for="' + idl + '">' + label + '</label><br/>';
 		}
+
+		html += '</div>';
+		html += '</div>';
+
 		div.append(html);
 
 		// Request type 
 		div.find("input[name=scType]").bind("change", function(item) {
 			var key = $(item.target).val();
+			if ( (key.substr(0, 6) === "FDSNWS") ) {
+				_controlDiv.find("#scCompressBlock").hide();
+			} else {
+				_controlDiv.find("#scCompressBlock").show();
+			}
+			if ( (key === "FDSNWS-station-xml") ) {
+				_controlDiv.find("#scLevelResp-station").prop('checked', true);
+				_controlDiv.find("#scLevelRespBlock").show();
+			} else {
+				_controlDiv.find("#scLevelRespBlock").hide();
+			}
+			if ( (key === "FDSNWS-station-text") ) {
+				_controlDiv.find("#scLevelNoResp-station").prop('checked', true);
+				_controlDiv.find("#scLevelNoRespBlock").show();
+			} else {
+				_controlDiv.find("#scLevelNoRespBlock").hide();
+			}
 			if ( (key === "DSEED") || (key === "FSEED") ) {
 				_controlDiv.find("#scResponseBlock").show();
 			} else {
 				_controlDiv.find("#scResponseBlock").hide();
-			};
+			}
 			if ( key === "INVENTORY" || (key === "DSEED") ) {
 				_controlDiv.find("#scCompress-yes").prop('checked', true);
 			} else {
@@ -389,7 +538,14 @@ function SubmitControl(htmlTagId) {
 		});
 
 		// Set the default
-		div.find("input[name=scType][id=scType-MSEED]").prop('checked', true);
+		if ( typeof wiFDSNWS_Control.submitRequest !== 'undefined' ) {
+			div.find("#scType-FDSNWS-dataselect").prop('checked', true);
+			_controlDiv.find("#scCompressBlock").hide();
+		}
+		else {
+			div.find("#scType-MSEED").prop('checked', true);
+			_controlDiv.find("#scCompressBlock").show();
+		}
 	}
 
 	function fillSelect(select, data) {
@@ -397,9 +553,9 @@ function SubmitControl(htmlTagId) {
 		select.empty();
 		for(var key in data) {
 			html += '<option value='+ data[key][0] + '>' + data[key][1] + '</option>';
-		};
+		}
 		select.append(html);
-	};
+	}
 
 	function resetControl() {
 		if (!_controlDiv) return;
@@ -407,12 +563,12 @@ function SubmitControl(htmlTagId) {
 		/*
 		 * Compress flag
 		 */
-		_controlDiv.find("input[name=scCompress][id=scCompress-no]").prop('checked', true);
+		_controlDiv.find("#scCompress-no").prop('checked', true);
 
 		/*
 		 * Response dictionary
 		 */
-		_controlDiv.find("input[name=scResponse][id=scResponse-no]").prop('checked', true);
+		_controlDiv.find("#scResponse-no").prop('checked', true);
 
 		/*
 		 * User field
@@ -433,7 +589,7 @@ function SubmitControl(htmlTagId) {
 			$("#scResponseBlock").show();
 		} else {
 			$("#scResponseBlock").hide();
-		};
+		}
 
 		var mode = null;
 		try {
@@ -450,7 +606,9 @@ function SubmitControl(htmlTagId) {
 
 		_controlDiv.find("#sbtStartSlider").slider("value", 0);
 		_controlDiv.find("#sbtEndSlider").slider("value", 24 * 60 * 60 - 1);
-		
+
+		_controlDiv.find("#sbtAuthModeEmail").click();
+
 		/*
 		 * This would reload the phase list & Request type
 		 */
@@ -472,14 +630,16 @@ function SubmitControl(htmlTagId) {
 		submitinfo.mode = _controlDiv.find("#sbtTimeMode input:checked").val();;
 
 		submitinfo.request.user = _controlDiv.find("#scUser").val();
-		if ( ! submitinfo.request.user ) {
-			alert("You need to supply your e-mail address to be able to send your request.");
-			_controlDiv.find("#scUser").addClass("wi-warn");
-			return;
-		};
-
 		submitinfo.request.requesttype = _controlDiv.find("#scType input:checked").val();
+		submitinfo.request.level = _controlDiv.find("#scLevel input:checked").val();
 		submitinfo.request.compressed = ( _controlDiv.find("#scCompress input:checked").val() === "yes" ) ? true : false ;
+		if (!submitinfo.request.user && submitinfo.request.requesttype.substr(0, 6) != "FDSNWS") {
+			_controlDiv.find("#scUser").addClass("wi-warn");
+			_controlDiv.find("#sbtAuthModeEmail").prop('checked', true);
+			_controlDiv.find("#sbtAuthModeEmail").change();
+			alert("You need to supply your e-mail address to be able to send your request.");
+			return;
+		}
 
 		// Load in values
 		if (submitinfo.mode === "Absolute") {
@@ -503,7 +663,7 @@ function SubmitControl(htmlTagId) {
 
 		// Associate
 		requestControl.submit(submitinfo);
-	};
+	}
 
 	function load(htmlTagId) {
 		var control = $(htmlTagId);
@@ -519,10 +679,10 @@ function SubmitControl(htmlTagId) {
 
 		// build the interface
 		buildControl();
-		
+
 		// Reset
 		resetControl();
-	};
+	}
 
 	// Public
 
@@ -530,14 +690,22 @@ function SubmitControl(htmlTagId) {
 	load(htmlTagId);
 }
 
-$(document).ready(function() {
-	try {
-		submitControl = new SubmitControl("#wi-SubmitControl");
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("submit.js: " + e.message);
+/*
+ * Export for main.js
+ */
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.submitControl = new SubmitControl("#wi-SubmitControl");
+			resolve();
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("submit.js: " + e.message);
 
-		wiConsole.error("submit.js: " + e.message, e);
-	}
-});
+			wiConsole.error("submit.js: " + e.message, e);
+			reject();
+		}
+	});
+}
+
