@@ -9,10 +9,7 @@
  *
  */
 
-"use strict"
-
-window.wiService = new function() {
-
+function WIService() {
 	// Private stuff
 
 	var _busyCount = 0
@@ -338,3 +335,23 @@ window.wiService = new function() {
 		}
 	}
 }
+
+/*
+ * Export for main.js
+ */
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.wiService = new WIService()
+			resolve()
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("service.js: " + e.message)
+
+			wiConsole.error("service.js: " + e.message, e)
+			reject()
+		}
+	})
+}
+

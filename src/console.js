@@ -9,8 +9,6 @@
  *
  */
 
-"use strict"
-
 /*
  * Implementation of the wiConsole
  */
@@ -52,10 +50,10 @@ function WIConsole(htmlTagId) {
 		msgDiv.text(msg)
 		_controlDiv.append(msgDiv)
 
-		if (exc !== undefined && printStackTrace !== undefined) {
+		if (typeof exc != 'undefined' && typeof printStackTrace != 'undefined') {
 			var trace = printStackTrace({e: exc})
 
-			for(var i in trace) {
+			for (var i in trace) {
 				if (msgList.length >= _maxMessages + 1)
 					msgList.eq(1).remove()
 
@@ -233,46 +231,46 @@ function WIConsole(htmlTagId) {
 }
 
 /*
- * Bind the creation of controls to the document.ready method so that they are
- * automatically loaded when this JS file is imported (by the loader).
- * Note that in javascript "strict mode" we have to use "window" rather than
- * just create a global variable.
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		window.wiConsole = new WIConsole("#wi-Console")
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.wiConsole = new WIConsole("#wi-Console")
 
-		// Define console object for old browsers, so we at least
-		// might have a chance to see some errors
-		if (window.console === undefined)
-			window.console = {}
+			// Define console object for old browsers, so we at least
+			// might have a chance to see some errors
+			if (window.console === undefined)
+				window.console = {}
 
-		if (window.console.debug === undefined)
-			window.console.debug = wiConsole.debug
+			if (window.console.debug === undefined)
+				window.console.debug = wiConsole.debug
 
-		if (window.console.info === undefined)
-			window.console.info = wiConsole.info
+			if (window.console.info === undefined)
+				window.console.info = wiConsole.info
 
-		if (window.console.log === undefined)
-			window.console.log = wiConsole.notice
+			if (window.console.log === undefined)
+				window.console.log = wiConsole.notice
 
-		if (window.console.warn === undefined)
-			window.console.warn = wiConsole.warning
+			if (window.console.warn === undefined)
+				window.console.warn = wiConsole.warning
 
-		if (window.console.error === undefined)
-			window.console.error = wiConsole.error
+			if (window.console.error === undefined)
+				window.console.error = wiConsole.error
 
-		window.wiConsole.info("Loading webinterface v0.6...")
-	}
-	catch (e) {
-		alert("console.js: " + e.message)
-	}
+			window.onerror = function(errorMsg, url, lineNumber) {
+				if (interfaceLoader.debug())
+					window.wiConsole.error(errorMsg + ' (' + url + ':' + lineNumber + ')')
+				else
+					window.wiConsole.error(errorMsg)
+			}
 
-	window.onerror = function(errorMsg, url, lineNumber) {
-		if (interfaceLoader.debug())
-			window.wiConsole.error(errorMsg + ' (' + url + ':' + lineNumber + ')')
-		else
-			window.wiConsole.error(errorMsg)
-	}
-})
+			resolve()
+		}
+		catch (e) {
+			alert("console.js: " + e.message)
+			reject()
+		}
+	})
+}
 

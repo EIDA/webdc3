@@ -10,12 +10,7 @@
  */
 
 /*
- * Page-wide variable to provide the configuration proxy to all modules
- */
-var eventSearchControl = undefined;
-
-/*
- * Configuration proxy Object implementation
+ * Implementation of the eventSearchControl
  */
 function EventSearchControl(htmlTagId) {
 	//
@@ -32,13 +27,13 @@ function EventSearchControl(htmlTagId) {
 		if (value === "") return null;
 
 		value = Number(value);
-		
+
 		if (isNaN(value)) return null;
 		if (value < min) return null;
 		if (value > max) return null;
-		
+
 		return value;
-	};
+	}
 
 	function fillCatalogList(cataloglist) {
 		if ( _controlDiv === null ) return;
@@ -51,13 +46,13 @@ function EventSearchControl(htmlTagId) {
 		var select = _controlDiv.find("#escCatalog");
 		select.empty();
 
-		for(key in _catalogList) {
+		for(var key in _catalogList) {
 			var item = _catalogList[key];
 			select.append('<option value="' + key + '">' + item.description + '</option>');
-		};
+		}
 
 		updateControlState();
-	};
+	}
 
 	function reloadCatalogs() {
 		wiService.event.catalogs(fillCatalogList, null, true, {});
@@ -72,16 +67,16 @@ function EventSearchControl(htmlTagId) {
 		if (Number(bottom) >= Number(top)) {
 			alert("Invalid latitude interval.");
 			return;
-		};
+		}
 
 		if (Number(left) >= Number(right)) {
 			alert("Invalid longitude interval.");
 			return;
-		};
+		}
 
 		// Update the map
 		if (mapControl.enabled()) mapControl.setSelect(bottom, left, top, right);
-	};
+	}
 
 	// Called by the reset (on the coordinate area) button is triggered
 	function resetCoordinates() {
@@ -90,22 +85,22 @@ function EventSearchControl(htmlTagId) {
 		_controlDiv.find("#escLatitudeMax").val("90");
 		_controlDiv.find("#escLongitudeMin").val("-180");
 		_controlDiv.find("#escLongitudeMax").val("180");
-		
+
 		// Map select
 		if (mapControl.enabled()) mapControl.clearSelect();
-	};
+	}
 
 	// Called by the main reset button is triggered
 	function resetControl() {
 		if (_controlDiv === null) return;
 
 		// Magnitude
-		mag = configurationProxy.value('events.magnitudes.minimum', 4.0)
+		var mag = configurationProxy.value('events.magnitudes.minimum', 4.0)
 		_controlDiv.find( "#escMagnitudeSlider" ).slider("value", mag);
 
 		// Depth Values
-		dmin = configurationProxy.value('events.depth.minimum', 0.0)
-		dmax = configurationProxy.value('events.depth.maximum', 1000.0)
+		var dmin = configurationProxy.value('events.depth.minimum', 0.0)
+		var dmax = configurationProxy.value('events.depth.maximum', 1000.0)
 		_controlDiv.find( "#escDepthSlider" ).slider("values", [dmin, dmax]);
 
 		// Date interval.
@@ -156,7 +151,7 @@ function EventSearchControl(htmlTagId) {
 		if (!catalogPrefs) {
 			alert("Invalid Catalog.");
 			return;
-		};
+		}
 
 		if (catalogPrefs.hasDate) {
 			try {
@@ -188,7 +183,7 @@ function EventSearchControl(htmlTagId) {
 
 			if ((start !== null) & (start !== undefined)) options.start= $.datepicker.formatDate("yy-mm-dd", start);
 			if ((end   !== null) & (  end !== undefined)) options.end =  $.datepicker.formatDate("yy-mm-dd", end);
-		};
+		}
 
 		if (catalogPrefs.hasMagnitude) {
 			if (minmag === null) {
@@ -234,7 +229,7 @@ function EventSearchControl(htmlTagId) {
 				alert(_controlDiv.find('#escLongitudeMax').val() + " is invalid as longitude.");
 				return;
 			}
-			
+
 			if (minlat >= maxlat) {
 				alert("Invalid latitude interval, " + minlat + " >= " + maxlat + ".");
 				return;
@@ -244,7 +239,7 @@ function EventSearchControl(htmlTagId) {
 				alert("Invalid longitude interval, " + minlon + " >= " + maxlon + ".");
 				return;
 			}
-			
+
 			if (minlat !== null) options.minlat=minlat;
 			if (minlon !== null) options.minlon=minlon;
 			if (maxlat !== null) options.maxlat=maxlat;
@@ -253,7 +248,7 @@ function EventSearchControl(htmlTagId) {
 		}
 
 		return options;
-	};
+	}
 
 	// A quick "one-click" button to search for the last few events
 	// with M>6.0.
@@ -318,7 +313,7 @@ function EventSearchControl(htmlTagId) {
 				_controlDiv.find("#escSearch").button("option", "label", "Append");
 			}
 		}, null, true, options);
-	};
+	}
 
 	function updateControlState() {
 		return;
@@ -342,7 +337,7 @@ function EventSearchControl(htmlTagId) {
 		_controlDiv.find("input[id*=escLatitude]").prop('disabled', !catalog.hasRectangle);
 		_controlDiv.find("input[id*=escLongitude]").prop('disabled', !catalog.hasRectangle);
 		_controlDiv.find("#escCoordinateReset").prop('disabled', !catalog.hasRectangle);
-	};
+	}
 
 	function parseUserCatalog() {
 		// After the user has ended the catalog data,
@@ -363,19 +358,19 @@ function EventSearchControl(htmlTagId) {
 		if ((nmin < 1) || isNaN(nmax)) {
 			alert("Error: column indices must be integers starting from 1.");
 			return result;
-		};
+		}
 
 		// Build the format, columns and input parameters prior to
 		// sending to the event service.
 		var format = "csv";
 		var columns = Array();
-	        // FIXME: UNVALIDATED USER INPUT??
+		// FIXME: UNVALIDATED USER INPUT??
 		var input = $("#escCatalogInput").val();
 
 		if (input === null || input === undefined || input === "") {
 			alert("Please paste your catalog inside the text area before pressing 'Send'.");
 			return result;
-		};
+		}
 
 		// Build the columns variable.
 		// Each element is 'ignore' except for the four required ones.
@@ -385,8 +380,8 @@ function EventSearchControl(htmlTagId) {
 		for (var i = 0 ; i < col_indices.length; i++) {
 			if (col_indices[i] === undefined) {
 				console.warn('Item ' + i + ':' + col_tags[i] + ' is undefined');
-			};
-		};
+			}
+		}
 		for (var i = 0 ; i < col_tags.length; i++) {
 			var index = col_indices[i]-1;
 			if (columns[index] === "ignore") {
@@ -400,8 +395,8 @@ function EventSearchControl(htmlTagId) {
 				columns = columns.toString();
 				result = { status: 1, message: "Index problem", header: columns };
 				return result; // {status: 1; header: columns};
-			};
-		};
+			}
+		}
 
 		columns = columns.toString();  // A comma-separated string
 
@@ -423,13 +418,13 @@ function EventSearchControl(htmlTagId) {
 		}, null, true, format, columns, input);
 
 		var br = "\n"; // "<br>";
-		msg = "OK, params are:" + br;
+		var msg = "OK, params are:" + br;
 		msg += " format: '" + format + "'" + br;
 		msg += " columns: '" + columns + "'" + br;
 		msg += " input: '" + input + "'" + br;
 		result = {status: 0, message: msg, header: columns };
 		return result; // { status: 0, header: columns };
-	};
+	}
 
 	function buildControl() {
 		if (_controlDiv === null) return;
@@ -468,9 +463,9 @@ function EventSearchControl(htmlTagId) {
 
 		/*
 		 * Here we set the z-index to:
-                 *  (1) keep it above the sliders
-                 *  (2) keep it above the map -- layer 0
-                 *  (3) Keep it below the pop-up dialog.
+		 *  (1) keep it above the sliders
+		 *  (2) keep it above the map -- layer 0
+		 *  (3) Keep it below the pop-up dialog.
 		 */
 
 		html += '<div class="wi-control-item">';
@@ -545,12 +540,12 @@ function EventSearchControl(htmlTagId) {
 			buttons: {
 				Send: function() {
 				    alert("Thank you, your upload is being checked.");
-				    result = parseUserCatalog();
+				    var result = parseUserCatalog();
 				    console.log("parseUserCatalog: " + result.message);
 				    if (result.header !== undefined) {
-					text = "Format: " + result.header;
+					var text = "Format: " + result.header;
 					$("body").find("#escCatalogHeader").empty().append(text);
-				    };
+				    }
 				},
 				Close: function() {
 					$( this ).dialog( "close" );
@@ -640,7 +635,7 @@ function EventSearchControl(htmlTagId) {
 			}
 			validateCoordinates();
 		});
-		
+
 		_controlDiv.find("input[id*=escLongitude]").bind("change", function(item) {
 			var value = checkNumber($(item.target).val(),-180,180);
 			if (value === null) {
@@ -652,8 +647,7 @@ function EventSearchControl(htmlTagId) {
 		});
 
 		_controlDiv.find("#escCoordinateReset").button().bind("click", resetCoordinates);
-	
-	};
+	}
 
 	function load(htmlTagId) {
 		var control = $(htmlTagId);
@@ -678,14 +672,14 @@ function EventSearchControl(htmlTagId) {
 				_controlDiv.find("#escLongitudeMax").val(right);
 				_controlDiv.find("#escLongitudeMin").val(left);
 			});
-		};
+		}
 
 		// Reset the control
 		resetControl();
 
 		// Trigger the first load of the catalog
 		reloadCatalogs();
-	};
+	}
 
 	//
 	// Public
@@ -698,17 +692,20 @@ function EventSearchControl(htmlTagId) {
 }
 
 /*
- * Bind the EventSearchControl to the document.ready method so that it is
- * automatically loaded when this JS file is imported (by the loader).
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		eventSearchControl = new EventSearchControl("#wi-EventSearchControl");
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("events.js: " + e.message);
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.eventSearchControl = new EventSearchControl("#wi-EventSearchControl");
+			resolve();
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("events.js: " + e.message);
 
-		wiConsole.error("events.js: " + e.message, e);
-	}
-});
+			wiConsole.error("events.js: " + e.message, e);
+			reject();
+		}
+	});
+}

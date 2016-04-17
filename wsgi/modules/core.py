@@ -1,4 +1,5 @@
 import os
+import json
 
 class WI_Module(object):
     def __init__(self, wi):
@@ -28,12 +29,17 @@ class WI_Module(object):
 
         # Create the variables that are returned in Javascript format based on the
         # information of the environment.
-        body.append("var eidaJSSource='%s';"  % (os.path.dirname(envir['SCRIPT_NAME']) + '/js'))
-        body.append("var eidaCSSSource='%s';" % (os.path.dirname(envir['SCRIPT_NAME']) + '/css'))
-        body.append("var eidaServiceRoot='%s';" % (envir['SCRIPT_NAME']))
-        debug = ( "true" if self.__wi.getConfigInt('DEBUG', 0) == 1 else "false" )
-        body.append("var eidaDebug=" + debug + ";")
-        body.append("$(document).ready(function() { $.getScript(eidaJSSource + '/loader.js') });")
+        serviceRoot = envir['SCRIPT_NAME']
+        cssSource = os.path.dirname(serviceRoot) + '/css'
+        jsSource = os.path.dirname(serviceRoot) + '/js'
+        debug = (self.__wi.getConfigInt('DEBUG', 0) == 1)
+        body.append("window.eidaServiceRoot=%s;" % json.dumps(serviceRoot))
+        body.append("window.eidaCSSSource=%s;" % json.dumps(cssSource))
+        body.append("window.eidaJSSource=%s;" % json.dumps(jsSource))
+        body.append("window.eidaDebug=%s;" % json.dumps(debug))
+        body.append("$('head').append($('<link>').attr({rel:'stylesheet',type:'text/css',href:%s}));" %
+            json.dumps(cssSource + '/wimodule.css'))
+        body.append("$.getScript(%s);" % json.dumps(jsSource + '/webdc3.min.js'))
 
         return body
 

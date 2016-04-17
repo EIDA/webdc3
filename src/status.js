@@ -9,8 +9,6 @@
  *
  */
 
-"use strict"
-
 /*
  * Implementation of the wiStatusQueryControl
  */
@@ -999,10 +997,48 @@ function WIStatusListControl(htmlTagId) {
 		return true
 	}
 
+	function presets(param) {
+		switch (param.requesttype) {
+			case "FDSNWS-dataselect": return {
+				service: "dataselect",
+				options: {},
+				bulk: false,
+				merge: true,
+				contentType: "application/vnd.fdsn.mseed",
+				filename: param.description.replace(' ', '_') + ".mseed"
+			}
+
+			case "FDSNWS-station-xml": return {
+				service: "station",
+				options: { format: "xml", level: param.level },
+				bulk: true,
+				merge: false,
+				contentType: "application/xml",
+				filename: param.description.replace(' ', '_') + ".xml"
+			}
+
+			case "FDSNWS-station-text": return {
+				service: "station",
+				options: { format: "text", level: param.level },
+				bulk: true,
+				merge: true,
+				contentType: "text/plain",
+				filename: param.description.replace(' ', '_') + ".txt"
+			}
+
+			default: return {}
+		}
+	}
+
 	function submitRequest(param) {
 		if (!_controlDiv) return
 
 		var self = this
+
+		if (param.requesttype.substr(0, 6) == "FDSNWS") {
+			wiFDSNWS_Control.submitRequest($.extend(param, presets(param)))
+			return true
+		}
 
 		if (param.requesttype == "FSEED" || param.requesttype == "MSEED") {
 			if (!self.checkWaveformSize(param))
@@ -1099,6 +1135,7 @@ function WIStatusListControl(htmlTagId) {
 
 	function setCallback(callback) {
 		_callback = callback
+		wiFDSNWS_Control.setCallback(callback)
 	}
 
 	this.resubmitFailFn = resubmitFailFn
@@ -1130,25 +1167,26 @@ function WIStatusListControl(htmlTagId) {
 WIStatusListControl.prototype = new WIStatusBase
 
 /*
- * Bind the creation of controls to the document.ready method so that they are
- * automatically loaded when this JS file is imported (by the loader).
- * Note that in javascript "strict mode" we have to use "window" rather than
- * just create a global variable.
+ * Export for main.js
  */
-$(document).ready(function(){
-	try {
-		window.wiStatusQueryControl = new WIStatusQueryControl("#wi-StatusQueryControl")
-		window.wiStatusFullControl = new WIStatusFullControl("#wi-StatusFullControl")
-		window.wiStatusListControl = new WIStatusListControl("#wi-StatusListControl")
+export default function() {
+	return new Promise(function(resolve, reject) {
+		try {
+			window.wiStatusQueryControl = new WIStatusQueryControl("#wi-StatusQueryControl")
+			window.wiStatusFullControl = new WIStatusFullControl("#wi-StatusFullControl")
+			window.wiStatusListControl = new WIStatusListControl("#wi-StatusListControl")
 
-		// Add hidden download frame, so clicking on download links will not cancel AJAX requests
-		$(document.body).append('<iframe name="wi-DownloadFrame" style="display: none"/>')
-	}
-	catch (e) {
-		if (console.error !== wiConsole.error)
-			console.error("status.js: " + e.message)
+			// Add hidden download frame, so clicking on download links will not cancel AJAX requests
+			$(document.body).append('<iframe name="wi-DownloadFrame" style="display: none"/>')
+			resolve()
+		}
+		catch (e) {
+			if (console.error !== wiConsole.error)
+				console.error("status.js: " + e.message)
 
-		wiConsole.error("status.js: " + e.message, e)
-	}
-})
+			wiConsole.error("status.js: " + e.message, e)
+			reject()
+		}
+	})
+}
 

@@ -88,7 +88,7 @@
  * positioning so it sets the height of the "wi-short-div".
  */
 .wi-short-div {
-    position: relative;
+	position: relative;
 }
 
 .wi-short-spacer {
@@ -110,7 +110,7 @@
 
 .wi-inline {
 	/* padding: 0.2em 0.5em; */
-	margin: 0em 0.5em 0em 0.5em;
+	margin: 0.2em 0.5em;
 	width: 95px;
 }
 
@@ -375,5 +375,17 @@
 	-ms-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
 	-o-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
 	-webkit-animation: blink 1s cubic-bezier(1,0,0,1) infinite;
+}
+
+.ui-progressbar {
+	position: relative;
+}
+
+.wi-progress-label {
+	position: absolute;
+	left: 8px;
+	top: 4px;
+	/* font-weight: bold; */
+	/* text-shadow: 1px 1px 0 #fff; */
 }
 

@@ -2,7 +2,16 @@
 # Makefile for the webinterface
 #
 # ----------------------------------------------------------------------
-all: documentation
+all: js/webdc3.min.js documentation
+
+.PHONY: all clean documentation gitcheck release test demo
+
+# sudo {zypper|apt-get|yum} install npm
+# npm install browserify babelify babel-preset-es2015
+# PATH=~/node_modules/.bin:$PATH
+js/webdc3.min.js: src/*
+	mkdir -p js
+	browserify --entry src/main.js --transform [ babelify --presets es2015 --no-comments --minified ] --outfile $@
 
 clean:
 	(cd doc ; make clean)
@@ -31,7 +40,7 @@ tools/manager.py:
 #
 # Before doing a release, update the version number in 
 #  - doc/templates/conf.py
-#  - js/console.js
+#  - src/main.js
 # and update doc/base/changelog.rst
 # (e.g. find . -type f -exec grep --color 0\\.5 {} \; -print)
 # Then 'make documentation' and check that it looks right.
