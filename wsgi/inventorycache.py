@@ -462,14 +462,11 @@ class InventoryCache(object):
                         for statRef in netw.findall(statRefXml):
                             virtualStations.append(statRef.get('stationID'))
 
-                        # April 2016: Quick heuristic: GFZ virtual networks start with...
-                        # Long-term fix might be to use the master table.
+                        # Virtual networks are always permanent,
+                        # and have no archive DCID, since that just leads
+                        # to turf battles and much crying.
                         netArchive = ''
-                        if netw.get('code').startswith("_G"):
-                                netArchive = 'GFZ'
-
                         netInstitutes = netArchive  # not used?
-                        # Virtual networks are always permanent
                         ptNets.append([netw.get('code'), None, None,
                                        virtualStations, start_year, end_year,
                                        netw.get('description'), False, 'p',
