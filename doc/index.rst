@@ -13,6 +13,7 @@ Documentation for the WebDC3 web interface
    userguide
    operator
    developer
+   changelog
 
 .. note::
 
