@@ -9,6 +9,7 @@ Documentation for the WebDC3 web interface
 .. toctree::
    :maxdepth: 2
 
+   introduction
 
 .. note::
 
