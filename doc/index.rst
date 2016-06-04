@@ -11,6 +11,7 @@ Documentation for the WebDC3 web interface
 
    introduction
    userguide
+   operator
 
 .. note::
 
