@@ -3,15 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to WebDC3 web interface's documentation!
-================================================
-
-Contents:
+Documentation for the WebDC3 web interface
+==========================================
 
 .. toctree::
    :maxdepth: 2
 
 
+.. note::
+
+    The WebDC3 software is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation; either version 2, or (at your option) any
+    later version. For more information, see http://www.gnu.org/
 
 Indices and tables
 ==================
