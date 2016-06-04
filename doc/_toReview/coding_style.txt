@@ -1,0 +1,45 @@
+For Python
+==========
+
+Classes:
+
+Functions:
+
+Strings:
+
+Identifiers:
+
+Other:
+
+** Indentation: Python-standard four spaces, please!
+
+** header: something like this:
+
+"""
+#
+# (one line description)
+#
+# (begun by / by / modif by) (human), GEOFON team, (month) 2013
+# <email address>
+#
+# ----------------------------------------------------------------------
+"""
+
+** one blank line at the end of the file.
+        - AH does it that way.
+        - SeisComP coding conventions <http://www.seiscomp3.org/doc/seattle/2013.046/base/coding-conventions.html>
+
+
+For JavaScript
+==============
+
+ * 'wi' prefix
+
+ * camelCase for identifiers.
+
+ * semicolon to end statements.
+
+ * tab instead of 8 spaces.
+
+ * one blank line at the end of the file.
+
