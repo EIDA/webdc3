@@ -1,6 +1,7 @@
 *.xml
 *.bin
 doc/build-doc/
+doc/_build/
 *.pyc
 *.cfg
 olddoc
