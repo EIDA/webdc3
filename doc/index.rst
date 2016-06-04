@@ -10,6 +10,7 @@ Documentation for the WebDC3 web interface
    :maxdepth: 2
 
    introduction
+   userguide
 
 .. note::
 
