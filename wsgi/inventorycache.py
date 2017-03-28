@@ -10,7 +10,7 @@
 
 """InventoryCache for the Arclink web interface
 
-Copyright (c) 2013, 2015 GEOFON, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+Copyright (C) 2013, 2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Encapsulate and manage the information of networks,
 stations, locations and streams read from an Arclink inventory XML file.

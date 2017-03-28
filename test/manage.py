@@ -2,9 +2,10 @@
 #
 # Stand-alone manager for web interface testing.
 #
-# Begun by GEOFON Team, July 2012
+# Begun by GEOFON team, July 2012
 # <pevans@gfz-potsdam.de>
 #
+# Copyright (C) 2012 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 # ----------------------------------------------------------------------
 
 import datetime

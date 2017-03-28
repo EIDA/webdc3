@@ -10,7 +10,7 @@
 """
 Interface to various event services.
 
-Copyright (C) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+Copyright (C) 2013-2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Provides a thin wrapper to event services.
 Implemented as part of a WSGI application.

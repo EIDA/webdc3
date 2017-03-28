@@ -2,7 +2,7 @@
 #
 # Functions to update the metadata of WebDC3
 #
-# (c) 2014 Javier Quinteros, GEOFON team
+# Copyright (C) 2014 Javier Quinteros, GEOFON team
 # <javier@gfz-potsdam.de>
 #
 # ----------------------------------------------------------------------

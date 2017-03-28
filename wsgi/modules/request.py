@@ -5,6 +5,8 @@
 # Begun by Andres Heinloo, GEOFON team, June 2013
 # <andres@gfz-potsdam.de>
 #
+# Copyright (C) 2013- GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+#
 # ----------------------------------------------------------------------
 
 import os

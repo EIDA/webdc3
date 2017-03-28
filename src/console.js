@@ -1,5 +1,5 @@
 /*
- * Geofon WebInterface
+ * GEOFON WebInterface
  *
  * console.js: Logging functions.
  *
@@ -7,6 +7,7 @@
  *  Marcelo Bianchi, Peter Evans, Javier Quinteros, Andres Heinloo, GFZ Potsdam
  *  June/July 2013
  *
+ * Copyright (C) 2013- GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
  */
 
 /*
