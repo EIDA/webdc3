@@ -729,7 +729,7 @@ function FDSNWS_Control(controlDiv) {
 		})
 	}
 
-	function loadRequests(done, fail) {
+	function loadRequests() {
 		return new Promise(function(resolve, reject) {
 			var t = db.transaction(["requests"])
 
