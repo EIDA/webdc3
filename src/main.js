@@ -1,7 +1,7 @@
 /*
  * WebDC 3
  *
- * (C) 2013-2016 Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+ * Copyright (C) 2013-2016 Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
  *
  */
 

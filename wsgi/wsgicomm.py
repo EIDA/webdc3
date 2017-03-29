@@ -10,7 +10,7 @@
 
 """Functions and resources to communicate via a WSGI module
 
-(c) 2013 GEOFON, GFZ Potsdam
+Copyright (C) 2013 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 The list of functions in this module and the information it returns is:
 - query: different network types (the name should change. See what returns.)

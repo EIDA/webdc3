@@ -13,7 +13,7 @@ Other:
 
 ** Indentation: Python-standard four spaces, please!
 
-** header: something like this:
+** header: use something like this:
 
 """
 #
@@ -22,6 +22,7 @@ Other:
 # (begun by / by / modif by) (human), GEOFON team, (month) 2013
 # <email address>
 #
+# Copyright (C) 2017 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ 
 # ----------------------------------------------------------------------
 """
 
