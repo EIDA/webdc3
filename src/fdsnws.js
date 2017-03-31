@@ -174,6 +174,7 @@ function FDSNWS_Download(controlDiv, db, authToken, data, options, bulk, merge, 
 	function doAjax(ajax, url, p, username, password) {
 		var q = $.extend({}, p)
 		delete q['id']
+		delete q['priority']
 
 		handle = ajax({
 			method: 'GET',
