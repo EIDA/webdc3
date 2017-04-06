@@ -764,48 +764,81 @@ function FDSNWS_Control(controlDiv) {
 		callback()
 
 		var timewindows = JSON.parse(param.timewindows)
-		var postData = 'service=' + param.service + '\nformat=json\n'
 
-		$.each(timewindows, function(i, item) {
-			var start = item[0]
-			var end = item[1]
-			var net = item[2]
-			var sta = item[3]
-			var cha = item[4]
-			var loc = item[5]
+		// If use of a routing service
+		if (routing) {
+			var postData = 'service=' + param.service + '\nformat=json\n'
 
-			if (loc == '')
-				loc = '--'
+			$.each(timewindows, function(i, item) {
+				var start = item[0]
+				var end = item[1]
+				var net = item[2]
+				var sta = item[3]
+				var cha = item[4]
+				var loc = item[5]
 
-			postData += net + ' ' + sta + ' ' + loc + ' ' + cha + ' ' + start + ' ' + end + '\n'
-		})
+				if (loc == '')
+					loc = '--'
 
-		$.ajax({
-			type: 'POST',
-			url: routerURL,
-			data: postData,
-			contentType: 'text/plain',
-			dataType: 'json',
-			success: function(data) {
-				if (!data) {
-					wiConsole.error("fdsnws.js: no routes received")
+				postData += net + ' ' + sta + ' ' + loc + ' ' + cha + ' ' + start + ' ' + end + '\n'
+			})
+
+			$.ajax({
+				type: 'POST',
+				url: routerURL,
+				data: postData,
+				contentType: 'text/plain',
+				dataType: 'json',
+				success: function(requestData) {
+					if (!requestData) {
+						wiConsole.error("fdsnws.js: no routes received")
+						reqDiv.remove()
+						return
+					}
+
+					requestData.options = param.options
+					requestData.bulk = param.bulk
+					requestData.merge = param.merge
+					requestData.filename = param.filename
+					requestData.contentType = param.contentType
+					req.load(requestData)
+					req.create()
+				},
+				error: function(jqXHR, textStatus) {
+					wiConsole.error("fdsnws.js: routing failed: " + ajaxErrorMessage(jqXHR, textStatus))
 					reqDiv.remove()
-					return
 				}
+			})
+		// If use of a local FDSNws without routing
+		} else {
+			var requestData = [{
+				url: fdsnwsURL + '/' + param.service + '/1/query',
+				name: param.service,
+				params: []
+			}]
 
-				data.options = param.options
-				data.bulk = param.bulk
-				data.merge = param.merge
-				data.filename = param.filename
-				data.contentType = param.contentType
-				req.load(data)
-				req.create()
-			},
-			error: function(jqXHR, textStatus) {
-				wiConsole.error("fdsnws.js: routing failed: " + ajaxErrorMessage(jqXHR, textStatus))
-				reqDiv.remove()
-			}
-		})
+			$.each(timewindows, function(i, item) {
+				var start = item[0]
+				var end = item[1]
+				var net = item[2]
+				var sta = item[3]
+				var cha = item[4]
+				var loc = item[5]
+
+				if (loc == '')
+					loc = '--'
+
+				requestData[0]['params'].push({ net: net, sta: sta, loc: loc, cha: cha, start: start, end: end })
+			})
+
+			requestData.options = param.options
+			requestData.bulk = param.bulk
+			requestData.merge = param.merge
+			requestData.filename = param.filename
+			requestData.contentType = param.contentType
+			req.load(requestData)
+			req.create()
+		}
 	}
 
 	function setCallback(cb) {
@@ -846,7 +879,10 @@ function FDSNWS_Control(controlDiv) {
 
 	buildControl()
 
+	// Get configuration about routing/not routing
+	var routing = (configurationProxy.value('fdsnws.routing', "true") == "true")
 	var routerURL = configurationProxy.value('fdsnws.routerURL', '/eidaws/routing/1/query')
+	var fdsnwsURL = configurationProxy.value('fdsnws.fdsnwsURL', '/fdsnws').replace(/\/+$/, '')
 
 	// Public interface
 	this.init = init

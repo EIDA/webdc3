@@ -34,6 +34,15 @@ js.request.localLineLimit = 4990
 js.request.lineLimit = 990
 js.request.sizeLimit = 500
 
+# fdsnws: whether or not to use a routing service
+js.fdsnws.routing = true
+
+# fdsnws: URL of routing service (if routing used)
+js.fdsnws.routerURL = "/eidaws/routing/1/query"
+
+# fdsnws: URL of local web service (if routing is not used)
+js.fdsnws.fdsnwsURL = "/fdsnws"
+
 # this is your local Arclink server:
 arclink.address = "eida.nohost.nodomain.invalid:18002"
 arclink.timeout.request = 300
