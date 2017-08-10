@@ -1,0 +1,35 @@
+
+You are welcome to use and modify the webinterface software.
+See the README.md and COPYING files for details.
+
+If you use this software for research we would appreciate appropriate citation.
+This may be prepared using the bibliographic metadata contained in our DOI, accessible through the DOI system and at
+http://pmd.gfz-potsdam.de/panmetaworks/download.php?item=escidoc:1423080&mdrecord=datacite
+
+To cite WebDC3 in publication, please use:
+
+  Bianchi, Marcelo; Evans, Peter L.; Heinloo, Andres; Quinteros, Javier (2015): WebDC3 Web Interface. GFZ Data Services. doi:10.5880/GFZ.2.4/2016.001
+
+This may need modification for the citation style of your publication.
+You are encouraged to include the version number of the software.
+This is shown on the "Console" tab when the page loads, e.g. "Loading webinterface v1.1 (2017.096)".
+
+A BibTeX entry for LaTeX users is
+
+@Book{,
+   author = {Marcelo Bianchi and Peter L. Evans and Andres Heinloo and Javier Quinteros}
+   title = {WebDC3 Web Interface},
+   publisher = {GFZ Data Services},
+   year = {2015},
+   doi = {10.5880/GFZ.2.4/2016.001},
+   url = {http://geofon.gfz-potsdam.de/software/webdc3},
+ }
+
+For information on citing software products generally, see the
+FORCE11 document [*].
+
+
+[*] FORCE11 Software Citation Working Group (2016), "Software Citation Principles", (Editors: Arfon M. Smith, Daniel S. Katz, Kyle E. Niemeyer).
+    Accessed 2017-08-08 at https://www.force11.org/sites/default/files/shared-documents/software-citation-principles.pdf
+
+

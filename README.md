@@ -1,5 +1,6 @@
 
 README file for webinterface
+----------------------------
 
 GUI tool for event- and time-based waveform selection.
 
@@ -7,10 +8,14 @@ Copyright (C) 2013-2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoFo
 
 
 To make the documentation:
- cd doc ; make all ; acroread webinterface.pdf
+
+  cd doc ; make all ; acroread webinterface.pdf
 
 To install:
  see doc/
+
+If you use this software for research we would appreciate appropriate citation.
+See the `CITATION` file for details.
 
 
 Licence
@@ -44,4 +49,4 @@ IDEAS for version 2.0
 
 * :event: Circular filter of the catalog.
 
-* und viel mehr... see TODO
+* und viel mehr... see `TODO`
