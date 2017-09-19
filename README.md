@@ -9,7 +9,7 @@ Copyright (C) 2013-2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoFo
 
 To make the documentation:
 
-  cd doc ; make all ; acroread webinterface.pdf
+  cd doc ; make latexpdf ; acroread _build/latex/WebDC3webinterface.pdf
 
 To install:
  see doc/
