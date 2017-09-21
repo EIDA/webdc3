@@ -76,9 +76,9 @@ event.service.geofon.baseURL = "http://geofon.gfz-potsdam.de/eqinfo/list.php"
 event.service.geofon.extraParams = "fmt=csv"
 
 event.service.comcat.description = USGS
-event.service.comcat.handler = comcat
-event.service.comcat.baseURL = "http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php"
-event.service.comcat.extraParams = "format=csv"
+event.service.comcat.handler = "fdsnws"
+event.service.comcat.baseURL = "http://earthquake.usgs.gov/fdsnws/event/1/query"
+event.service.comcat.extraParams = "format=text"
 
 event.service.emsc.description = EMSC
 event.service.emsc.handler = fdsnws
