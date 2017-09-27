@@ -18,7 +18,7 @@ import initSubmit from './submit'
 import initReview from './review'
 import initInterface from './interface'
 
-var VERSION = "1.1 (2017.096)"
+var VERSION = "1.1 (2017.270)"
 
 window.WIError = function(message) {
 	this.name = undefined // omit exception name on the console

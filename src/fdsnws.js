@@ -765,7 +765,7 @@ function FDSNWS_Control(controlDiv) {
 
 		var timewindows = JSON.parse(param.timewindows)
 
-		// If use of a routing service
+		// If using a routing service
 		if (routing) {
 			var postData = 'service=' + param.service + '\nformat=json\n'
 
@@ -789,19 +789,19 @@ function FDSNWS_Control(controlDiv) {
 				data: postData,
 				contentType: 'text/plain',
 				dataType: 'json',
-				success: function(requestData) {
-					if (!requestData) {
+				success: function(reqData) {
+					if (!reqData) {
 						wiConsole.error("fdsnws.js: no routes received")
 						reqDiv.remove()
 						return
 					}
 
-					requestData.options = param.options
-					requestData.bulk = param.bulk
-					requestData.merge = param.merge
-					requestData.filename = param.filename
-					requestData.contentType = param.contentType
-					req.load(requestData)
+					reqData.options = param.options
+					reqData.bulk = param.bulk
+					reqData.merge = param.merge
+					reqData.filename = param.filename
+					reqData.contentType = param.contentType
+					req.load(reqData)
 					req.create()
 				},
 				error: function(jqXHR, textStatus) {
@@ -809,9 +809,9 @@ function FDSNWS_Control(controlDiv) {
 					reqDiv.remove()
 				}
 			})
-		// If use of a local FDSNws without routing
+		// If using a local FDSNWS without routing
 		} else {
-			var requestData = [{
+			var reqData = [{
 				url: fdsnwsURL + '/' + param.service + '/1/query',
 				name: param.service,
 				params: []
@@ -828,15 +828,15 @@ function FDSNWS_Control(controlDiv) {
 				if (loc == '')
 					loc = '--'
 
-				requestData[0]['params'].push({ net: net, sta: sta, loc: loc, cha: cha, start: start, end: end })
+				reqData[0]['params'].push({ net: net, sta: sta, loc: loc, cha: cha, start: start, end: end })
 			})
 
-			requestData.options = param.options
-			requestData.bulk = param.bulk
-			requestData.merge = param.merge
-			requestData.filename = param.filename
-			requestData.contentType = param.contentType
-			req.load(requestData)
+			reqData.options = param.options
+			reqData.bulk = param.bulk
+			reqData.merge = param.merge
+			reqData.filename = param.filename
+			reqData.contentType = param.contentType
+			req.load(reqData)
 			req.create()
 		}
 	}
@@ -858,8 +858,13 @@ function FDSNWS_Control(controlDiv) {
 			var text = openpgp.message.readArmored(tok).getText()
 
 			if (!text) {
-				wiConsole.error("fdsnws.js: invalid auth token: No auth data")
-				return
+				try {
+					text = openpgp.cleartext.readArmored(tok).getText()
+				}
+				catch(e) {
+					wiConsole.error("fdsnws.js: invalid auth token: No auth data")
+					return
+				}
 			}
 
 			var auth = $.parseJSON(text)
@@ -879,8 +884,8 @@ function FDSNWS_Control(controlDiv) {
 
 	buildControl()
 
-	// Get configuration about routing/not routing
-	var routing = (configurationProxy.value('fdsnws.routing', "true") == "true")
+	// Get routing configuration
+	var routing = (configurationProxy.value('fdsnws.routing', 'true') == 'true')
 	var routerURL = configurationProxy.value('fdsnws.routerURL', '/eidaws/routing/1/query')
 	var fdsnwsURL = configurationProxy.value('fdsnws.fdsnwsURL', '/fdsnws').replace(/\/+$/, '')
 
