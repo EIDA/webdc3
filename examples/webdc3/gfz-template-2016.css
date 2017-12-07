@@ -1,0 +1,1119 @@
+@charset "utf-8";
+/* CSS Dokument */
+
+
+/* REGELWERK
+***************************************************/
+/* 
+ * body.homepage <- Klasse nur fuer Homepage
+ * body.subpage-2column <- Klassen fuer zweispaltige Folgeseiten
+ * body.subpage-3column <- Klassen fuer dreispaltige Folgeseiten
+ */
+
+/* 
+ * Styleregeln fuer Blockelemente (p, div, td, li etc.)
+ * befinden sich in der Datei gfz_text.css.
+ * Desweiteren sind dort spezielle RTE classes untergebracht.
+ */
+
+/* 
+ * Styleregeln für Extensions liegen in extra Dateien.
+ * Beispiel: Formatierungen fuer das Plugin cal liegen 
+ * im Extension-Ordner in der Datei cal.css
+ */
+
+/* GrundLayout CSS
+***************************************************/
+body {
+  background: #FFF url(../images/background.gif) repeat-x;
+  color: #000;
+  font: 100% Verdana, Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.clearfix::after {
+  clear: both;
+  content: " ";
+  display: block;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  visibility: hidden;
+  width: 0;
+}
+
+#wrapper_borderOverall {  
+  background: transparent;
+  background-color: transparent; 
+  margin: 0 auto;
+  overflow: hidden;
+  width: 990px;
+}
+
+#borderOverall {  
+  background: #FFF;
+  -moz-border-radius: 15px; /* Firefox */
+  -webkit-border-radius: 15px; /* Safari, Chrome */
+  -khtml-border-radius: 15px; /* Konqueror */
+  border-radius: 15px; /* CSS3 */  
+  -moz-box-shadow: 2px 2px 6px #999;
+  -webkit-box-shadow: 2px 2px 6px #999;  
+  box-shadow: 2px 2px 6px #999;  
+  margin: 10px;
+  padding: 10px;
+}
+
+#wrapper_header_mainNav_carousel {
+  margin: 0 10px;
+}
+
+#wrapper_mainContent_leftColumn_rightColumn {
+  padding: 10px 0 0;
+}
+
+#wrapper_mainContent_3columnLayout {
+  width: 520px;
+  float: left;
+}
+
+#mainContent_3columnLayout {
+  margin: 0 10px 0 0;
+  overflow-x: hidden;
+}
+
+#wrapper_mainContent_2columnLayout {
+  width: 720px;
+  float: left;
+}
+
+#mainContent_2columnLayout {
+  margin: 0 10px 0 0;
+  overflow: hidden;
+}
+
+/* Scrollbar horizontal bei ueberbreiten iframes ausblenden
+#mainContent_2columnLayout iframe {
+  overflow-x: hidden;
+}
+*/
+
+#wrapper_lastChange_toTop {
+  border-top: 1px solid #BBDCEB;
+  border-bottom: 1px solid #BBDCEB;  
+  padding: 5px 0 5px 0;
+}
+
+#wrapper_lastChange {
+  float: left;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  width: 80%;
+}
+
+#wrapper_toTop {
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  text-align: right;  
+}
+
+#wrapper_rightColumn {
+  width: 200px;
+  float: right;
+  overflow-x: hidden;
+}
+
+
+/* NUR Homepage
+***************************************************/
+#gfzAktuell,
+#gfzAktiv {  
+  margin: 0 0 0 10px;
+}
+
+#gfzAktuell h2,
+#gfzAktiv h2,
+#gfzAktiv h1,
+#erdbebeninfo h2 {
+  color: #00589C;
+  font-size: 15.4px;
+  font-size: 0.963rem;
+  font-weight: bold;
+}
+
+#gfzAktuell ul,
+#gfzAktiv ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#gfzAktuell img {
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */
+  width: 170px; 
+}
+
+#gfzAktuell img.first {
+  -moz-border-radius: 0 0 0 15px !important; /* Firefox */
+  -webkit-border-radius: 0 0 0 15px !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 0 0 15px !important; /* Konqueror */
+  border-radius: 0 0 0 15px !important; /* CSS3 */  
+}
+
+#gfzAktuell img.last {
+  -moz-border-radius: 0 15px 0 0 !important; /* Firefox */
+  -webkit-border-radius: 0 15px 0 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 15px 0 0 !important; /* Konqueror */
+  border-radius: 0 15px 0 0 !important; /* CSS3 */  
+}
+
+#gfzAktuell li {
+  display: inline-block;
+  float: left;
+  -webkit-hyphens: auto; /* Safari, Chrome */
+  -moz-hyphens: auto; /* Firefox */
+  -ms-hyphens: auto;
+  hyphens: auto; /* CSS3 */
+  padding: 0 10px 0 0;
+  width: 170px;
+}
+
+#gfzAktuell li.last {
+  padding: 0;
+}
+
+#gfzAktuell li span a {
+  background: url(../images/arrows/arr_right_orange_white_no.gif) no-repeat -3px 2px;
+  color: #000;
+  display: block;
+  padding: 0 0 0 10px;
+  width: 160px;  
+}
+
+#gfzAktuell li span a:hover {
+  color: #F60;
+  text-decoration: none;
+}
+
+#gfzAktuell span {
+  margin: 10px 0 0 0;
+}
+
+.homepage hr {
+  margin: 25px 0 25px 10px;
+}
+
+#gfzAktiv {
+  float: left;
+}
+
+#gfzAktiv li {  
+  background: #BBDCEB;
+  height: 16px;
+  margin: 10px 0; 
+  padding: 0px 5px 15px 5px;
+  width: 340px;
+}
+
+#gfzAktiv li:hover {
+  background: #4CA8CD;  
+}
+
+#gfzAktiv li a {  
+  background: url(../images/arrows/arr_right_orange_blue3_no.gif) no-repeat 0 10px; /* TODO */
+  display: block;
+  font-size: 11px;
+  font-size: 0.688rem;
+  font-weight: bold;
+  padding: 10px 0 8px 15px;
+}
+
+#gfzAktiv li a:hover {  
+  background: url(../images/arrows/arr_right_orange_blue2_no.gif) no-repeat 0 10px; 
+  color: #00589C;
+  text-decoration: none;  
+}
+
+#erdbebeninfo {
+  float: right; 
+  width: 350px;
+}
+
+#erdbebeninfo div {
+  background: #E0EFF6;
+  border: 3px solid #BBDCEB;
+  -moz-border-radius: 0 15px 0 15px; /* Firefox */
+  -webkit-border-radius: 0 15px 0 15px; /* Safari, Chrome */
+  -khtml-border-radius: 0 15px 0 15px; /* Konqueror */
+  border-radius: 0 15px 0 15px; /* CSS3 */  
+  padding: 7px 0 4px 0;
+  text-align: center; 
+}
+
+
+/* header
+***************************************************/
+#header {
+  height: 100px;
+  position: relative;
+}
+
+#header img { /* keine runden Ecken im Kopfbereich (Logo, Wortmarke, Druckersymbol etc.) */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */
+}
+
+
+/* serviceNav
+***************************************************/
+#serviceNav {
+  float: right;  
+  padding: 6px 0 0 20px;
+  text-align: right;
+}
+
+#serviceNav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#serviceNav li {
+  color: #00589C;
+  display: inline-block;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  margin: 0;
+}
+
+#serviceNav li div.tx-srlanguagemenu-pi1 {
+  font-size: 8.8px;
+  font-size: 0.55rem; /* Schriftgroesze fuer Sprachumschalter anpassen */
+}
+
+#serviceNav .symbol-link { /* Icons auf Grundlinie setzen */
+    position: relative;
+    top: 2px;
+}
+
+#serviceNav a:hover {
+  text-decoration: none;
+}
+
+
+/* logoGFZ
+***************************************************/
+#logoGFZ {
+  position: absolute;
+  left: -20px;
+  bottom: 0;
+}
+
+
+/* wordmarkGFZ
+***************************************************/
+#wordmarkGFZ {
+  position: absolute;
+  right: -8px;
+  bottom: 0;
+}
+
+
+/* mainNav
+***************************************************/
+#mainNav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#mainNav li {
+  color: #00589C;
+  display: inline-block;
+  font-size: 15.4px;
+  font-size: 0.963rem;
+  font-weight: bold;
+}
+
+#mainNav a:hover {
+  text-decoration: none;
+}
+
+#mainNav .divider {
+  font-weight: normal;
+  margin: 0 16px 0 16px;
+}
+
+
+/* carousel
+***************************************************/
+#carousel {  
+  margin: 12px 0 0 0;
+  overflow: hidden;
+}
+
+
+/* leftColumn (Seitennavigation)
+***************************************************/
+#wrapper_leftColumn {  
+  float: left;
+  width: 230px;
+}
+
+#leftColumn {
+  -webkit-hyphens: auto; /* Safari, Chrome */
+  -moz-hyphens: auto; /* Firefox */
+  -ms-hyphens: auto;
+  hyphens: auto; /* CSS3 */
+  margin: 10px 20px 0 10px;
+  overflow-x: hidden;
+}
+
+/*** LISTEN ***/
+#leftColumn ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;  
+}
+
+#leftColumn ul ul {  
+  margin: 8px 0 0 0;
+  width: 200px; 
+}
+
+/*** LISTENELEMENTE ***/
+#leftColumn ul li {
+  background: #00589C;
+  border-bottom: 1px solid #4CA8CD;
+  color: #FFF;
+  display: block;
+  font-size: 11px;
+  font-size: 0.688rem;
+  font-weight: bold;
+  padding: 8px 8px 8px 0;  
+}
+
+#leftColumn ul ul li {
+  background: #BBDCEB;  
+  font-weight: normal;
+}
+
+#leftColumn ul ul ul li {
+  background: #E0EFF6;  
+  padding: 8px 8px 8px 13px; 
+}
+
+/*** LINKS ***/
+#leftColumn ul li a {
+  background: url(../images/arrows/arr_right_orange_blue1_no.gif) no-repeat;
+  color: #FFF;
+  margin: 0 0 0 10px;
+  padding: 0 0 0 15px;
+  display: block;  
+}
+
+#leftColumn ul ul li a {
+  background: url(../images/arrows/arr_right_black_blue3_no.gif) no-repeat;
+  color: #000;   
+}
+
+#leftColumn ul ul ul li a {
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+  color: #666;
+}
+
+#leftColumn ul li.active a { /* Erste Ebene aktiv */
+  background: url(../images/arrows/arr_down_orange_blue1_no.gif) no-repeat;
+}
+
+#leftColumn ul li.up a { /* Erste Ebene aktiv - speziell fuer Sektionen */
+  background: url(../images/arrows/arr_up_orange_blue1_no.gif) no-repeat 0 1px;
+}
+
+#leftColumn ul li.active ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_black_blue3_no.gif) no-repeat;
+}
+
+#leftColumn ul li.active ul li ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+}
+
+#leftColumn ul li.active ul li.active a { /* Zweite Ebene aktiv */
+  background: url(../images/arrows/arr_down_orange_blue3_no.gif) no-repeat;
+  color: #F60;
+  font-weight: bold;  
+}
+
+#leftColumn ul li.active ul li.active ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+  color: #666;
+  font-weight: normal;
+}
+
+/*** SPEZIELL ***/
+#leftColumn ul li.has-children,
+#leftColumn ul ul li.has-children {
+  padding: 8px 8px 0 0;
+}
+
+#leftColumn ul li li.last {
+  border-bottom: none !important;
+}
+
+
+/* breadcrumb
+***************************************************/
+#wrapper_breadcrumb {
+  padding: 6px 0 10px;
+}
+
+ul.breadcrumb {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.breadcrumb li {
+  color: #666;
+  display: inline-block;  
+  font-size: 8.8px;
+  font-size: 0.55rem;   
+}
+
+ul.breadcrumb li a {
+  background: url(../images/arrows/arr_right_gray_white_sm.gif) no-repeat 0 1px;
+  color: #666;
+  margin: 0;
+  padding: 0 0 0 12px;  
+}
+
+ul.breadcrumb li a:hover {
+  color: #F60;
+  text-decoration: none;
+}
+
+ul.breadcrumb li.active a {
+  background: url(../images/arrows/arr_right_orange_white_sm.gif) no-repeat 0 1px;
+  color: #F60;  
+}
+
+ul.breadcrumb li.first a {
+  background: none !important;
+  padding: 0;
+}
+
+
+/* rightColumn (Boxen)
+***************************************************/
+#rightColumn {  
+  margin: 4px 10px 0 10px;
+}
+
+.homepage #rightColumn {  
+  margin: 20px 10px 0 10px;
+}
+
+.boxRight { /* einzelne Box */
+  background: #E0EFF6;
+  -moz-box-shadow: 2px 2px 6px #999; /* Firefox */
+  -webkit-box-shadow: 2px 2px 6px #999; /* Safari, Chrome */ 
+  box-shadow: 2px 2px 6px #999; /* CSS3 */
+  -webkit-hyphens: auto; /* Safari, Chrome */
+  -moz-hyphens: auto; /* Firefox */
+  -ms-hyphens: auto;
+  hyphens: auto; /* CSS3 */
+  overflow: hidden;
+  padding: 0 0 8px 0;
+  margin-bottom: 20px; 
+}
+
+.boxRight h2 {
+  background: #BBDCEB;
+  font-size: 11px;
+  font-size: 0.688rem;  
+  padding: 8px;  
+}
+
+.boxRight h2:first-child { /* nur erste H2 mit dunkelblauem HG */
+  background: #00589C;
+  color: #FFF;
+  margin: 0 0 10px 0; 
+}
+
+.boxRight h2:first-child a {
+   color: #FFF;
+}
+
+.boxRight a:hover {
+  text-decoration: none;
+}
+
+.boxRight p,
+.boxRight table {
+  font-size: 10px;
+  font-size: 0.625rem;
+  padding: 0 10px;
+}
+
+.boxRight ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.boxRight li {
+  padding: 0 0 4px 0;
+  font-size: 10px;
+  font-size: 0.625rem;
+}
+
+.boxRight li a {
+  background: url(../images/arrows/arr_right_orange_blue4_no.gif) no-repeat;
+  display: block;
+  padding: 0 0 0 14px;  
+}
+
+.boxRight .csc-textpic-image {
+   padding: 0 10px;
+}
+
+.boxRight table,
+.boxRight table tbody td {
+  border: none;
+}
+
+.homepage .boxRight li a { /* nur Startseite: andere Pfeile */
+  background: url(../images/arrows/arr_right_blue1_blue4_no.gif) no-repeat;
+}
+
+.homepage .boxRight li a:hover { /* nur Startseite: andere Pfeile */
+  background: url(../images/arrows/arr_right_orange_blue4_no.gif) no-repeat;  
+}
+
+
+/* footer
+***************************************************/
+#footer {
+  clear: both;  
+  margin: 0 10px 0 230px;
+  padding: 20px 0;
+  text-align: right;  
+}
+
+#footer img { /* keine runden Ecken fuer Helmholtz-Logo */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */
+}
+
+#wrapper_lastChange_toTop {
+  position: relative;
+  text-align: left;
+  top: 25px;
+  width: 70%;  
+}
+
+#copyright {
+  color: #999;
+  float: left;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  position: relative;
+  text-align: center;
+  top: 30px;
+  width: 60%;
+}
+
+.homepage #copyright,
+.subpage-2column #copyright {
+  text-align: left;
+}
+
+.homepage #copyright {
+  width: 64%;
+}
+
+#logoHelmholtzGemeinschaft {
+  float: right;
+}
+
+#mitgliedslogo {
+  float: left;
+  left: 8px;
+  position: relative;  
+}
+
+#logo-20jahrehelmholtz {
+  float: left;
+  left: 25px;
+  position: relative;
+  top: 15px;
+  left: 8px;
+  top: -8px;
+}
+
+#logo-20jahrehelmholtz.neuestes {
+  left: 122px;
+  top: -35px;
+  left: 142px;
+  top: -55px;
+  width: 173px;
+  height: 25px;
+}
+
+.homepage #footer {
+  margin: 0 10px 0 10px;
+}
+
+/* quicksearch
+***************************************************/
+#quicksearch {
+  float: right;
+}
+
+.newsearch {
+  background: url(../images/search_gray.png) no-repeat 8px 4px;
+  background-color: #FCFCFC;
+  border: 1px solid #D0D0D0;
+  -moz-border-radius: 15px; /* Firefox */
+  -webkit-border-radius: 15px; /* Safari, Chrome */
+  -khtml-border-radius: 15px; /* Konqueror */
+  border-radius: 15px; /* CSS3 */ 
+  color: #BCBCBC;
+  font-size: 11px;
+  font-size: 0.688rem;
+  margin: 3px;
+  padding: 6px 15px 6px 30px;
+  width: 180px;  
+}
+
+#inputText:focus {
+  border: 1px solid #F60;
+  outline: none;  
+  outline: #D0D0D0 dotted 1px;
+  outline-offset: 3px;
+}
+
+.newsearchform fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#search-options {  
+  background: #F1F1F1;
+  -moz-border-radius: 0 0 15px 15px; /* Firefox */
+  -webkit-border-radius: 0 0 15px 15px; /* Safari, Chrome */
+  -khtml-border-radius: 0 0 15px 15px; /* Konqueror */
+  border-radius: 0 0 15px 15px; /* CSS3 */
+  font-size: 11px;
+  font-size: 0.688rem;
+  list-style: none;
+  margin: 0.6px 0 0 -1px;
+  opacity: 0.9;
+  padding: 5px 0 10px 10px;
+  position: absolute;
+  text-align: left;
+  width: 225px;
+  z-index: 2;
+}
+
+#search-options li {
+  line-height: 2;
+}
+
+div.tx-indexedsearch-res img { /* keine runden Ecken im Suchergebnis */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */
+}
+
+/* Spezielle Formate
+***************************************************/
+.toTop a:hover { /* keine Unterstreichung beim To-Top-Link */
+  text-decoration: none;
+}
+
+.invisible { /* Verstecken */
+  display: none;
+}
+
+.orange { /* fuer Texte */
+  color: #F60;
+}
+
+.orange a { /* fuer Links */
+  color: #F60;
+}
+
+.align-justify { /* Blocksatz */
+  text-align: justify;
+}
+
+#fancybox-title-over { /* Fancybox Overlay farblich anpassen */
+  background-image: none;
+  /* Fallback for web browsers that doesn't support RGBa */
+  background: rgb(0, 0, 0);
+  /* RGBa with 0.6 opacity */
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.csc-textpic-caption { /* fuer Bildunterschriften */
+  color: #666;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  line-height: 1.4;
+  margin: 5px 0 0 0;  
+}
+
+.csc-textpic-image table,
+.csc-textpic-image td { /* hellgrauen Rand ausblenden */
+  border: 0px !important;
+}
+
+DIV.csc-textpic .csc-textpic-imagewrap .csc-textpic-image {
+  margin: 15px 0 10px 0; /* Bild in Text mit Bild nach unten schieben */
+}
+
+.csc-frame-imgNoRoundCorners img { /* spezielles Format fuer Bilder ohne Rundungen */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */ 
+}
+
+/* fuer jfmulticontent */
+.equalize{  overflow: visible;  display: table;  table-layout: fixed;}
+
+.csc-frame-nachruf img { /* spezielles Format fuer Nachruf-Box (rechts) */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */ 
+}
+
+.csc-frame-nachruf {
+  background: #EEE;
+}
+
+.csc-frame-nachruf h2 {
+  background: #000 !important;
+}
+
+#newsslider-overlay {
+  background: rgba(0,88,156,0.75);
+  color: #FFF;
+  font-size: 14px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  padding: 0.25em 1em;
+  position: relative;
+  top: 1.5em;
+  z-index: 100;
+}
+
+#newsslider-overlay a {
+  color: #FFF;
+}
+
+/*************************
+  EXT: pits_rssnews begin
+ *************************/
+#pits_rss {
+  font-family: inherit !important; 
+  font-size: 11px !important;
+  font-size: 0.688rem !important;
+  width: 90% !important;
+}
+
+#pits_rss ul {
+  padding: 0;  
+}
+
+.rss_desc a {
+  font-size: 11px !important;
+  font-size: 0.688rem !important;
+}
+/*************************
+  EXT: pits_rssnews end
+ *************************/
+
+/*************************
+     FONTAWESOME begin
+ *************************/
+.fa-twitter,
+.fa-facebook,
+.fa-rss,
+.fa-youtube-play {
+  color: #55ACEE;
+  font-size: 150%;
+  vertical-align: top;
+}
+/*************************
+     FONTAWESOME end
+ *************************/
+
+/***********************************
+  MODIFICATION: logos to svg start
+ ***********************************/
+#wordmarkGFZ {
+  height: 53px;
+  right: 0;
+  width: 175px;
+}
+
+#logoGFZ {  
+  height: 84px;
+  left: -12px;
+  top: 10px;
+  width: 120px;
+}
+
+/* 
+Quelle: https://blog.mozilla.org/webdev/2009/02/20/cross-browser-inline-block/
+Quelle: http://css-tricks.com/snippets/css/cross-browser-inline-block/
+*/
+a.svg {
+  position: relative;  
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: top;
+  *display: inline;
+}
+
+a.svg:after {
+  content: ""; 
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left:0;
+}
+
+#logoGFZ a.svg {
+  width: 120px;
+  min-height: 84px;
+  height: 84px;  
+  _height: 84px;
+}
+
+#logoHelmholtzGemeinschaft a.svg {
+  width: 100px;
+  min-height: 36px;
+  height: 36px; 
+  _height: 36px;
+  
+  width: 113px;
+  min-height: 57px;
+  height: 57px; 
+  _height: 57px;
+}
+
+/***********************************
+  MODIFICATION: logos to svg end
+ ***********************************/
+
+/***************************
+     MODERNIZR begin
+****************************/
+
+.no-svg #wordmarkGFZ object,
+.no-svg #logoGFZ object,
+.no-svg #logoHelmholtzGemeinschaft object {
+  display: none;
+}
+
+.no-svg #wordmarkGFZ {
+  background: url(../images/wordmark_gfz_de.gif) no-repeat;
+  height: 79px;
+  left: auto;
+  position: absolute;
+  top: 40px;
+  width: 175px;
+}
+
+.no-svg .en #wordmarkGFZ {
+  background: url(../images/wordmark_gfz_en.gif) no-repeat;
+}
+
+.no-svg #logoGFZ {
+  background: url(../images/logo_gfz_de.gif) no-repeat;
+  height: 84px;
+  left: -20px;
+  position: absolute;
+  width: 120px;
+}
+
+.no-svg .en #logoGFZ {
+  background: url(../images/logo_gfz_en.gif) no-repeat;
+}
+
+.no-svg #logoHelmholtzGemeinschaft {
+  background: url(../images/logo_helmholtz_gemeinschaft_de.gif) no-repeat;
+  background: url(../images/HG20J_LOGO_DE_Blau_klein_RGB.jpg) no-repeat;
+  height: 36px;
+  width: 100px;
+}
+
+.no-svg .en #logoHelmholtzGemeinschaft {
+  background: url(../images/logo_helmholtz_gemeinschaft_en.gif) no-repeat;
+  background: url(../images/HG20J_LOGO_ENG_Blau_klein_RGB.jpg) no-repeat;
+}
+
+/***************************
+     MODERNIZR end
+****************************/
+
+/***********************************
+  MODIFICATION: Anfahrt Maps start
+ ***********************************/
+/* 27-03-2015, vivien.lindemann@gfz-potsdam.de */
+.map-box .map-buttons {
+  float: left;
+  width: 110px;
+}
+
+.map-box .map-buttons.act-campus.act-indicator .map-button-campus,
+.map-box .map-buttons.act-behlert.act-indicator .map-button-behlert,
+.map-box .map-buttons.act-hma.act-indicator .map-button-hma,
+.map-box .map-buttons.act-helmholtz.act-indicator .map-button-helmholtz,
+.map-box .map-buttons .map-button.act,
+.map-box .map-buttons .map-button.cur {
+  background-color: #00589C;
+  color: #FFF;
+}
+
+.map-box .map-buttons.act-campus.act-indicator .map-button-campus:after,
+.map-box .map-buttons.act-behlert.act-indicator .map-button-behlert:after, 
+.map-box .map-buttons.act-hma.act-indicator .map-button-hma:after,
+.map-box .map-buttons.act-helmholtz.act-indicator .map-button-helmholtz:after,
+.map-box .map-buttons .map-button.act:after, 
+.map-box .map-buttons .map-button.cur:after {
+  border-color: transparent #00589C;
+  border-color: rgba(0, 66, 96, 0) #00589C;
+  border-style: solid;
+  border-width: 25px 0 25px 20px;
+  content: "";
+  display: block;
+  position: absolute;
+  right: -20px;
+  top: 0;
+  -moz-transform: scale(0.9999);
+  width: 0;
+  z-index: 20;
+}
+
+.map-box .map-buttons.act-campus.act-indicator .map-button-campus p,
+.map-box .map-buttons.act-behlert.act-indicator .map-button-behlert p,
+.map-box .map-buttons.act-hma.act-indicator .map-button-hma p,
+.map-box .map-buttons.act-helmholtz.act-indicator .map-button-helmholtz p,
+.map-box .map-buttons .map-button.act p,
+.map-box .map-buttons .map-button.cur p {
+  color: #FFF;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.map-box .map-button-campus p,
+.map-box .map-button-behlert p,
+.map-box .map-button-hma p,
+.map-box .map-button-helmholtz p{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.map-box .map-buttons .map-button {
+  background-color: #D9D9D9;
+  border-bottom: 3px solid #FFF;
+  color: #00589C;
+  cursor: pointer;
+  display: table;
+  height: 30px;
+  padding: 10px;
+  position: relative;
+  width: 90px;
+}
+
+.map-box .map-buttons .map-button p {
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+
+.map-box .maps {
+  position: relative;
+  max-width: 400px;
+  overflow: hidden;
+  height: 320px;
+}
+
+.map-box .maps.act-campus.act-indicator .map-campus,
+.map-box .maps.act-behlert.act-indicator .map-behlert,
+.map-box .maps.act-hma.act-indicator .map-hma,
+.map-box .maps.act-helmholtz.act-indicator .map-helmholtz {
+  display: block;
+}
+
+.map-box .maps .map {
+  display: none;
+  height: 300px;
+  position: absolute;
+  width: 400px;
+}
+
+.map-box .maps .map.act,
+.map-box .maps .map.cur {
+  display: block;
+}
+/***********************************
+  MODIFICATION: Anfahrt Maps end
+ ***********************************/
+
+/********************************************
+  MODIFICATION: Externe Helmholtz-Feeds start
+ ********************************************/
+/* 14-08-2015, vivien.lindemann@gfz-potsdam.de */
+.boxRight .tx-pits-rssnews li a {
+  background: none;
+  padding: 5px 15px 5px 25px;
+}
+
+.boxRight .tx-pits-rssnews li a:before {
+  color: #00589C;
+  color: #55ACEE;
+  content: "\f14c";
+  float: left;
+  font-family: FontAwesome;
+  font-size: 120%;
+  margin-left: -1.2em;
+}
+
+.boxRight .tx-pits-rssnews li a:hover:before {
+  color: #F60;
+}
+/********************************************
+  MODIFICATION: Externe Helmholtz-Feeds end
+ ********************************************/
+/* 2016-02-02, vivien: class for page "Meldungen" */
+.news-filter {
+  background: #EEE;
+  padding: 10px 5px;
+}
+/* 2016-02-02, vivien: class for page "Meldungen" */
+
+/*
+ * 19.02.2016 mkeusch
+ * Erweiterung für Inhaltselement Medien
+ * root/typo3/contrib/videojs/video-js/video-js.css
+ * HTML5Video Fullscreen Fix: Video wird nicht auf die volle Höhe erweitert
+ */
+.video-js-box.vjs-fullscreen {
+    height: 100% !important;
+}
