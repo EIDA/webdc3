@@ -30,6 +30,7 @@ Other:
         - AH does it that way.
         - SeisComP coding conventions <http://www.seiscomp3.org/doc/seattle/2013.046/base/coding-conventions.html>
 
+** Use PEP-8, flake8 --max-line-length=99 to get things cleaner.
 
 For JavaScript
 ==============
