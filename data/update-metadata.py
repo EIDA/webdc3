@@ -84,9 +84,9 @@ def getNetworks(arclinkserver, arclinkport):
 
     myStatus = 'UNSET'
     while (myStatus in ('UNSET', 'PROCESSING')):
-        sleep(1)
+        sleep(10)
         tn.write('status %s\n' % reqID)
-        stText = tn.read_until('END', 5)
+        stText = tn.read_until('END', 30)
 
         stStr = 'status='
         myStatus = stText[stText.find(stStr) + len(stStr):].split()[0]
@@ -105,7 +105,7 @@ def getNetworks(arclinkserver, arclinkport):
     expectedLength = 1000
     totalBytes = 0
     while totalBytes < expectedLength:
-        buffer = tn.read_until('END', 5)
+        buffer = tn.read_until('END', 30)
         if start is None:
             start = buffer.find('<')
             expectedLength = int(buffer[:start])
@@ -267,9 +267,9 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
 
     myStatus = 'UNSET'
     while (myStatus in ('UNSET', 'PROCESSING')):
-        sleep(1)
+        sleep(10)
         tn.write('status %s\n' % reqID)
-        stText = tn.read_until('END', 5)
+        stText = tn.read_until('END', 30)
 
         stStr = 'status='
         myStatus = stText[stText.find(stStr) + len(stStr):].split()[0]
@@ -293,7 +293,7 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
         expectedLength = 1000
         totalBytes = 0
         while totalBytes < expectedLength:
-            buffer = tn.read_until('END', 5)
+            buffer = tn.read_until('END', 30)
             if start is None:
                 start = buffer.find('<')
                 try:
