@@ -233,7 +233,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
       # Make SeisComP3 available for webinterface:
       export SEISCOMP_ROOT=/home/sysop/seiscomp3/
       export LD_LIBRARY_PATH=/home/sysop/seiscomp3/lib:$LD_LIBRARY_PATH
-      export PYTHONPATH=/home/sysop/seiscomp3/lib/python:$PYTHONPATH 
+      export PYTHONPATH=/home/sysop/seiscomp3/lib/python:$PYTHONPATH
 
  #. Change to the installation directory and fix the path which is added in `wsgi/webdc3.wsgi`::
 
@@ -244,7 +244,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
       cp wsgi/webinterface.cfg.sample wsgi/webinterface.cfg
       cd $SEISCOMP_ROOT/etc
-      ln -s /var/www/webinterface/wsgi/webinterface.cfg webinterface.cfg 
+      ln -s /var/www/webinterface/wsgi/webinterface.cfg webinterface.cfg
 
  #. Edit `webinterface.cfg` and be sure to configure correctly the ``SERVER_FOLDER`` and ``arclink.address`` variables. This is discussed under "`Configuration Options`_" below.
 
@@ -303,16 +303,16 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
       $ ./update-metadata.py -h
       usage: update-metadata.py [-h] [-a ADDRESS] [-p PORT] [-o OUTPUT] [-v]
                                 {eida,singlenode} ...
-      
+
       Script to update the metadata for the usage of WebDC3
-      
+
       positional arguments:
         {eida,singlenode}
           eida                Get master table from EIDA
           singlenode          Create master table based on local inventory. Type
                               "update-metadata.py singlenode -h" to get detailed
                               help.
-      
+
       optional arguments:
         -h, --help            show this help message and exit
         -a ADDRESS, --address ADDRESS
@@ -326,7 +326,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
 
       $ ./update-metadata.py eida -h
       usage: update-metadata.py eida [-h]
-      
+
       optional arguments:
         -h, --help  show this help message and exit
 
@@ -337,11 +337,11 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
       $ ./update-metadata.py singlenode -h
       usage: update-metadata.py singlenode [-h] [-c CONTACT] [-e EMAIL] [-n NAME]
                                            dcid
-      
+
       positional arguments:
         dcid                  Short ID of your data centre. Up to 5 letters, no
                               spaces.
-      
+
       optional arguments:
         -h, --help            show this help message and exit
         -c CONTACT, --contact CONTACT
@@ -365,7 +365,7 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
     The system will also try to create and
     write temporary information in this directory, but it will still work even
     if this cannot be done.
-   
+
     .. warning :: Wrong configuration in the permissions of the `data` directory could diminish the performance of the system.
 
     One possible configuration would be to install the system as a user (for
@@ -382,7 +382,14 @@ To deploy the WebDC3 web interface on an Apache2 web server using `mod_wsgi`:
     Something like the following lines will be needed in your crontab::
 
       # Daily metadata update for webinterface:
-      52 03 * * * /var/www/webinterface/data/update-metadata.py
+      52 03 * * * /var/www/webinterface/data/update-metadata.py eida
+
+    or if you run it outside EIDA: ::
+
+      # Daily metadata update for webinterface:
+      52 03 * * * /var/www/webinterface/data/update-metadata.py singlenode \
+                  -c CONTACT -e contact@mail.org -n "My name" MYDCID
+
 
 Installation problems
 ---------------------
@@ -411,7 +418,7 @@ in your browser e.g. going to::
 should show you something like this::
 
   {"geofon": {"description": "GFZ (eqinfo)", "hasDepth": true, "hasDate":
-  true, "hasRectangle": true, ... 
+  true, "hasRectangle": true, ...
 
 
 .. _configuration-options-extra:
@@ -446,7 +453,7 @@ At a minimum, you will need to
 
    #. set `arclink.address` to point to your Arclink server,
    #. set `SERVER_FOLDER` to the top directory of your webinterface installation
-  
+
 to something suitable for your site.
 Other options should be suitable for getting started.
 You may also wish to adjust the selection of event services.
@@ -490,7 +497,7 @@ Metadata options
     arclink.networkXML = "eida.xml"
 
   This is an XML file [or a URL?].
-  This option enables you to give a list of Arclink servers which can be checked for status of requests. Generally this list should be those servers which are included in the routing table provided by your Arclink server. For an EIDA node, this should be the EIDA master table. 
+  This option enables you to give a list of Arclink servers which can be checked for status of requests. Generally this list should be those servers which are included in the routing table provided by your Arclink server. For an EIDA node, this should be the EIDA master table.
 
 Events options
 ~~~~~~~~~~~~~~
