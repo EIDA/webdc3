@@ -27,12 +27,12 @@ There is a modular decomposition into functions related to presentation, events,
 
 * Documentation
 
-  This documentation is written in a simple mark-up format called
-  reStructuredText <http://docutils.sourceforge.net/rst.html> (reST). The final documentation is generated using Sphinx.
+  This documentation is written in
+  reStructuredText <http://docutils.sourceforge.net/rst.html> (reST, a common simple mark-up format). The final documentation is generated using Sphinx.
   Our philosophy follows the SeisComP documentation, described at
-  http://www.seiscomp3.org/doc/seattle/2013.149/base/contributing-docs.html
+  http://www.seiscomp3.org/doc/seattle/2013.149/base/contributing-docs.html .
   Look in the `descriptions` subdirectory for configuration options
-  etc. relating to particular modules e.g. wsgi/descriptions .
+  etc. relating to particular modules e.g., `wsgi/descriptions`.
 
 Interfaces and name spaces
 ==========================
@@ -406,8 +406,8 @@ Station metadata module
 
 The information related to the inventory is first retrieved and updated from
 an Arclink server by means of a script (`data/update-metadata.py`) run from
-a crontab. The update interval can be configured according to the needs of
-the operator. As this information is does not change frequently over time, an
+crontab. The update interval can be configured according to the needs of
+the operator. As this information does not change frequently over time, an
 update interval of 24 hours is the suggested value.
 
 This information is saved to a file on the server (`data/Arclink-inventory.xml`) and will be read from this file if necessary. The parsing of the file and the creation of the internal representation can take up from 5 to 9 seconds, depending on the hardware. To improve performance, once the information is stored in memory, a dump of all these variables are saved in a temporary file.
@@ -416,6 +416,16 @@ information and the memory dump is checked and the newer is loaded. In this
 way, the system does not need to establish a connection with the Arclink
 server while consulting the metadata, making operations much faster than in
 the previous version of the system.
+
+.. note::  Note on Timeouts for Arclink
+   A generous timeout is needed for requesting metadata from a busy server.
+   The `arclink_fetch` client uses the Python sockets library, with a default timeout of 300 seconds. ObsPy's <https://github.com/obspy/obspy/blob/master/obspy/clients/arclink/client.py>_ client.py sets this to 20 seconds. So 60 seconds is probably adequate.
+  (ObsPy uses additional command_delay = 0, status_delay = 0.5s variables.
+  ObsPy uses MAX_REQUEST = 50 STATUS requests, so 25 sec by default.)
+  ~~Timeout may have the signature "invalid request:" in the Arclink server logging.~~
+
+  Regardless of success or not, the update-metadata client should probably send "PURGE {request id}".
+
 
 The internal representation of the metadata consists of four lists representing networks, stations, sensor locations and streams. All the lists contain tuples and every tuple represents one instance of the related information (e.g. one network). 
 The structure of these tuples is described below.
