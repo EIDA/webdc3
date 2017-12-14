@@ -52,8 +52,10 @@ except ImportError:
 # to Arclink server. In seconds.
 _SOCKET_TIMEOUT = 60
 
-# Interval between checks of request status, before
+# Polling interval between checks of request status, before
 # sending DOWNLOAD command. In seconds.
+# This can be quite large - this request takes a few minutes,
+# and there is no interactive user anxiously waiting for the result.
 _STATUS_DELAY = 10
 
 
@@ -92,7 +94,7 @@ def getNetworks(arclinkserver, arclinkport):
 
     myStatus = 'UNSET'
     while (myStatus in ('UNSET', 'PROCESSING')):
-        sleep(10)
+        sleep(_STATUS_DELAY)
         tn.write('status %s\n' % reqID)
         stText = tn.read_until('END', _SOCKET_TIMEOUT)
 
@@ -261,6 +263,7 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
     logging.debug(tn.read_until('OK', 5))
     tn.write('1980,1,1,0,0,0 %d,1,1,0,0,0 * * * *\nEND\n' %
              (datetime.datetime.now().year + 1))
+    logging.info('Sent request to %s:%s' % (arclinkserver, arclinkport))
 
     reqID = 0
     while not reqID:
@@ -272,6 +275,7 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
                 continue
             if testReqID:
                 reqID = testReqID
+    logging.info('Request ID: %s' % str(reqID))
 
     myStatus = 'UNSET'
     while (myStatus in ('UNSET', 'PROCESSING')):
@@ -285,9 +289,10 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
         logging.debug(myStatus + '\n')
 
     if myStatus != 'OK':
-        logging.error('Error! Request status is not OK.\n')
+        logging.error('Error! Request status was not OK: got %s.' % str(myStatus))
         return
 
+    logging.info('Request status was %s; starting download.' % str(myStatus))
     tn.write('download %s\n' % reqID)
 
     here = os.path.dirname(__file__)
@@ -397,6 +402,7 @@ def main():
             return
 
     downloadInventory(args.address, args.port, args.output)
+    logging.info('Done downloading inventory')
 
     # Check for mandatory argument in case of a single node
     if 'dcid' not in args:
@@ -406,6 +412,7 @@ def main():
         genRoutingTable(nets, address=args.address, port=args.port,
                         contact=args.contact, email=args.email, dcid=dcid,
                         name=args.name)
+    logging.info('Finished. Bye.')
 
 if __name__ == '__main__':
     main()
