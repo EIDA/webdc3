@@ -56,6 +56,7 @@ _SOCKET_TIMEOUT = 60
 # sending DOWNLOAD command. In seconds.
 _STATUS_DELAY = 10
 
+
 def getNetworks(arclinkserver, arclinkport):
     """Connects via telnet to an Arclink server to get inventory information.
     The data is returned as a string.
@@ -67,11 +68,11 @@ def getNetworks(arclinkserver, arclinkport):
     # FIXME The institution should be detected here. Shouldn't it?
     # Yes, it should -PLE.
     try:
-        myhostname = socket.getfqdn()
+        myHostname = socket.getfqdn()
     except:
-        myhostname= "eida.invalid"
+        myHostname = "eida.invalid"
     logging.info(tn.read_until('GFZ', 5))
-    tn.write('user webinterface@%s\n' % myhostname)
+    tn.write('user webinterface@%s\n' % myHostname)
     logging.debug(tn.read_until('OK', 5))
     tn.write('request inventory\n')
     logging.debug(tn.read_until('OK', 5))
@@ -352,7 +353,7 @@ def main():
     parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
                         help='Filename where inventory should be saved.')
     parser.add_argument('-v', '--verbosity', action="count", default=0,
-                        help='Increase the verbosity level')
+                        help='Increase the verbosity level.')
 
     subparsers = parser.add_subparsers()
 
@@ -368,11 +369,13 @@ def main():
     dcidhelp = 'Short ID of your data centre. Up to 5 letters, no spaces.'
     parser_s.add_argument('dcid', help=dcidhelp)
     parser_s.add_argument('-c', '--contact', default='No Name',
-                          help='Name of the person responsible for this instance of WebDC3.')
+                          help='Name of the person responsible '
+                          'for this instance of WebDC3.')
     parser_s.add_argument('-e', '--email', default='noreply@localhost',
-                          help='Email address of the person responsible for this instance of WebDC3.')
-    parser_s.add_argument('-n', '--name', default='Name of Datacentre',
-                          help='Official name of Datacentre.')
+                          help='Email address of the person responsible '
+                          'for this instance of WebDC3.')
+    parser_s.add_argument('-n', '--name', default='Name of data centre',
+                          help='Official name of data centre.')
     args = parser.parse_args()
 
     # Limit the maximum verbosity to 3 (DEBUG)
