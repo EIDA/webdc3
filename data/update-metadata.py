@@ -2,7 +2,7 @@
 #
 # Functions to update the metadata of WebDC3
 #
-# Copyright (C) 2014 Javier Quinteros, GEOFON team
+# Copyright (C) 2014-2017 Javier Quinteros, GEOFON team
 # <javier@gfz-potsdam.de>
 #
 # ----------------------------------------------------------------------
@@ -48,6 +48,13 @@ try:
 except ImportError:
     import urllib2 as ul
 
+# Timeout for sockets, used by telnetlib, for connection
+# to Arclink server. In seconds.
+_SOCKET_TIMEOUT = 60
+
+# Interval between checks of request status, before
+# sending DOWNLOAD command. In seconds.
+_STATUS_DELAY = 10
 
 def getNetworks(arclinkserver, arclinkport):
     """Connects via telnet to an Arclink server to get inventory information.
@@ -86,7 +93,7 @@ def getNetworks(arclinkserver, arclinkport):
     while (myStatus in ('UNSET', 'PROCESSING')):
         sleep(10)
         tn.write('status %s\n' % reqID)
-        stText = tn.read_until('END', 30)
+        stText = tn.read_until('END', _SOCKET_TIMEOUT)
 
         stStr = 'status='
         myStatus = stText[stText.find(stStr) + len(stStr):].split()[0]
@@ -105,7 +112,7 @@ def getNetworks(arclinkserver, arclinkport):
     expectedLength = 1000
     totalBytes = 0
     while totalBytes < expectedLength:
-        buffer = tn.read_until('END', 30)
+        buffer = tn.read_until('END', _SOCKET_TIMEOUT)
         if start is None:
             start = buffer.find('<')
             expectedLength = int(buffer[:start])
@@ -267,9 +274,9 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
 
     myStatus = 'UNSET'
     while (myStatus in ('UNSET', 'PROCESSING')):
-        sleep(10)
+        sleep(_STATUS_DELAY)
         tn.write('status %s\n' % reqID)
-        stText = tn.read_until('END', 30)
+        stText = tn.read_until('END', _SOCKET_TIMEOUT)
 
         stStr = 'status='
         myStatus = stText[stText.find(stStr) + len(stStr):].split()[0]
@@ -293,7 +300,7 @@ def downloadInventory(arclinkserver, arclinkport, foutput):
         expectedLength = 1000
         totalBytes = 0
         while totalBytes < expectedLength:
-            buffer = tn.read_until('END', 30)
+            buffer = tn.read_until('END', _SOCKET_TIMEOUT)
             if start is None:
                 start = buffer.find('<')
                 try:
