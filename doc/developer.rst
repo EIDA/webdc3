@@ -420,11 +420,9 @@ the previous version of the system.
 .. note::  Note on Timeouts for Arclink
    A generous timeout is needed for requesting metadata from a busy server.
    The `arclink_fetch` client uses the Python sockets library, with a default timeout of 300 seconds. ObsPy's <https://github.com/obspy/obspy/blob/master/obspy/clients/arclink/client.py>_ client.py sets this to 20 seconds. So 60 seconds is probably adequate.
-  (ObsPy uses additional command_delay = 0, status_delay = 0.5s variables.
-  ObsPy uses MAX_REQUEST = 50 STATUS requests, so 25 sec by default.)
-  ~~Timeout may have the signature "invalid request:" in the Arclink server logging.~~
+  ~~Timeout may display the signature "invalid request:" in Arclink server log messages.~~
 
-  Regardless of success or not, the update-metadata client should probably send "PURGE {request id}".
+  Regardless of success or not, the update-metadata client should probably send "PURGE {request id}" at the end of a successful metadata update.
 
 
 The internal representation of the metadata consists of four lists representing networks, stations, sensor locations and streams. All the lists contain tuples and every tuple represents one instance of the related information (e.g. one network). 
