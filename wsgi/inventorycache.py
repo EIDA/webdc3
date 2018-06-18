@@ -875,7 +875,7 @@ class InventoryCache(object):
         for i in netsOK:
             netList.append(('%s-%s-%s' % (ptNets[i][0], ptNets[i][4],
                                           ptNets[i][5]),
-                            '%s%s%s (%s) - %s [%s]' %
+                            '%s%s%s (%s) - %s [data hosted at: %s]' %
                             (ptNets[i][0],
                              '*' if ptNets[i][8] == 't' else ' ',
                              '+' if ptNets[i][7] == 1 else ' ',
