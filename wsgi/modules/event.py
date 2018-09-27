@@ -316,9 +316,20 @@ Service version:
         else:
             joint = ", "
         prefService = self._EventServicePreferred
+
+        if 'isc' in d.keys():
+            rest = d.pop('isc')
+        else:
+            rest = None
+
         left = json.dumps({prefService: d.pop(prefService)}, indent=indent)[0:-1]
         right = json.dumps(d, indent=indent).lstrip("{")
         tmp = left.rstrip() + joint + right.lstrip()
+
+        if (rest is not None):
+            left = tmp[0:-1]  # Only remove the final '}'
+            right = json.dumps({'isc': rest}, indent=indent).lstrip('{')
+            tmp = left.rstrip() + joint + right.lstrip()
 
         # DEBUG: Check the output string is loadable.
         tmp2 = json.loads(tmp)
