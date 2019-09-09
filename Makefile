@@ -2,16 +2,16 @@
 # Makefile for the webinterface
 #
 # ----------------------------------------------------------------------
-all: js/webdc3.min.js documentation
+all: js/webdc3.min.js
 
 .PHONY: all clean documentation gitcheck release test demo
 
 # sudo {zypper|apt-get|yum} install npm
-# npm install browserify babelify babel-preset-es2015
-# PATH=~/node_modules/.bin:$PATH
+# npm install browserify babelify@8 babel-core babel-preset-env
+# PATH=./node_modules/.bin:$PATH
 js/webdc3.min.js: src/*
 	mkdir -p js
-	browserify --entry src/main.js --transform [ babelify --presets es2015 --no-comments --minified ] --outfile $@
+	browserify --entry src/main.js --transform [ babelify --presets env --no-comments --minified ] --outfile $@
 
 clean:
 	(cd doc ; make clean)
