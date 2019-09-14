@@ -812,7 +812,7 @@ function FDSNWS_Control(controlDiv) {
 		// If using a local FDSNWS without routing
 		} else {
 			var reqData = [{
-				url: fdsnwsURL + '/' + param.service + '/1/query',
+				url: fdsnwsURL + '/' + param.service + '/1/' + ((param.service == 'dataselect')? 'queryauth': 'query'),
 				name: param.service,
 				params: []
 			}]
@@ -833,7 +833,7 @@ function FDSNWS_Control(controlDiv) {
 
 			reqData.options = param.options
 			reqData.bulk = param.bulk
-			reqData.merge = param.merge
+			reqData.merge = true
 			reqData.filename = param.filename
 			reqData.contentType = param.contentType
 			req.load(reqData)
