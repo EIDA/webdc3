@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>WebDC3 web interface at GEOFON - Help</title>
+
+	<!-- Those should be loaded from the page -->
+	<script src="tools/jquery/jquery-1.9.1.js"></script>
+
+	<link rel="stylesheet" href="css/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="css/smoothness/jquery.ui.theme.css" />
+	<link rel="stylesheet" href="css/bootstrap-3.3.7.css" />
+
+	<script src="tools/jquery/jquery-ui.js"></script>
+	<script src="tools/jquery/jquery.cookie.js"></script>
+	<!-- Done -->
+
+	<!-- Load GFZ style first; we override as necessary later.-->
+	<link href="examples/webdc3/gfz-backup.css" rel="stylesheet" type="text/css" />
+	<link href="examples/webdc3-2019/webdc3-2019.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="css/basic.css" />
+	<link rel="stylesheet" type="text/css" href="examples/webdc3-2019/geofon.css" />
+</head>
+
+<body>
+<div id="wrapper_borderOverall"><!-- wrapper_borderOveralll -->
+<div id="borderOverall"><!-- borderOverall -->
+<div id="holder">
+	<div id="header">
+		<h1>WebDC3 Interface to<br/>EIDA Data Archives at GEOFON</h1>
+	</div>
+
+	<div id="menu">
+		<div class="wi-control-item" style="float: left">
+			<a href="index.html">Main page</a>
+		</div>
+		<div class="wi-control-item" style="float: right">
+			<a href="help.html">Help</a>
+		</div>
+		<br class="clear" />
+	</div>
+
+	<div id="contents"><div class="all">
+
+	<h2>Getting started</h2>
+	<p>This site is a portal to the seismic waveform data archives at GEOFON, including the EIDA data holdings.
+	With it, you can request</p>
+	<ol>
+	  	<li><a href="#waveform">seismological data</a> (waveforms) and</li>
+		<li><a href="#station">station lists</a> (Dataless SEED, Inventory XML).</li>
+	</ol>
+	<p>from different data centers spread across Europe.</p>
+
+	<p>If you encounter difficulties using the WebDC software, please contact the authors at geofon@gfz-potsdam.de .</p>
+
+	<p>The portal allows you to create requests which combine the stations'
+	locations with earthquake lists provided by 
+	<a href="http://geofon.gfz-potsdam.de/">GFZ</a>
+	or other agencies.
+	See the "<a href="#EventControls">Event Controls</a>" box.
+	In this case the event time and coordinates are used to
+	compute approximated arrival times ("onset times") for the P or S wave of the selected earthquakes
+	at the selected stations.</p>
+
+	<div class="alert alert-warning">
+		WebDC <a class="alert-link external-link" href="http://www.seiscomp3.org/wiki/doc/applications/arclink">ArcLink</a>
+			data requests can also be made
+			using the <a class="alert-link external-link" href="http://www.seiscomp3.org/wiki/doc/applications/arclink_fetch">arclink_fetch</a> program.
+	</div>
+
+	<h2>About the web interface</h2>
+	  <ol>
+		<li id="waveform">Waveform data: We offer you the choice of downloading mini-SEED or full SEED volumes.
+		    These can be easily converted to other major seismological formats using the
+		    <a href="http://www.iris.edu/manuals/rdseed.htm">rdseed</a> tool.</li>
+		<li id="station">Metadata:
+		    You can also download Dataless SEED and Inventory XML.
+		    These formats contain only the station and stream information. 
+		    They contain information like coordinates, names, codes and instrument responses for certain stations or networks.
+		    Dataless SEED files can be decoded by the rdseed program. An inventory XML file is a plain text file that can be inspected by any text editor, but it is recommended that you use a real generic XML parser to extract the desired information from it.
+		    A handy tool that allows you to convert XML files to a more linear format is Dan Egnor's <a href="http://www.ofb.net/~egnor/xml2">xml2</a>.
+		    </li>
+	  </ol>
+		<div class="alert alert-danger" id="RestrictedData">
+		  <p>For restricted datasets, some data centers (including GEOFON) deliver encrypted data.
+		  For those cases it is necessary to first decrypt the received data
+		  using the password that you will receive in your e-mail.
+		  The decryption can be performed by using the <a class="alert-link" href="http://www.openssl.org/">OpenSSL</a> tool available on most Linux distributions.
+		  For decrypting your data use the following command:</p>
+<pre>
+  openssl des-cbc -pass pass:{Your Password} -in {Input File} -out {Output File} -d
+</pre>
+		  <p>If your password contains symbols we recommend that you quote your
+		  password (using single quotes) on the command line by using this line instead:</p>
+<pre>
+  openssl des-cbc -pass pass:'{Your Password}' -in {Input File} -out {Output File} -d
+</pre>
+		  <p>If you feel you should have access to a data set, contact the responsible principal investigator(s), or the data centre holding the data. (<a class="alert-link" href="http://geofon.gfz-potsdam.de/contact.php">Contacting GEOFON</a>)</p>
+	  </div>
+	  <h2>Using the web interface</h2>
+	  <p>The web interface is built up from boxes.
+          Here are some of the features
+	   of each box.</p>
+
+	  <h3>Index</h3>
+	  <ul>
+<li>The <a href="#EventSearchControl">Event Controls</a> box</li>
+<li>The <a href="#StationSearchControl">Station Controls</a> box</li>
+<li>The <a href="#MappingControl">Event and Station Map</a> box</li>
+<li>The <a href="#RequestManagerControl">Event and Station List</a> box</li>
+<li>The <a href="#SubmitControl">Submit</a> box</li>
+<li>The <a href="#StatusListControl">Recent Requests</a> box</li>
+<!-- The <a href="#StatusFullControl">StatusFullControl</a> box is the part of the StatusQueryControl box which shows results. -->
+<li>The <a href="#StatusQueryControl">Manage Requests</a> box</li>
+<li>The <a href="#Console">Console</a> box</li>
+	  </ul>
+
+
+<h3>User interface boxes</h3>
+<dl>
+  <dt id="EventSearchControl">The "Event Controls" box</dt>
+  <dd><p>Use this to select events to compose your request.
+This powerful tool is an event browser which can query several sources of
+information.</p>
+
+<p>Catalog Services:
+At GFZ you can choose events from one of the following public catalog services:</p>
+<ol>
+<li>GFZ - The GEOFON catalog (<a href="http://geofon.gfz-potsdam.de/eqinfo/">http://geofon.gfz-potsdam.de/eqinfo/</a>.)</li>
+<li>EMSC - The EMSC catalog (<a href="http://www.emsc-csem.org/Earthquake/">http://www.emsc-csem.org/Earthquake/</a>.)</li>
+<li>USGS - The ANSS Comprehensive Catalog (ComCat) service (<a href="http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php">http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php</a>.)</li>	
+<li>XXXX NEIC - A temporary replacement for the NEIC service, at USGS (<a href="http://earthquake.usgs.gov/earthquakes/eqarchives/epic/">http://earthquake.usgs.gov/earthquakes/eqarchives/epic/</a>) based on the new Comprehensive Catalog (ComCat). XXXX</li>
+</ol>
+<p>Select "Catalog Services" under "Event Information".
+Then use the pull-down menu under "Catalog Service" to choose the desired
+catalog. Now you can filter events by:</p>
+<ul>
+  <li>Date interval</li>
+  <li>Magnitude range</li>
+  <li>Depth</li>
+  <li>Location</li>
+</ul>
+<p>User Supplied:
+Alternatively you can upload your own catalog...
+</p>
+</dd>
+
+  <dt id="StationSearchControl">The "Station Controls" box</dt>
+<dd><p>Use this to add channels to your request. The selection of stations can
+    be made according to</p>
+<ul>
+<li>by geographical coordinates</li>
+<li>the currently selected events - distance and (back)azimuth are in degrees</li>
+<li>or by network/station codes.</li>
+</ul>
+<p>Symbols used on the pull-down lists are:
+* = temporary network; + = restricted access (see <a href="#RestrictedData">here</a>)
+</p>
+<p>You can limit the selection to particular types of streams/channels, either</p>
+<ul>
+<li>by channel code, e.g. BH (for BHE, BHZ, BH1, etc.).
+  Location codes appear before the channel code, e.g. 00BH.
+	You can select multiple types of channel
+  codes by selecting with the SHIFT and/or CTRL keys.</li>
+<li>by sampling rate - for every station, this will return those streams with
+  a reported sample rate closest to that specified.</li>
+</ul>
+</dd>
+
+  <dt id="MappingControl">The "Event and Station Map" box</dt>
+  <dd><p>Here the events and stations you choose will be displayed.
+      Use the mouse to drag the map around.
+      Use the left SHIFT + Mouse to drag areas for limiting the search of events and stations when the appropriate modules are enabled.</p>
+  </dd>
+
+  <dt id="RequestManagerControl">The "Event and Station List" box</dt>
+  <dd><p>The tables here show the events and stations you choose.
+Use these tables to check which events and stations have been selected by your search criteria.
+You can interactively remove unwanted items.
+Your final request will be built from the currently displayed information.
+You can refine the selection of streams for stations using the "Advanced Stream Filters Control".</p>
+<p>Triangles on the column headers allow you to sort rows by the values in those columns.</p>
+<p>The "O/R" column shows whether the station is "open" (field is empty) or "<a href="#RestrictedData">restricted</a>" (shown by a red "<span style="color: red;">R</span>").</p>
+</dd>
+
+  <dt id="SubmitControl">The "Submit" box</dt>
+  <dd><p>Use this to send your request to a server. You can check the status of your requests using the controls under the "Download data" tab.</p></dd>
+
+  <dt id="StatusListControl">The "Recent Requests" box</dt>
+  <dd><p>Here you can check the status of your Arclink requests made during your current use of this service. The usual request group operations (Reroute/Retry/Resend/Delete/Refresh) as well as download links are available on the status popup. Use this box to conveniently download a small number of recent data volumes.</p></dd>
+
+  <dt id="StatusQueryControl">The "Manage Requests" box</dt>
+  <dd><p>Here you can manage all your Arclink requests (including requests made during previous visits). Downloading all your data volumes with a single click is possible if you have <a href="http://jdownloader.org/">jDownloader</a> installed.</p></dd>
+
+  <dt id="Console">The "Console" box</dt>
+  <dd><p>Warnings and other messages appear here. Unwanted messages can be
+      removed by reloading the page, or using the "Clear" button.</p></dd>
+
+</dl>
+		<br class="clear"/>
+</div></div>
+
+	<div id="footer">
+		<div id="copyright">WebDC3 Interface &copy;&nbsp;(2013&ndash;2017)&nbsp;Helmholtz-Zentrum Potsdam&nbsp;-&nbsp;<strong><a href="http://www.gfz-potsdam.de/">Deutsches GeoForschungsZentrum GFZ</a></strong>&nbsp;-&nbsp;doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a></div>
+	</div>
+</div>
+</div><!-- / borderOverall -->
+</div><!-- / wrapper_borderOverall -->
+</body>
+</html>
