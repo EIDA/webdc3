@@ -74,10 +74,6 @@ img {
 	border: 0; /* html5: border-Attribut nicht mehr erlaubt */
 }
 
-#logoGFZ {
-	left: -16px;
-}
-
 .inner-left {
     position: absolute;
     left: 130px;

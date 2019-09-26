@@ -57,29 +57,8 @@ body {
   padding: 10px;
 }
 
-#wrapper_mainContent_leftColumn_rightColumn {
-  padding: 10px 0 0;
-}
 
-#wrapper_mainContent_3columnLayout {
-  width: 520px;
-  float: left;
-}
 
-#mainContent_3columnLayout {
-  margin: 0 10px 0 0;
-  overflow-x: hidden;
-}
-
-#wrapper_mainContent_2columnLayout {
-  width: 720px;
-  float: left;
-}
-
-#mainContent_2columnLayout {
-  margin: 0 10px 0 0;
-  overflow: hidden;
-}
 
 /* Scrollbar horizontal bei ueberbreiten iframes ausblenden
 #mainContent_2columnLayout iframe {
@@ -87,18 +66,6 @@ body {
 }
 */
 
-#wrapper_lastChange_toTop {
-  border-top: 1px solid #BBDCEB;
-  border-bottom: 1px solid #BBDCEB;  
-  padding: 5px 0 5px 0;
-}
-
-#wrapper_lastChange {
-  float: left;
-  font-size: 8.8px;
-  font-size: 0.55rem;
-  width: 80%;
-}
 
 #wrapper_toTop {
   font-size: 8.8px;
@@ -106,141 +73,15 @@ body {
   text-align: right;  
 }
 
-#wrapper_rightColumn {
-  width: 200px;
-  float: right;
-  overflow-x: hidden;
-}
-
 
 /* NUR Homepage
 ***************************************************/
-#gfzAktuell,
-#gfzAktiv {  
-  margin: 0 0 0 10px;
-}
-
-#gfzAktuell h2,
-#gfzAktiv h2,
-#gfzAktiv h1,
-#erdbebeninfo h2 {
-  color: #00589C;
-  font-size: 15.4px;
-  font-size: 0.963rem;
-  font-weight: bold;
-}
-
-#gfzAktuell ul,
-#gfzAktiv ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-#gfzAktuell img {
-  -moz-border-radius: 0 !important; /* Firefox */
-  -webkit-border-radius: 0 !important; /* Safari, Chrome */
-  -khtml-border-radius: 0 !important; /* Konqueror */
-  border-radius: 0 !important; /* CSS3 */
-  width: 170px; 
-}
-
-#gfzAktuell img.first {
-  -moz-border-radius: 0 0 0 15px !important; /* Firefox */
-  -webkit-border-radius: 0 0 0 15px !important; /* Safari, Chrome */
-  -khtml-border-radius: 0 0 0 15px !important; /* Konqueror */
-  border-radius: 0 0 0 15px !important; /* CSS3 */  
-}
-
-#gfzAktuell img.last {
-  -moz-border-radius: 0 15px 0 0 !important; /* Firefox */
-  -webkit-border-radius: 0 15px 0 0 !important; /* Safari, Chrome */
-  -khtml-border-radius: 0 15px 0 0 !important; /* Konqueror */
-  border-radius: 0 15px 0 0 !important; /* CSS3 */  
-}
-
-#gfzAktuell li {
-  display: inline-block;
-  float: left;
-  -webkit-hyphens: auto; /* Safari, Chrome */
-  -moz-hyphens: auto; /* Firefox */
-  -ms-hyphens: auto;
-  hyphens: auto; /* CSS3 */
-  padding: 0 10px 0 0;
-  width: 170px;
-}
-
-#gfzAktuell li.last {
-  padding: 0;
-}
-
-#gfzAktuell li span a {
-  background: url(../images/arrows/arr_right_orange_white_no.gif) no-repeat -3px 2px;
-  color: #000;
-  display: block;
-  padding: 0 0 0 10px;
-  width: 160px;  
-}
-
-#gfzAktuell li span a:hover {
-  color: #F60;
-  text-decoration: none;
-}
-
-#gfzAktuell span {
-  margin: 10px 0 0 0;
-}
 
 .homepage hr {
   margin: 25px 0 25px 10px;
 }
 
-#gfzAktiv {
-  float: left;
-}
 
-#gfzAktiv li {  
-  background: #BBDCEB;
-  height: 16px;
-  margin: 10px 0; 
-  padding: 0px 5px 15px 5px;
-  width: 340px;
-}
-
-#gfzAktiv li:hover {
-  background: #4CA8CD;  
-}
-
-#gfzAktiv li a {  
-  background: url(../images/arrows/arr_right_orange_blue3_no.gif) no-repeat 0 10px; /* TODO */
-  display: block;
-  font-size: 11px;
-  font-size: 0.688rem;
-  font-weight: bold;
-  padding: 10px 0 8px 15px;
-}
-
-#gfzAktiv li a:hover {  
-  background: url(../images/arrows/arr_right_orange_blue2_no.gif) no-repeat 0 10px; 
-  color: #00589C;
-  text-decoration: none;  
-}
-
-#erdbebeninfo {
-  float: right; 
-  width: 350px;
-}
-
-#erdbebeninfo div {
-  background: #E0EFF6;
-  border: 3px solid #BBDCEB;
-  -moz-border-radius: 0 15px 0 15px; /* Firefox */
-  -webkit-border-radius: 0 15px 0 15px; /* Safari, Chrome */
-  -khtml-border-radius: 0 15px 0 15px; /* Konqueror */
-  border-radius: 0 15px 0 15px; /* CSS3 */  
-  padding: 7px 0 4px 0;
-  text-align: center; 
-}
 
 
 /* header
@@ -257,51 +98,6 @@ body {
   border-radius: 0 !important; /* CSS3 */
 }
 
-
-/* serviceNav
-***************************************************/
-#serviceNav {
-  float: right;  
-  padding: 6px 0 0 20px;
-  text-align: right;
-}
-
-#serviceNav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-#serviceNav li {
-  color: #00589C;
-  display: inline-block;
-  font-size: 8.8px;
-  font-size: 0.55rem;
-  margin: 0;
-}
-
-#serviceNav li div.tx-srlanguagemenu-pi1 {
-  font-size: 8.8px;
-  font-size: 0.55rem; /* Schriftgroesze fuer Sprachumschalter anpassen */
-}
-
-#serviceNav .symbol-link { /* Icons auf Grundlinie setzen */
-    position: relative;
-    top: 2px;
-}
-
-#serviceNav a:hover {
-  text-decoration: none;
-}
-
-
-/* logoGFZ
-***************************************************/
-#logoGFZ {
-  position: absolute;
-  left: -20px;
-  bottom: 0;
-}
 
 
 /* wordmarkGFZ
@@ -447,47 +243,6 @@ body {
 }
 
 
-/* breadcrumb
-***************************************************/
-#wrapper_breadcrumb {
-  padding: 6px 0 10px;
-}
-
-ul.breadcrumb {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-ul.breadcrumb li {
-  color: #666;
-  display: inline-block;  
-  font-size: 8.8px;
-  font-size: 0.55rem;   
-}
-
-ul.breadcrumb li a {
-  background: url(../images/arrows/arr_right_gray_white_sm.gif) no-repeat 0 1px;
-  color: #666;
-  margin: 0;
-  padding: 0 0 0 12px;  
-}
-
-ul.breadcrumb li a:hover {
-  color: #F60;
-  text-decoration: none;
-}
-
-ul.breadcrumb li.active a {
-  background: url(../images/arrows/arr_right_orange_white_sm.gif) no-repeat 0 1px;
-  color: #F60;  
-}
-
-ul.breadcrumb li.first a {
-  background: none !important;
-  padding: 0;
-}
-
 
 /* rightColumn (Boxen)
 ***************************************************/
@@ -586,19 +341,7 @@ ul.breadcrumb li.first a {
   text-align: right;  
 }
 
-#footer img { /* keine runden Ecken fuer Helmholtz-Logo */
-  -moz-border-radius: 0 !important; /* Firefox */
-  -webkit-border-radius: 0 !important; /* Safari, Chrome */
-  -khtml-border-radius: 0 !important; /* Konqueror */
-  border-radius: 0 !important; /* CSS3 */
-}
 
-#wrapper_lastChange_toTop {
-  position: relative;
-  text-align: left;
-  top: 25px;
-  width: 70%;  
-}
 
 #copyright {
   color: #999;
@@ -611,110 +354,24 @@ ul.breadcrumb li.first a {
   width: 60%;
 }
 
-.homepage #copyright,
-.subpage-2column #copyright {
+.homepage #copyright {
   text-align: left;
 }
 
 .homepage #copyright {
-  width: 64%;
+  /* width: 64%;  */
 }
 
 #logoHelmholtzGemeinschaft {
-  float: right;
+  /* float: right; */
 }
 
-#mitgliedslogo {
-  float: left;
-  left: 8px;
-  position: relative;  
-}
 
-#logo-20jahrehelmholtz {
-  float: left;
-  left: 25px;
-  position: relative;
-  top: 15px;
-  left: 8px;
-  top: -8px;
-}
-
-#logo-20jahrehelmholtz.neuestes {
-  left: 122px;
-  top: -35px;
-  left: 142px;
-  top: -55px;
-  width: 173px;
-  height: 25px;
-}
 
 .homepage #footer {
-  margin: 0 10px 0 10px;
+  /* margin: 0 10px 0 10px; */
 }
 
-/* quicksearch
-***************************************************/
-#quicksearch {
-  float: right;
-}
-
-.newsearch {
-  background: url(../images/search_gray.png) no-repeat 8px 4px;
-  background-color: #FCFCFC;
-  border: 1px solid #D0D0D0;
-  -moz-border-radius: 15px; /* Firefox */
-  -webkit-border-radius: 15px; /* Safari, Chrome */
-  -khtml-border-radius: 15px; /* Konqueror */
-  border-radius: 15px; /* CSS3 */ 
-  color: #BCBCBC;
-  font-size: 11px;
-  font-size: 0.688rem;
-  margin: 3px;
-  padding: 6px 15px 6px 30px;
-  width: 180px;  
-}
-
-#inputText:focus {
-  border: 1px solid #F60;
-  outline: none;  
-  outline: #D0D0D0 dotted 1px;
-  outline-offset: 3px;
-}
-
-.newsearchform fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-#search-options {  
-  background: #F1F1F1;
-  -moz-border-radius: 0 0 15px 15px; /* Firefox */
-  -webkit-border-radius: 0 0 15px 15px; /* Safari, Chrome */
-  -khtml-border-radius: 0 0 15px 15px; /* Konqueror */
-  border-radius: 0 0 15px 15px; /* CSS3 */
-  font-size: 11px;
-  font-size: 0.688rem;
-  list-style: none;
-  margin: 0.6px 0 0 -1px;
-  opacity: 0.9;
-  padding: 5px 0 10px 10px;
-  position: absolute;
-  text-align: left;
-  width: 225px;
-  z-index: 2;
-}
-
-#search-options li {
-  line-height: 2;
-}
-
-div.tx-indexedsearch-res img { /* keine runden Ecken im Suchergebnis */
-  -moz-border-radius: 0 !important; /* Firefox */
-  -webkit-border-radius: 0 !important; /* Safari, Chrome */
-  -khtml-border-radius: 0 !important; /* Konqueror */
-  border-radius: 0 !important; /* CSS3 */
-}
 
 /* Spezielle Formate
 ***************************************************/
@@ -788,21 +445,6 @@ DIV.csc-textpic .csc-textpic-imagewrap .csc-textpic-image {
   background: #000 !important;
 }
 
-#newsslider-overlay {
-  background: rgba(0,88,156,0.75);
-  color: #FFF;
-  font-size: 14px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  padding: 0.25em 1em;
-  position: relative;
-  top: 1.5em;
-  z-index: 100;
-}
-
-#newsslider-overlay a {
-  color: #FFF;
-}
 
 /*************************
   EXT: pits_rssnews begin
@@ -882,19 +524,15 @@ a.svg:after {
   width: 120px;
   min-height: 84px;
   height: 84px;  
-  _height: 84px;
 }
 
 #logoHelmholtzGemeinschaft a.svg {
   width: 100px;
   min-height: 36px;
   height: 36px; 
-  _height: 36px;
-  
   width: 113px;
   min-height: 57px;
   height: 57px; 
-  _height: 57px;
 }
 
 /***********************************
