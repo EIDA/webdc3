@@ -22,7 +22,6 @@
 	<!-- Done -->
 
 	<!-- Those should be loaded from the page -->
-	<script src="https://maps.google.com/maps/api/js?v=3.8&amp;sensor=false"></script>
 	<script src="tools/openlayers/OpenLayers.js"></script>
 	<!-- Done -->
 
@@ -46,43 +45,39 @@
 
 <body class="homepage">
 
-  <div class="geofon-header-wrapper container-fluid">
-    <div id="geofon-header">
-      <span>
-        <a href="/">
-          <h1>GEOFON and EIDA Data Archives</h1>
-        </a>
-        <a href="//geofon.gfz-potsdam.de/">
-	  GEOFON
-	</a>
+<div class="geofon-header-wrapper container-fluid">
+  <div id="geofon-header">
+      <h1>
+        <a href="/">GEOFON and EIDA Data Archives</a>
+      </h1>
         <a href="http://www.orfeus-eu.org/eida/eida.html">
           <div class="inner-right">
-	    <img src="examples/webdc3/images/eida-logo2.png" alt="EIDA" height="48" width="120">
-	  </div>
-	  EIDA
-	</a>
-      </span>
-      <div class="rigth">
-	<div class="gfz-list-h">
-	  <ul>
-            <li><a href="http://geofon.gfz-potsdam.de/">GEOFON</a></li>
-            <li><a href="http://www.orfeus-eu.org/eida/eida.html">EIDA</a></li>
-            <li><a href="https://www.gfz-potsdam.de/en/imprint">Imprint</a></li>
-            <li><a href="https://www.gfz-potsdam.de/en/data-protection">Data Protection</a></li>
-            <!-- <li>
-              <a href="https://www.gfz-potsdam.de">Deutsch</a>
-              <i aria-hidden="true" class="fa fa-globe"></i>
-            </li> -->
-	  </ul>
-	</div>
-	<a href="//www.gfz-potsdam.de">
-	  <div class="gfz-brand" style="float: right;">
-	    <img alt="Workmark GFZ Potsdam" style="height: 70px;" src="http://dataservices.gfz-potsdam.de/mesi/images/GFZ-Logo-white.png">
+	    <img src="images/eida-orfeus3_blue.png" alt="Logo EIDA" height="50" width="140">
 	  </div>
 	</a>
-      </div>
-    </div><!-- #geofon-header -->
-  </div><!-- .geofon-header-wrapper -->
+  <div class="rigth">
+    <div class="gfz-list-h">
+      <ul>
+        <li><a href="http://geofon.gfz-potsdam.de/">GEOFON</a></li>
+        <li><a href="http://www.orfeus-eu.org/eida/eida.html">EIDA</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/imprint">Imprint</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/data-protection">Data Protection</a></li>
+        <!-- li
+
+            <a href="https://www.gfz-potsdam.de">Deutsch</a>
+            <i aria-hidden="true" class="fa fa-globe"></i>
+        /li> -->
+      </ul>
+    </div>
+    <a href="//www.gfz-potsdam.de">
+    <div class="gfz-brand" style="float: right;">
+      <img alt="Workmark GFZ Potsdam" style="height: 70px;" src="http://dataservices.gfz-potsdam.de/mesi/images/GFZ-Logo-white.png">
+    </div>
+    </a>
+  </div>
+
+  </div><!-- #geofon-header -->
+</div><!-- .geofon-header-wrapper -->
 
 <div><!-- wrapper_borderOveralll -->
 <div><!-- borderOverall -->
@@ -198,10 +193,31 @@
 		<br class="clear"/>
 	</div>
 
-	<div id="footer">
-		<div id="copyright">WebDC3 Interface &copy;&nbsp;(2013&ndash;2017)&nbsp;Helmholtz-Zentrum Potsdam&nbsp;-&nbsp;<strong><a href="http://www.gfz-potsdam.de/">Deutsches GeoForschungsZentrum GFZ</a></strong>&nbsp;-&nbsp;doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a></div>
-	</div>
+<div id="footer">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div id="copyright">WebDC3 Interface ©&#160; (2013&ndash;2019) Helmholtz-Zentrum Potsdam&#160;-&#160;<strong><a href="http://www.gfz-potsdam.de/" title="Opens website of GFZ Potsdam in new window" target="_blank">Deutsches GeoForschungsZentrum GFZ</a></strong><br />
+	doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <a href="http://www.gfz-potsdam.de/en/home/" title="Go to GFZ Homepage">
+        <div><img src="images/GFZ_Wortmarke_SVG_min2_en.svg" height="44px" style="margin-top: 10px" alt="Logo GFZ Potsdam"/></div>
+      </a>
+    </div>
+    <div class="col-md-3" style="margin-right: -15px; padding-right: 10px;">
+      <a href="http://www.helmholtz.de/" title="Opens website of Helmholtz Association in new window" target="_blank">
+        <div id="logoHelmholtzGemeinschaft"><img src="images/logo_helmholtz_gemeinschaft_de.gif" alt="Logo der Helmholtz-Gemeinschaft" height="70px"/></div>
+      </a>
+    </div>
+  </div><!-- .row -->
 </div>
+</div><!-- / footer -->
+
+</div>
+
+
 </div><!-- / borderOverall -->
 </div><!-- / wrapper_borderOverall -->
 </body>

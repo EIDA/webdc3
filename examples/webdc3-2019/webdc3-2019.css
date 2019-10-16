@@ -27,7 +27,8 @@
 body {
   background: #fff;
   color: #000;
-  font: 100% Verdana, Arial, Helvetica, sans-serif;
+  font: 100%;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
 }
@@ -592,6 +593,35 @@ a.svg:after {
 
 /* ------------------------------ */
 /* From new (2018/2019) GFZ style */
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/1e9b84fcbc477139e16061c80f0d873d/SourceSansProBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/abbaecf00224cd1086837404c418af32/SourceSansProExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d911d4041f365469aa2ca97/a663a1ba5f49629a86f7486aaf0f5359/SourceSansProLight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/d165cf1a72ee7db500ecfc9d7672a834/SourceSansProRegular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
 @media (min-width: 46.875em) {
   .geofon-header-wrapper {
         background-color: #00589c;

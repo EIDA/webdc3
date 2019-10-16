@@ -21,7 +21,7 @@ body {
   /* background: #FFF url('images/background.gif') repeat-x; */
   /* color: #000; */
 	height: 100%;
-	/* font-family: sans-serif; */
+	font-family: "Source Sans Pro", Verdana, sans-serif;
 	/* font-size: 8.8px;  */
 	/* font-size: 0.55rem; */
 	/* These should be set from gfz_text.css?? */
@@ -38,6 +38,8 @@ body {
 
 h1 {
   color: #fff;
+  font-size: 14px;
+  font-size: 0.875rem;
 	padding: 0;
 	margin: 0;
 	text-align: center;
@@ -65,6 +67,15 @@ p {
   position: relative; /* Repeats GFZ template but defends against its absence? */
 }
 
+#geofon-header h1 {
+
+  font-size: 28px;
+}
+
+#geofon-header a {
+  color: #fff;
+  text-decoration: none;
+}
 
 /* Make sure border is removed; border-radius is not enough.
  * Set in gfz_text.css
@@ -136,10 +147,7 @@ img {
 }
 
 #footer {
-	width: 942px;
 	/* height: 20px; */
-	position: absolute;
-	bottom: 0px; 
 	/* margin: auto; */
 	padding-top: 20px;
 	text-align: center;
@@ -317,6 +325,6 @@ dd {
 
 /* * Rolling mouse cursor *************************************************** */
 body.busy, body.busy * {
-	cursor: wait !important;
+  cursor: wait !important;
 }
 
