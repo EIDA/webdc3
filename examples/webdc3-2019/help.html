@@ -55,7 +55,7 @@
 <div id="borderOverall"><!-- borderOverall -->
 <div id="holder">
 	<div id="header">
-		<h1>WebDC3 Interface to<br/>EIDA Data Archives at GEOFON</h1>
+		<h1>WebDC3 Interface to EIDA Data Archives at GEOFON</h1>
 	</div>
 
 	<div id="menu">
@@ -130,21 +130,20 @@
           Here are some of the features
 	   of each box.</p>
 
-	  <h3>Index</h3>
-	  <ul>
-<li>The <a href="#EventSearchControl">Event Controls</a> box</li>
-<li>The <a href="#StationSearchControl">Station Controls</a> box</li>
-<li>The <a href="#MappingControl">Event and Station Map</a> box</li>
-<li>The <a href="#RequestManagerControl">Event and Station List</a> box</li>
-<li>The <a href="#SubmitControl">Submit</a> box</li>
-<li>The <a href="#StatusListControl">Recent Requests</a> box</li>
-<!-- The <a href="#StatusFullControl">StatusFullControl</a> box is the part of the StatusQueryControl box which shows results. -->
-<li>The <a href="#StatusQueryControl">Manage Requests</a> box</li>
-<li>The <a href="#Console">Console</a> box</li>
-	  </ul>
-
-
-<h3>User interface boxes</h3>
+<div role="navigation" style="padding-bottom: 2em;">
+  <ul class="nav nav-pills nav-justified">
+    <li><a href="#EventSearchControl">Event Controls</a></li>
+    <li><a href="#StationSearchControl">Station Controls</a></li>
+    <li><a href="#MappingControl">Event and Station Map</a></li>
+    <li><a href="#RequestManagerControl">Event and Station List</a></li>
+    <li><a href="#SubmitControl">Submit</a></li>
+    <li><a href="#StatusListControl">Recent Requests</a></li>
+<!-- <a href="#StatusFullControl">StatusFullControl</a> is the part of the StatusQueryControl box which shows results. -->
+    <li><a href="#StatusQueryControl">Manage Requests</a></li>
+    <li><a href="#Console">Console</a></li>
+  </ul>
+</div>
+	  
 <dl>
   <dt id="EventSearchControl">The "Event Controls" box</dt>
   <dd><p>Use this to select events to compose your request.
@@ -228,9 +227,28 @@ You can refine the selection of streams for stations using the "Advanced Stream 
 		<br class="clear"/>
 </div></div>
 
-	<div id="footer">
-		<div id="copyright">WebDC3 Interface &copy;&nbsp;(2013&ndash;2017)&nbsp;Helmholtz-Zentrum Potsdam&nbsp;-&nbsp;<strong><a href="http://www.gfz-potsdam.de/">Deutsches GeoForschungsZentrum GFZ</a></strong>&nbsp;-&nbsp;doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a></div>
-	</div>
+<div id="footer">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div id="copyright">WebDC3 Interface ©&#160; (2013&ndash;2019) Helmholtz-Zentrum Potsdam&#160;-&#160;<strong><a href="http://www.gfz-potsdam.de/" title="Opens website of GFZ Potsdam in new window" target="_blank">Deutsches GeoForschungsZentrum GFZ</a></strong><br />
+	doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <a href="http://www.gfz-potsdam.de/en/home/" title="Go to GFZ Homepage">
+        <div><img src="images/GFZ_Wortmarke_SVG_min2_en.svg" height="44px" style="margin-top: 10px" alt="Logo GFZ Potsdam"/></div>
+      </a>
+    </div>
+    <div class="col-md-3" style="margin-right: -15px; padding-right: 10px;">
+      <a href="http://www.helmholtz.de/" title="Opens website of Helmholtz Association in new window" target="_blank">
+        <div id="logoHelmholtzGemeinschaft"><img src="images/logo_helmholtz_gemeinschaft_de.gif" alt="Logo der Helmholtz-Gemeinschaft" height="70px"/></div>
+      </a>
+    </div>
+  </div><!-- .row -->
+</div>
+</div><!-- / footer -->
+
 </div>
 </div><!-- / borderOverall -->
 </div><!-- / wrapper_borderOverall -->
