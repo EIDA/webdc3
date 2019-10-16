@@ -94,7 +94,7 @@ img {
 .inner-right {
     position: absolute;
     right: 170px;
-    bottom: 0px;
+    bottom: 45px;
 }
 
 /* Footer needs centering since we don't adopt GFZ 2column layout. */
