@@ -21,6 +21,7 @@
 
 .help a {
 	color: silver;
+	cursor: help;
 	text-decoration: none;
 	padding: 1px 6px;
 	margin-right: 8px;
@@ -29,10 +30,9 @@
 }
 
 .help a:hover {
-	/* border: 1px solid silver; */
-	color: blue;
-	background-color: orange;
-	border: 1px Solid red;
+	background-color: #fcf8e3;
+	border: 1px Solid #faebcc;
+	color: #8a6d3b;
 	float: right;
 	z-index: 999;
 }
@@ -42,17 +42,20 @@
 }
 
 .help a:hover span {
+/* Like BS .alert-warning */
 	display: block;
 	overflow: visible;
 	position: absolute;
 	top: auto;
 	right:0px;
-	text-align: right; 
-	color:red;
-	background-color:pink;
-	width: 24em;
+	text-align: right;
+	background-color: #fcf8e3;
+	color: #8a6d3b;
 	padding: 0px;
-	border: 1px solid red;
+	border: 1px solid;
+	border-color: #faebcc;
+	border-radius: 4px;
+	width: 24em;
 	z-index: 999;
 }
 
