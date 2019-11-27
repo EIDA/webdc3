@@ -110,6 +110,19 @@ function SubmitControl(htmlTagId) {
 			html += '</div>';
 			html += '</div>';
 			html += '</div>';
+
+			html += '<h3>Authentication:</h3>';
+			html += '<div style="padding: 10px;">';
+			html += '<div class="wi-control-item">';
+			html += '<div>Current ID: <span id="scAuthUser"/></div>'
+			html += '<div>Valid until: <span id="scAuthValid"/></div>'
+			html += '<input id="scTokenSelect" type="file" style="visibility:hidden"/>';
+			html += '<input id="scTokenLoad" class="wi-inline" type="button" value="Load Token"/>';
+			html += '<input id="scTokenRemove" class="wi-inline" type="button" value="Remove Token"/>';
+			html += '</div>';
+			html += '</div>';
+
+
 		} else {
 			html += "<div class='wi-control-item-first'>";
 			html += '<div class="wi-spacer">Offline storage of the web browser must be enabled to use FDSNWS.</div>';
@@ -308,12 +321,65 @@ function SubmitControl(htmlTagId) {
 			$(obj.target).val(seconds2time(_controlDiv.find('#sbtEndSlider').slider('value')));
 		});
 
+		function resetTokenSelect(event) {
+			var div = _controlDiv.find("#scTokenSelect");
+			div.wrap('<form>').closest('form').get(0).reset();
+			div.unwrap();
+			event.stopPropagation();
+			event.preventDefault();
+		}
+
+		_controlDiv.find("#scTokenSelect").button().bind("change", function(event) {
+			var f = event.target.files[0];
+			var r = new FileReader();
+			r.readAsText(f);
+			r.onload = function(event) {
+				resetTokenSelect(event);
+				window.wiFDSNWS_Control.setAuthToken(event.target.result);
+				var authInfo = window.wiFDSNWS_Control.getAuthInfo();
+
+				if (authInfo) {
+					_controlDiv.find("#scAuthUser").text(authInfo.userId);
+					_controlDiv.find("#scAuthValid").text(authInfo.validUntil.toString());
+				}
+			};
+
+			r.onabort = function(event) {
+				resetTokenSelect(event);
+			}
+
+			r.onerror = function(event) {
+				resetTokenSelect(event);
+			}
+		})
+
+		_controlDiv.find("#scTokenLoad").button().bind("click", function() {
+			_controlDiv.find("#scTokenSelect").click();
+		})
+
+		_controlDiv.find("#scTokenRemove").button().bind("click", function(event) {
+			resetTokenSelect(event);
+			wiFDSNWS_Control.setAuthToken(null);
+			_controlDiv.find("#scAuthUser").text("Anonymous");
+			_controlDiv.find("#scAuthValid").text("N/A");
+		})
+
 		_controlDiv.find("#scReset").button().bind("click", resetControl);
 		_controlDiv.find("#scReview").button().bind("click", function() { submit(true) });
 		_controlDiv.find("#scSubmit").button().bind("click", function() { submit(false) });
 
 		requestControl.bind("onDeleteEvents", reselect);
 		requestControl.bind("onAddEvents", reselect);
+
+		var authInfo = wiFDSNWS_Control.getAuthInfo();
+
+		if (authInfo) {
+			_controlDiv.find("#scAuthUser").text(authInfo.userId);
+			_controlDiv.find("#scAuthValid").text(authInfo.validUntil.toString());
+		} else {
+			_controlDiv.find("#scAuthUser").text("Anonymous");
+			_controlDiv.find("#scAuthValid").text("N/A");
+		}
 	}
 
 	function reselect() {
