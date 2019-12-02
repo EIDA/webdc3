@@ -248,6 +248,7 @@ def parseStationXML(invfile, archive='N/A'):
                     numer = int(cha.find(namesp + 'SampleRateRatio').find(namesp + 'NumberSeconds').text)
                 except Exception:
                     try:
+                        # Otherwise SampleRate
                         denom = int(cha.find(namesp + 'SampleRate').text)
                         numer = 1
                     except Exception:
@@ -584,9 +585,17 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
                 idxloc += 1
 
             sta[2] = idxloc
+            # Remove the year from station code
+            if '_' in sta[4]:
+                sta[4] = sta[4].split('_')[0]
+
             idxsta += 1
 
         net[2] = idxsta
+        # Remove the year from temporary networks
+        if '_' in net[0]:
+            net[0] = net[0].split('_')[0]
+
         idxnet += 1
 
     return
