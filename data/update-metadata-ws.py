@@ -6,11 +6,17 @@ from urlparse import urlparse
 import xml.etree.cElementTree as ET
 import logging
 import argparse
+import pickle
+
 
 def makenetcode(net, year):
     if net[0] in '0123456789XYZ':
         return '%s_%d' % (net, year)
     return net
+
+
+def makestationcode(sta, year):
+    return '%s_%d' % (sta, year)
 
 
 class ListChans(list):
@@ -81,8 +87,17 @@ class ListStats(list):
                 # end2 is the end of the station to be added
                 end2 = sta[9] if sta[9] is not None else datetime.datetime(2999, 1, 1)
 
-                # Find if there is an overlap in time between the two stations
-                if range(max(sta[8].year, item[8].year), min(end1.year, end2.year)+1):
+                # If there is no overlap skip to the next item
+                if max(sta[8], item[8]) > min(end1, end2):
+                    continue
+                # overlap = range(max(sta[8].year, item[8].year), min(end1.year, end2.year)+1)
+                # # Find if there is an overlap in time between the two stations
+                # if len(overlap):
+                #     if len(overlap) == 1:
+                #         # If there is no overlap skip to the next item
+                #         if max(sta[8], item[8]) > min(end1, end2):
+                #             continue
+
                     # There is an overlap and therefore we guess that it is
                     # the same station
                     # print('%s already present!' % sta[4])
@@ -172,25 +187,35 @@ def parseStationXML(invfile, archive='N/A'):
         except Exception:
             etnet = None
 
+        try:
+            description = netw.find(namesp + 'Description').text
+        except Exception:
+            description = 'N/A'
+
         restricted = 1 if netw.get('restrictedStatus') == 'open' else 2
         netClass = 't' if netw.get('code')[0] in '0123456789XYZ' else 'p'
         institutions = ''
 
         ptNets.append([makenetcode(netw.get('code'), stnet), 0, None, None, stnet, etnet,
-                       netw.get('description'), restricted, netClass, archive,
+                       description, restricted, netClass, archive,
                        institutions])
 
         for stat in netw.findall(namesp + 'Station'):
             # logging.debug(stat.attrib)
             try:
-                lat = stat.get('Latitude')
+                lat = float(stat.find(namesp + 'Latitude').text)
             except Exception:
                 lat = None
 
             try:
-                lon = stat.get('Longitude')
+                lon = float(stat.find(namesp + 'Longitude').text)
             except Exception:
                 lon = None
+
+            try:
+                description = stat.find(namesp + 'Site').find(namesp + 'Name').text
+            except Exception:
+                description = None
 
             st = str2date(stat.get('startDate'))
             try:
@@ -202,15 +227,15 @@ def parseStationXML(invfile, archive='N/A'):
 
             try:
                 ptStats.append([makenetcode(netw.get('code'), stnet),
-                                0, None, None, stat.get('code'),
-                                lat, lon, stat.get('Description'), st, et,
+                                0, None, None, makestationcode(stat.get('code'), st.year),
+                                lat, lon, description, st, et,
                                 stat.get('Elevation'), restricted])
             except ValueError:
                 continue
 
             for cha in stat.findall(namesp + 'Channel'):
                 # if stat.get('code').startswith('Y01'):
-                ptLocs.append(['%s.%s-%d' % (makenetcode(netw.get('code'), stnet), stat.get('code'), st.year),
+                ptLocs.append(['%s.%s' % (makenetcode(netw.get('code'), stnet), makestationcode(stat.get('code'), st.year)),
                                0, None, None, cha.get('locationCode')])
                 # SampleRateRatio: NumberSamples; NumberSeconds
                 try:
@@ -230,8 +255,8 @@ def parseStationXML(invfile, archive='N/A'):
                 except Exception:
                     description = ''
 
-                ptChans.append(['%s.%s.%s-%d' % (makenetcode(netw.get('code'), stnet), stat.get('code'),
-                                                 cha.get('locationCode'), st.year),
+                ptChans.append(['%s.%s.%s' % (makenetcode(netw.get('code'), stnet), makestationcode(stat.get('code'), st.year),
+                                                 cha.get('locationCode')),
                                 cha.get('code'), None, denom, numer, description,
                                 st, et, restricted])
 
@@ -447,6 +472,15 @@ def main():
 
     fixIndexes(ptNets, ptStats, ptLocs, ptChans)
 
+    # ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
+    ptStreamIdx = dict()
+
+    cachefile = 'webinterface-cache.bin'
+    with open(cachefile, 'wb') as cache:
+        os.chmod(cachefile, 0664)
+        pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
+                    cache)
+
     logging.info('%d networks' % len(ptNets))
     logging.info('%d stations' % len(ptStats))
     logging.info('%d locations' % len(ptLocs))
@@ -464,7 +498,43 @@ def main():
     for cha in ptChans[:10]:
         logging.debug(cha)
 
+    count = 0
+    for cha in ptStreamIdx:
+        logging.info(cha)
+        logging.info(ptStreamIdx[cha])
+        count += 1
+        if count > 10:
+            break
+
     return
+
+
+def indexStreams(networks, stations, sensorsLoc, streams):
+    streamidx = {}
+
+    for stream in streams:
+        try:
+            sensorLoc = sensorsLoc[stream[0]]
+        except Exception:
+            print(stream)
+            return
+
+        station = stations[sensorLoc[0]]
+        network = networks[station[0]]
+
+        # (net,sta,cha,loc)
+        key = (network[0], station[4], stream[1], sensorLoc[4])
+
+        try:
+            obj = streamidx[key]
+
+        except KeyError:
+            obj = []
+            streamidx[key] = obj
+
+        obj.append(stream)
+
+    return streamidx
 
 
 def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
@@ -490,8 +560,8 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
             while idxloc < len(ptLocs):
                 loc = ptLocs[idxloc]
                 netcode, year = net[0], str(sta[8].year)
-                logging.debug('%s ... %s' % (loc[0], netcode + '.' + sta[4] + '-' + year))
-                if loc[0] != netcode + '.' + sta[4] + '-' + year:
+                logging.debug('%s ... %s' % (loc[0], netcode + '.' + sta[4]))
+                if loc[0] != netcode + '.' + sta[4]:
                     break
                 loc[0] = idxsta
                 loc[1] = idxcha
@@ -499,16 +569,19 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
                 while idxcha < len(ptChans):
                     cha = ptChans[idxcha]
                     netsta = net[0] + '.' + sta[4]
-                    logging.debug('%s ... %s' % (cha[0], netsta + '.' + loc[4] + '-' + year))
-                    if cha[0] != netsta + '.' + loc[4] + '-' + year:
+                    logging.debug('%s ... %s' % (cha[0], netsta + '.' + loc[4]))
+                    if cha[0] != netsta + '.' + loc[4]:
                         break
                     cha[0] = idxloc
                     idxcha += 1
 
+                loc[2] = idxcha
                 idxloc += 1
 
+            sta[2] = idxloc
             idxsta += 1
 
+        net[2] = idxsta
         idxnet += 1
 
     return
