@@ -192,7 +192,7 @@ def parseStationXML(invfile, archive='N/A'):
         except Exception:
             description = 'N/A'
 
-        restricted = 1 if netw.get('restrictedStatus') == 'open' else 2
+        restricted = 2 if netw.get('restrictedStatus') == 'open' else 1
         netClass = 't' if netw.get('code')[0] in '0123456789XYZ' else 'p'
         institutions = ''
 
@@ -228,7 +228,7 @@ def parseStationXML(invfile, archive='N/A'):
             except Exception:
                 et = None
 
-            restricted = 1 if stat.get('restrictedStatus') == 'open' else 2
+            restricted = 2 if stat.get('restrictedStatus') == 'open' else 1
 
             try:
                 ptStats.append([makenetcode(netw.get('code'), stnet),
@@ -382,10 +382,8 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
 
             # FIXME This is only to make the process much shorter
             # FIXME and should be removed after these tests!
-            break
+            # break
 
-
-    # return inv2rs
     return
 
 
@@ -449,8 +447,7 @@ def main():
     logging.basicConfig(level=args.log)
 
     foutput = 'inventory'
-    # inv2rs = downloadInventory(level='channel', foutput=foutput)
-    # downloadInventory(level='channel', foutput=foutput)
+    downloadInventory(level='channel', foutput=foutput)
 
     logging.info('Inventory downloaded')
 
