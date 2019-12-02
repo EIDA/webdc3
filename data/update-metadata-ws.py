@@ -217,6 +217,11 @@ def parseStationXML(invfile, archive='N/A'):
             except Exception:
                 description = None
 
+            try:
+                elevation = float(stat.find(namesp + 'Elevation').text)
+            except Exception:
+                elevation = None
+
             st = str2date(stat.get('startDate'))
             try:
                 et = str2date(stat.get('endDate'))
@@ -229,7 +234,7 @@ def parseStationXML(invfile, archive='N/A'):
                 ptStats.append([makenetcode(netw.get('code'), stnet),
                                 0, None, None, makestationcode(stat.get('code'), st.year),
                                 lat, lon, description, st, et,
-                                stat.get('Elevation'), restricted])
+                                elevation, restricted])
             except ValueError:
                 continue
 
