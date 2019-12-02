@@ -1,3 +1,36 @@
+#!/usr/bin/env python
+#
+# Functions to update the metadata of WebDC3
+#
+# Copyright (C) 2014-2019 Javier Quinteros, GEOFON team
+# <javier@gfz-potsdam.de>
+#
+# ----------------------------------------------------------------------
+
+"""Functions to update the metadata for WebDC3
+
+   :Platform:
+       Linux
+   :Copyright:
+       GEOFON, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+       <geofon@gfz-potsdam.de>
+   :License:
+       GNU General Public License, Version 3, 29 June 2007
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation; either version 3, or (at your option) any later
+   version. For more information, see http://www.gnu.org/
+
+.. moduleauthor:: Javier Quinteros <javier@gfz-potsdam.de>, GEOFON, GFZ Potsdam
+"""
+
+##################################################################
+#
+# First all the imports
+#
+##################################################################
+
 import os
 import glob
 import datetime
