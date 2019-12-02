@@ -478,8 +478,7 @@ def main():
 
     fixIndexes(ptNets, ptStats, ptLocs, ptChans)
 
-    # ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
-    ptStreamIdx = dict()
+    ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
 
     cachefile = 'webinterface-cache.bin'
     with open(cachefile, 'wb') as cache:
