@@ -413,10 +413,6 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
             except Exception:
                 pass
 
-            # FIXME This is only to make the process much shorter
-            # FIXME and should be removed after these tests!
-            # break
-
     return
 
 
@@ -471,6 +467,9 @@ def main():
     desc = 'Script to update the metadata for the usage of WebDC3'
     parser = argparse.ArgumentParser(description=desc)
 
+    defaultRS = 'http://www.orfeus-eu.org/eidaws/routing/1'
+    parser.add_argument('-r', '--routing',default=defaultRS,
+                        help='Routing Service from which the inventory should be read.')
     parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
                         help='Filename where inventory should be saved.')
     parser.add_argument('-l', '--log', default='WARNING', choices=['DEBUG', 'WARNING', 'INFO', 'DEBUG'],
@@ -480,7 +479,8 @@ def main():
     logging.basicConfig(level=args.log)
 
     foutput = 'inventory'
-    downloadInventory(level='channel', foutput=foutput)
+    downloadInventory(routingserver=args.routing, level='channel',
+                      foutput=foutput)
 
     logging.info('Inventory downloaded')
 
