@@ -111,11 +111,7 @@ Requirements
 
  * SeisComP(reg) 3 provides useful functions for configuration, geometry, travel time computation.
 
- * Seiscomp Python library (`$SEISCOMP_ROOT/lib/python/seiscomp`), including a
-   recent version of `manager.py`
-   (SeisComP 3 release >= 2013.200; there is a temporary version with this
-   release in the `tools` directory, which you can use to replace your
-   installed version in `$SEISCOMP_ROOT/lib/python/seiscomp/arclink`).
+ * Seiscomp Python library (`$SEISCOMP_ROOT/lib/python/seiscomp`), may not be needed now.
 
  * JavaScript libraries: jquery-base, jquery-ui [https://jquery.org/]
 
