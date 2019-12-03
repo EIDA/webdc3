@@ -67,7 +67,6 @@ class ListChans(list):
         for ind, item in enumerate(self):
             # If network.station.location-year code is already in the list
             if (item[0] == cha[0]) and (item[1] == cha[1]):
-                # print('%s already present!' % cha[0])
                 return
 
         # Add location if not present
@@ -90,7 +89,6 @@ class ListLocs(list):
         for ind, item in enumerate(self):
             # If network.station-year code is already in the list
             if (item[0] == loc[0]) and (item[4] == loc[4]):
-                # print('%s already present!' % loc[0])
                 return
 
         # Add location if not present
@@ -133,7 +131,6 @@ class ListStats(list):
 
                     # There is an overlap and therefore we guess that it is
                     # the same station
-                    # print('%s already present!' % sta[4])
                     logging.warning('<ValueError')
                     logging.warning(sta)
                     logging.warning(item)
@@ -164,7 +161,6 @@ class ListNets(list):
                     # Network is already inserted, but consider if the
                     # archive should be added
                     if net[9] in item[9]:
-                        # print('%s already present!' % net[0])
                         return
                     else:
                         item[9] += ',%s' % net[9]
@@ -172,7 +168,6 @@ class ListNets(list):
 
         # Add network if not present
         super(ListNets, self).append(net)
-
 
 
 def parseStationXML(invfile, archive='N/A'):
@@ -313,15 +308,15 @@ def downloadURL(url, params=None):
         # What is read has to be decoded in python3
         buf = u.read()
     except ul.URLError as e:
-        print('The URL does not seem to be a valid Routing-WS %s %s' % (url, params))
+        logging.error('The URL does not seem to be a valid Routing-WS %s %s' % (url, params))
         if hasattr(e, 'reason'):
-            print('Reason: %s\n' % (e.reason))
+            logging.error('Reason: %s\n' % (e.reason))
         elif hasattr(e, 'code'):
-            print('The server couldn\'t fulfill the request.')
-            print('Error code: %s\n', e.code)
+            logging.error('The server couldn\'t fulfill the request.')
+            logging.error('Error code: %s\n', e.code)
         raise Exception('URLError!')
     except Exception as e:
-        print('WATCH THIS! %s' % e)
+        logging.error('WATCH THIS! %s' % e)
         return None
 
     return buf
@@ -333,7 +328,7 @@ def parseRSinv(inv):
     routes = list()
     for line in inv.splitlines():
         if not len(line):
-            print('Adding routes from %s' % urlparse(dc).hostname)
+            logging.info('Adding routes from %s' % urlparse(dc).hostname)
             routingTable[dc] = routes
             dc = ''
             routes = list()
@@ -345,7 +340,7 @@ def parseRSinv(inv):
 
         routes.append(line)
     else:
-        print('Adding routes from %s' % urlparse(dc).hostname)
+        logging.info('Adding routes from %s' % urlparse(dc).hostname)
         routingTable[dc] = routes
 
     return routingTable
@@ -366,6 +361,7 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
         foutput = foutput[:-4]
 
     url = routingserver + '/query?format=post&service=station'
+    logging.info('Getting routes from %s' % urlparse(routingserver).hostname)
     req = ul.Request(url)
     try:
         u = ul.urlopen(req)
@@ -373,15 +369,15 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
         buf = u.read()
 
     except ul.URLError as e:
-        print('The URL does not seem to be a valid Routing-WS %s' % url)
+        logging.error('The URL does not seem to be a valid Routing-WS %s' % url)
         if hasattr(e, 'reason'):
-            print('Reason: %s\n' % (e.reason))
+            logging.error('Reason: %s\n' % (e.reason))
         elif hasattr(e, 'code'):
-            print('The server couldn\'t fulfill the request.')
-            print('Error code: %s\n', e.code)
+            logging.error('The server couldn\'t fulfill the request.')
+            logging.error('Error code: %s\n', e.code)
         return None
     except Exception as e:
-        print('WATCH THIS! %s' % e)
+        logging.error('WATCH THIS! %s' % e)
         return None
 
     inv = parseRSinv(buf)
@@ -404,11 +400,9 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
             postreq = 'level=%s\n%s' % (level, routebatch)
             try:
                 buf = downloadURL(dc, postreq)
-                # print(buf)
-                print('Writing to tmp file %d' % tmpfile)
+                logging.error('Writing to tmp file %d' % tmpfile)
                 with open('%s-%s-%07d.xml' % (foutput, archive, tmpfile), 'wt') as fout:
                     fout.write(buf)
-                    # inv2rs.append(archive)
                     tmpfile += 1
             except Exception:
                 pass
@@ -441,6 +435,8 @@ def url2archive(url):
         return 'NOA'
     elif o.hostname.endswith('uib.no'):
         return 'UIB'
+    elif o.hostname.endswith('iris.edu'):
+        return 'IRIS'
 
     raise Exception('Unknown data centre: %s' % o.hostname)
 
@@ -551,7 +547,7 @@ def indexStreams(networks, stations, sensorsLoc, streams):
         try:
             sensorLoc = sensorsLoc[stream[0]]
         except Exception:
-            print(stream)
+            logging.error('Problem with stream: %s' % stream)
             return
 
         station = stations[sensorLoc[0]]
