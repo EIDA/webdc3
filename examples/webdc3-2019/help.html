@@ -95,19 +95,21 @@
 		<li id="waveform">Waveform data:
 		    Using FDSN web services you can download mini-SEED data.
 		    These can be easily converted to other major seismological formats using the
-		    <a href="http://www.iris.edu/manuals/rdseed.htm">rdseed</a> tool.</li>
+		    <a class="external-link" href="http://www.iris.edu/manuals/rdseed.htm">rdseed</a> tool.</li>
 		<li id="station">Metadata:
 		    You can also download FDSN Station XML and text output.
 		    These formats contain only the station and stream information ("inventory").
 		    They contain information like coordinates, names, codes and instrument responses for certain stations or networks.
 		    While an inventory XML file is a plain text file that can be inspected by any text editor,
 		    it is recommended that you use a real generic XML parser to extract the desired information from it.
-		    A handy tool that allows you to convert XML files to a more linear format is Dan Egnor's <a href="http://www.ofb.net/~egnor/xml2">xml2</a>.
+		    A handy tool that allows you to convert XML files to a more linear format is Dan Egnor's
+		    <a class="external-link" href="http://www.ofb.net/~egnor/xml2">xml2</a>.
 		    </li>
 	  </ol>
 		<div class="alert alert-warning" id="SeisComPXML">
 		    <i class="fa fa-hand-o-right"></i>
-		    <a href="http://seiscomp3.org">SeisComP</a> users can use FDSN Station XML to configure stations.
+		    <a class="alert-link" href="http://seiscomp3.org">SeisComP</a> users
+		    can use FDSN Station XML to configure stations.
 		    It can be imported directly from <code>scconfig</code>, or converted with <code>scinv</code>.
 		</div>
 		<div class="alert alert-danger" id="RestrictedData">
@@ -150,9 +152,13 @@ information.</p>
 At GFZ you can choose events from one of the following public catalog services:</p>
 <ol>
 <li>GFZ - The GEOFON catalog (<a href="http://geofon.gfz-potsdam.de/eqinfo/">http://geofon.gfz-potsdam.de/eqinfo/</a>.)</li>
-<li>EMSC - The EMSC catalog (<a href="http://www.emsc-csem.org/Earthquake/">http://www.emsc-csem.org/Earthquake/</a>.)</li>
-<li>USGS - The ANSS Comprehensive Catalog (ComCat) service (<a href="http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php">http://comcat.cr.usgs.gov/earthquakes/feed/v0.1/search.php</a>.)</li>	
-<li>XXXX NEIC - A temporary replacement for the NEIC service, at USGS (<a href="http://earthquake.usgs.gov/earthquakes/eqarchives/epic/">http://earthquake.usgs.gov/earthquakes/eqarchives/epic/</a>) based on the new Comprehensive Catalog (ComCat). XXXX</li>
+<li>EMSC - The EMSC catalog (<a class="external-link" href="http://www.emsc-csem.org/Earthquake/">http://www.emsc-csem.org/Earthquake/</a>.)</li>
+<li>USGS - The ANSS Comprehensive Catalog (ComCat) service
+   (<a href="https://earthquake.usgs.gov/data/comcat/">https://earthquake.usgs.gov/data/comcat/</a>.)
+</li>
+<li>XXXX NEIC - A temporary replacement for the NEIC service, at USGS
+   (<a class="external-link" href="http://earthquake.usgs.gov/earthquakes/eqarchives/epic/">http://earthquake.usgs.gov/earthquakes/eqarchives/epic/</a>)
+   based on the new Comprehensive Catalog (ComCat). XXXX</li>
 </ol>
 <p>Select "Catalog Services" under "Event Information".
 Then use the pull-down menu under "Catalog Service" to choose the desired
