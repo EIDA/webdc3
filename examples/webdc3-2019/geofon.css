@@ -306,6 +306,18 @@ body.busy, body.busy * {
   cursor: wait !important;
 }
 
+/* From GFZ styling */
+a:after {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  margin: 0 0 0 5px;
+  text-decoration: none;
+}
+a.external-link:after {
+  content: '\f08e';
+}
+
 /* Remove .alert .alert-danger etc. when we use bootstrap.css */
 .alert {
   padding: 15px;
