@@ -74,8 +74,8 @@
 	<p>This site is a portal to the seismic waveform data archives at GEOFON, including the EIDA data holdings.
 	With it, you can request</p>
 	<ol>
-	  	<li><a href="#waveform">seismological data</a> (waveforms) and</li>
-		<li><a href="#station">station lists</a> (Dataless SEED, Inventory XML).</li>
+		<li><a href="#waveform">Seismological data</a> (waveforms) and</li>
+		<li><a href="#station">Station lists</a> (Station XML).</li>
 	</ol>
 	<p>from different data centers spread across Europe.</p>
 
@@ -92,17 +92,24 @@
 
 	<h2>About the web interface</h2>
 	  <ol>
-		<li id="waveform">Waveform data: We offer you the choice of downloading mini-SEED or full SEED volumes.
+		<li id="waveform">Waveform data:
+		    Using FDSN web services you can download mini-SEED data.
 		    These can be easily converted to other major seismological formats using the
 		    <a href="http://www.iris.edu/manuals/rdseed.htm">rdseed</a> tool.</li>
 		<li id="station">Metadata:
-		    You can also download Dataless SEED and Inventory XML.
-		    These formats contain only the station and stream information.
+		    You can also download FDSN Station XML and text output.
+		    These formats contain only the station and stream information ("inventory").
 		    They contain information like coordinates, names, codes and instrument responses for certain stations or networks.
-		    Dataless SEED files can be decoded by the rdseed program. An inventory XML file is a plain text file that can be inspected by any text editor, but it is recommended that you use a real generic XML parser to extract the desired information from it.
+		    While an inventory XML file is a plain text file that can be inspected by any text editor,
+		    it is recommended that you use a real generic XML parser to extract the desired information from it.
 		    A handy tool that allows you to convert XML files to a more linear format is Dan Egnor's <a href="http://www.ofb.net/~egnor/xml2">xml2</a>.
 		    </li>
 	  </ol>
+		<div class="alert alert-warning" id="SeisComPXML">
+		    <i class="fa fa-hand-o-right"></i>
+		    <a href="http://seiscomp3.org">SeisComP</a> users can use FDSN Station XML to configure stations.
+		    It can be imported directly from <code>scconfig</code>, or converted with <code>scinv</code>.
+		</div>
 		<div class="alert alert-danger" id="RestrictedData">
 		  <p>For restricted datasets, you will need a token from the EIDA authentication service.
 		See <a class="alert-link" href="http://geofon.gfz-potsdam.de/waveform/arclink.php#access-to-restricted-data">our help page</a>.
