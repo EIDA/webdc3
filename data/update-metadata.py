@@ -400,7 +400,7 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
             postreq = 'level=%s\n%s' % (level, routebatch)
             try:
                 buf = downloadURL(dc, postreq)
-                logging.error('Writing to tmp file %d' % tmpfile)
+                logging.info('Writing to tmp file %d' % tmpfile)
                 with open('%s-%s-%07d.xml' % (foutput, archive, tmpfile), 'wt') as fout:
                     fout.write(buf)
                     tmpfile += 1
