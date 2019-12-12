@@ -40,6 +40,7 @@ import xml.etree.cElementTree as ET
 import logging
 import argparse
 import pickle
+import csv
 
 
 def makenetcode(net, year):
@@ -517,6 +518,12 @@ def main():
     logging.info('%d locations' % len(ptLocs))
     logging.info('%d channels' % len(ptChans))
 
+    with open('history.csv', 'ab') as histo:
+        logging.info('Writing results to history.csv')
+        csvwriter = csv.writer(histo)
+        csvwriter.writerow([datetime.datetime.now(), len(ptNets), len(ptStats),
+                            len(ptLocs), len(ptChans)])
+
     for net in ptNets[:10]:
         logging.debug(net)
 
@@ -531,8 +538,8 @@ def main():
 
     count = 0
     for cha in ptStreamIdx:
-        logging.info(cha)
-        logging.info(ptStreamIdx[cha])
+        logging.debug(cha)
+        logging.debug(ptStreamIdx[cha])
         count += 1
         if count > 10:
             break
