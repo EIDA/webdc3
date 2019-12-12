@@ -517,6 +517,11 @@ def main():
     with open('history.csv', 'rb') as histo:
         q = deque(histo, 5)
 
+    nnet = 0
+    nsta = 0
+    nloc = 0
+    ncha = 0
+
     while True:
         try:
             last = csv.reader([q.pop()])
@@ -531,18 +536,18 @@ def main():
             raise Exception('Error reading from the last lines of history.csv')
 
         try:
-            dt, nnet, nsta, nloc, ncha = lastline
+            dt, strnnet, strnsta, strnloc, strncha = lastline
             print('Last: %s.%s.%s.%s' % (nnet, nsta, nloc, ncha))
-            break
         except ValueError:
             logging.error('Wrong formatted line in history.csv?\n%s' % lastline)
-            pass
+            continue
 
         try:
-            nnet = int(nnet)
-            nsta = int(nsta)
-            nloc = int(nloc)
-            ncha = int(ncha)
+            nnet = int(strnnet)
+            nsta = int(strnsta)
+            nloc = int(strnloc)
+            ncha = int(strncha)
+            break
         except ValueError:
             logging.error('Wrong formatted line in history.csv?\n%s', lastline)
 
