@@ -41,6 +41,7 @@ import logging
 import argparse
 import pickle
 import csv
+from collections import deque
 
 
 def makenetcode(net, year):
@@ -507,22 +508,62 @@ def main():
 
     ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
 
-    cachefile = 'webinterface-cache.bin'
-    with open(cachefile, 'wb') as cache:
-        os.chmod(cachefile, 0664)
-        pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
-                    cache)
-
     logging.info('%d networks' % len(ptNets))
     logging.info('%d stations' % len(ptStats))
     logging.info('%d locations' % len(ptLocs))
     logging.info('%d channels' % len(ptChans))
 
+    # Recover the summary of the last run (#nets, #stations, etc)
+    with open('history.csv', 'rb') as histo:
+        q = deque(histo, 5)
+
+    while True:
+        try:
+            last = csv.reader([q.pop()])
+        except IndexError:
+            logging.error('No statistics about previous runs available in history.csv!')
+            break
+
+        try:
+            lastline = last.next()
+        except StopIteration:
+            logging.error('Error reading from the last lines of history.csv')
+            raise Exception('Error reading from the last lines of history.csv')
+
+        try:
+            dt, nnet, nsta, nloc, ncha = lastline
+            print('Last: %s.%s.%s.%s' % (nnet, nsta, nloc, ncha))
+            break
+        except ValueError:
+            logging.error('Wrong formatted line in history.csv?\n%s' % lastline)
+            pass
+
+        try:
+            nnet = int(nnet)
+            nsta = int(nsta)
+            nloc = int(nloc)
+            ncha = int(ncha)
+        except ValueError:
+            logging.error('Wrong formatted line in history.csv?\n%s', lastline)
+
+    # Check a safety threshold to decide if the inventory should be replaced or not
+    # We accept it if it has up to 3% less stations
+    if len(ptStats) < nsta * 0.97:
+        raise Exception('Too few stations compared to the last update! %s vs %s' % (nsta, len(ptStats)))
+
+    # Update the time series with the results from this run
     with open('history.csv', 'ab') as histo:
         logging.info('Writing results to history.csv')
         csvwriter = csv.writer(histo)
         csvwriter.writerow([datetime.datetime.now(), len(ptNets), len(ptStats),
                             len(ptLocs), len(ptChans)])
+
+    # Save binary version of the inventory
+    cachefile = 'webinterface-cache.bin'
+    with open(cachefile, 'wb') as cache:
+        os.chmod(cachefile, 0664)
+        pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
+                    cache)
 
     for net in ptNets[:10]:
         logging.debug(net)
