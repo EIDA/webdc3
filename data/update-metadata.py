@@ -41,6 +41,7 @@ import logging
 import argparse
 import pickle
 import csv
+import json
 from collections import deque
 
 
@@ -348,6 +349,44 @@ def parseRSinv(inv):
     return routingTable
 
 
+def getstaID(strnet, strsta, nets, stats):
+    for auxidnet, net in enumerate(nets):
+        if net[0] == strnet:
+            idnet = auxidnet
+            break
+    else:
+        raise Exception('Network %s not found!' % strnet)
+
+    for auxidsta, sta in enumerate(stats):
+        if sta[0] == idnet:
+            if sta[4] == strsta:
+                idsta = auxidsta
+                break
+    else:
+        raise Exception('Station %s not found!' % strsta)
+
+    return idsta
+
+
+def parseVirtualNets(vntable, nets, stats):
+    for vnnet in vntable:
+        idstats = set()
+        minyear = 0
+        for vnroute in vntable[vnnet]:
+            try:
+                idsta = getstaID(vnroute[0][0], vnroute[0][1], nets, stats)
+            except Exception as e:
+                logging.error(e)
+                continue
+            minyear = min(stats[idsta][8].year, minyear)
+            idstats.add(idsta)
+
+        logging.info('Adding network %s' % vnnet)
+        nets.append([vnnet, None, None, list(idstats), minyear, None, '%s virtual network' % vnnet, False, 'p', '', ''])
+
+    return
+
+
 def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
                       level='station', foutput='inventory'):
     """Connects to a Routing Service to get routes and downloads the inventory
@@ -409,6 +448,8 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
             except Exception:
                 pass
 
+            # FIXME To make shorter the process
+            break
     return
 
 
@@ -507,6 +548,11 @@ def main():
     fixIndexes(ptNets, ptStats, ptLocs, ptChans)
 
     ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
+
+    vnraw = downloadURL('%s/virtualnets' % args.routing)
+    vnjson = json.loads(vnraw)
+
+    parseVirtualNets(vnjson, ptNets, ptStats)
 
     logging.info('%d networks' % len(ptNets))
     logging.info('%d stations' % len(ptStats))
