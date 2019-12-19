@@ -350,6 +350,7 @@ def parseRSinv(inv):
 
 
 def getstaID(strnet, strsta, nets, stats):
+    logging.debug('Looking for %s.%s' % (strnet, strsta))
     for auxidnet, net in enumerate(nets):
         if net[0] == strnet:
             idnet = auxidnet
@@ -449,7 +450,7 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
                 pass
 
             # FIXME To make shorter the process
-            break
+            # break
     return
 
 
@@ -552,12 +553,14 @@ def main():
     vnraw = downloadURL('%s/virtualnets' % args.routing)
     vnjson = json.loads(vnraw)
 
-    parseVirtualNets(vnjson, ptNets, ptStats)
-
     logging.info('%d networks' % len(ptNets))
     logging.info('%d stations' % len(ptStats))
     logging.info('%d locations' % len(ptLocs))
     logging.info('%d channels' % len(ptChans))
+
+    parseVirtualNets(vnjson, ptNets, ptStats)
+
+    logging.info('%d networks (including virtual networks)' % len(ptNets))
 
     # Recover the summary of the last run (#nets, #stations, etc)
     with open('history.csv', 'rb') as histo:
