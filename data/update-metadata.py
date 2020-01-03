@@ -364,7 +364,7 @@ def getstaID(strnet, strsta, nets, stats):
                 idsta = auxidsta
                 break
     else:
-        raise Exception('Station %s not found!' % strsta)
+        raise Exception('Station %s.%s not found!' % (strnet, strsta))
 
     return idsta
 
