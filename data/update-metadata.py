@@ -370,6 +370,16 @@ def getstaID(strnet, strsta, nets, stats):
 
 
 def parseVirtualNets(vntable, nets, stats):
+    """Add the virtual networks to the network table.
+
+    The definition of the virtual networks (vntable) looks like
+    {"_MOST": [[["IV", "APEC", "*", "*"], ["2014-02-06T12:00:00", null]], [["IV", "CRM1", "*", "*"], ["2011-05-30T10:49:00", "2017-07-27T01:24:00"]], ...
+
+    :param vntable: json object
+    :param nets: network table
+    :param stats: station table
+    :return: nothing
+    """
     for vnnet in vntable:
         idstats = set()
         minyear = 0
@@ -392,7 +402,8 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
                       level='station', foutput='inventory'):
     """Connects to a Routing Service to get routes and downloads the inventory
     from the Station-WS in StationXML format.
-    The data is saved in the files with names starting as foutput.
+    The data is saved in the files with names starting as foutput. If old files
+    exist they will be deleted.
 
     """
 
@@ -514,41 +525,64 @@ def main():
                         help='Filename where inventory should be saved.')
     parser.add_argument('-l', '--log', default='WARNING', choices=['DEBUG', 'WARNING', 'INFO', 'DEBUG'],
                         help='Increase the verbosity level.')
+    parser.add_argument('-sd', '--skip-download', action='store_true',
+                        help='Do not download inventory and re-use the available files.')
+    parser.add_argument('-sp', '--skip-parse', action='store_true',
+                        help='Do not parse the StationXML files downloaded from the endpoints.')
     args = parser.parse_args()
 
     logging.basicConfig(level=args.log)
 
     foutput = 'inventory'
-    downloadInventory(routingserver=args.routing, level='channel',
-                      foutput=foutput)
 
-    logging.info('Inventory downloaded')
+    if args.skip_download:
+        logging.warning('Skipping download of inventory from endpoints')
+    else:
+        downloadInventory(routingserver=args.routing, level='channel',
+                          foutput=foutput)
+        logging.info('Inventory downloaded')
 
-    ptNets = ListNets()
-    ptStats = ListStats()
-    ptLocs = ListLocs()
-    ptChans = ListChans()
 
-    for filename in glob.glob('%s-*.xml' % (foutput)):
-        basefn, archive, auxidx = filename[:-4].split('-')
-        idx = int(auxidx)
+    # File with incomplete inventory (no virtual networks)
+    auxfile = 'webinterface-novn.bin'
 
-        with open(filename) as fin:
-            logging.info('Opening tmp file %s' % filename)
-            nets2add, stats2add, locs2add, chans2add = parseStationXML(fin, archive=archive)
-            ptNets.extend(nets2add)
-            ptStats.extend(stats2add)
-            ptLocs.extend(locs2add)
-            ptChans.extend(chans2add)
+    if args.skip_parse:
+        logging.warning('Skipping parse of downloaded inventory')
+        # Read the temporary and incomplete version of the inventory
+        with open(auxfile) as cache:
+            ptNets, ptStats, ptLocs, ptChans, ptStreamIdx = pickle.load(cache)
+    else:
+        ptNets = ListNets()
+        ptStats = ListStats()
+        ptLocs = ListLocs()
+        ptChans = ListChans()
 
-    ptNets.sort()
-    ptStats.sort()
-    ptLocs.sort()
-    ptChans.sort()
+        for filename in glob.glob('%s-*.xml' % (foutput)):
+            basefn, archive, auxidx = filename[:-4].split('-')
+            idx = int(auxidx)
 
-    fixIndexes(ptNets, ptStats, ptLocs, ptChans)
+            with open(filename) as fin:
+                logging.info('Opening tmp file %s' % filename)
+                nets2add, stats2add, locs2add, chans2add = parseStationXML(fin, archive=archive)
+                ptNets.extend(nets2add)
+                ptStats.extend(stats2add)
+                ptLocs.extend(locs2add)
+                ptChans.extend(chans2add)
 
-    ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
+        ptNets.sort()
+        ptStats.sort()
+        ptLocs.sort()
+        ptChans.sort()
+
+        fixIndexes(ptNets, ptStats, ptLocs, ptChans)
+
+        ptStreamIdx = indexStreams(ptNets, ptStats, ptLocs, ptChans)
+
+        # Save a temporary and incomplete version of the inventory
+        with open(auxfile, 'wb') as cache:
+            os.chmod(auxfile, 0o0664)
+            pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
+                        cache)
 
     vnraw = downloadURL('%s/virtualnets' % args.routing)
     vnjson = json.loads(vnraw)
@@ -615,7 +649,7 @@ def main():
     # Save binary version of the inventory
     cachefile = 'webinterface-cache.bin'
     with open(cachefile, 'wb') as cache:
-        os.chmod(cachefile, 0664)
+        os.chmod(cachefile, 0o0664)
         pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
                     cache)
 
