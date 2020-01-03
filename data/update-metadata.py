@@ -349,17 +349,23 @@ def parseRSinv(inv):
     return routingTable
 
 
-def getstaID(strnet, strsta, nets, stats):
-    logging.debug('Looking for %s.%s' % (strnet, strsta))
+def getstaID(strnet, strsta, strstart, nets, stats):
+    logs = logging.getLogger('getstaID')
+    start = str2date(strstart)
+    logs.debug('Looking for %s.%s %s' % (strnet, strsta, start.year))
+
     for auxidnet, net in enumerate(nets):
         if net[0] == strnet:
-            idnet = auxidnet
-            break
+            logs.debug('%s %s %s: %s' % (net[4], start.year, net[5], (net[4] <= start.year <= net[5])))
+            if (net[4] <= start.year) and (net[5] is None or start.year <= net[5]):
+                idnet = auxidnet
+                break
     else:
         raise Exception('Network %s not found!' % strnet)
 
     for auxidsta, sta in enumerate(stats):
         if sta[0] == idnet:
+            logs.debug('%s %s' % (strsta, sta))
             if sta[4] == strsta:
                 idsta = auxidsta
                 break
@@ -385,7 +391,7 @@ def parseVirtualNets(vntable, nets, stats):
         minyear = 0
         for vnroute in vntable[vnnet]:
             try:
-                idsta = getstaID(vnroute[0][0], vnroute[0][1], nets, stats)
+                idsta = getstaID(vnroute[0][0], vnroute[0][1], vnroute[1][0], nets, stats)
             except Exception as e:
                 logging.error(e)
                 continue
