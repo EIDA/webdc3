@@ -75,13 +75,16 @@ except ImportError:
         def debug(s):
             print("[debug] %s" % s, file=sys.stderr)
 
+
 def hush(args):
     pass
+
 
 try:
     import seiscomp3.Seismology as Seismology
 except ImportError:
-    logs.warning("Couldn't import seiscomp3.Seismology ... do you have the SeisComP libraries installed?")
+    logs.warning("Couldn't import seiscomp3.Seismology ... are SeisComP libraries installed?")
+
     class Seismology(object):
         class Regions(object):
             def getRegionName(self, flat, flon):
@@ -102,10 +105,12 @@ except ImportError:
 try:
     import seiscomp3.Math as Math
 except ImportError:
-    logs.warning("Couldn't import seiscomp3.Math ... do you have the SeisComP libraries installed?")
+    logs.warning("Couldn't import seiscomp3.Math ... are SeisComP libraries installed?")
+
     class Math(object):
         def delazi(self, lat_0, lon_0, lat_1, lon_1):
             return [_delazi(lat_0, lon_0, lat_1, lon_1), None, None]
+
 
 class WI_Module(object):
 
@@ -160,9 +165,9 @@ Service version:
 # FIXME - unneeded??
             if (h is None) and (k in known_handlers):
                 h = k
-##            # Assign a handler if none was provided in configuration
+#            # Assign a handler if none was provided in configuration
 # #           if not self.services[k].has_key('handler'):
-##                self.services[k]['handler'] = h  ## better: make this a function handle.
+#                self.services[k]['handler'] = h  # Better: make this a function handle.
 
         self._EventServiceCatalog = {}
         for s in self.services:
@@ -179,7 +184,7 @@ Service version:
                                     self._EventServiceCatalog.get(s, (None,))[0]))
         logs.info("Preferred event service: %s" % (self._EventServicePreferred))
 
-        #NOT NEEDED: self.defaultLimit = config['defaultLimit']
+        # NOT NEEDED: self.defaultLimit = config['defaultLimit']
 
         wi.registerAction("/event/catalogs", self.catalogs)
         wi.registerAction("/event/parse", self.parse, 'columns', 'informat', 'input')
@@ -205,7 +210,7 @@ Service version:
         self.es = dict()
         for s, props in self.services.items():
 
-            start_time = datetime.datetime.now()
+            # DEBUG start_time = datetime.datetime.now()
 
             # April 2014: A handler specification in the configuration
             # file is now mandatory:
@@ -223,18 +228,18 @@ Service version:
             else:
                 try:
                     h = props["handler"]
-                    if not h in known_handlers:
+                    if h not in known_handlers:
                         logs.warning("Unknown handler '%s' configured for service '%s', but continuing anway!" % (h, s))
                         continue
                 except KeyError:
                     logs.error("No handler configured for service '%s', aborting!" % s)
                     abort = True
                     continue
-##            ##try:
-##            h = props.get('handler', s)   ## Or raise if no handler set?
-##            ##except KeyError:
-##            ##    logs.error("No event service handler was set for service '%s'; fix in webinterface.cfg." % (s))
-##            ##    h = s
+#            ##try:
+#            h = props.get('handler', s)   ## Or raise if no handler set?
+#            ##except KeyError:
+#            ##    logs.error("No event service handler was set for service '%s'; fix in webinterface.cfg." % (s))
+#            ##    h = s
             logs.debug("Handler for service id=%s is '%s'" % (s, h))
 
             # All known handlers:
@@ -256,14 +261,14 @@ Service version:
                 raise SyntaxError("Uncaught handler %s" % h)
             self.es[s] = es
 
-            end_time = datetime.datetime.now()
-            #Python 2.7: logs.debug("Created new event service '%s' in %g s" % (s, (end_time-start_time).total_seconds()))
+            # end_time = datetime.datetime.now()
+            # Python 2.7: logs.debug("Created new event service '%s' in %g s" % (s, (end_time-start_time).total_seconds()))
             logs.notice("Created new event service '%s', handler %s" % (s, h))
             for p in ('handler', 'baseURL', 'extraParams'):
                 logs.debug('%24s: %s' % (p, props.get(p)))
 
         if (abort):
-	    raise SyntaxError("Configuration problem(s), see the logs.")
+            raise SyntaxError("Configuration problem(s), see the logs.")
 
     def dumpConfig(self, envir, params):
         return ("Event services configuration at %s\n" % str(datetime.datetime.now()) + str(self),)
@@ -288,11 +293,11 @@ Service version:
 
         """
         handler_capabilities_default = {"hasDate": True,
-                        "hasRectangle": True,
-                        "hasCircle": False,
-                        "hasDepth": False,
-                        "hasMagnitude": True,
-                        "description": None}
+                                        "hasRectangle": True,
+                                        "hasCircle": False,
+                                        "hasDepth": False,
+                                        "hasMagnitude": True,
+                                        "description": None}
 
         d = dict.fromkeys(list(self._EventServiceCatalog.keys()))
         for k in d.keys():
@@ -338,7 +343,7 @@ Service version:
         assert len(tmp2) == len(self._EventServiceCatalog)
 
         return tmp
-        ##return json.dumps(self._EventServiceCatalog)
+        # return json.dumps(self._EventServiceCatalog)
 
     def __str__(self):
         """Report what is known about catalogs. This is for
@@ -364,10 +369,10 @@ Service version:
         """Parse a user-supplied catalog.
 
         Input:
-          informat={string} ## The INPUT format. So far CSV, later can be QML, GeoJSON
-          format={string}   ## The OUTPUT format. Default 'json', others: 'csv'
-          columns={string}  ## Comma-separated list of columns
-                            ## in the supplied CSV file, from:
+          informat={string} - The INPUT format. So far CSV, later can be QML, GeoJSON
+          format={string}   - The OUTPUT format. Default 'json', others: 'csv'
+          columns={string}  - Comma-separated list of columns
+                              in the supplied CSV file, from:
                     ('latitude', 'longitude', 'depth', 'time', 'ignore')
           input=<user supplied catalog sent as POST>
         Returns: JSON - a list of events.
@@ -375,7 +380,7 @@ Service version:
         """
         params_white_list = ('informat', 'format', 'columns', 'input')
         es = self.es['parser']
-        # Re-use existing service ##es = ESFile("file", options)
+        # Re-use existing service # es = ESFile("file", options)
         for name in params.keys():
             if name not in params_white_list:
                 return [bodyBadRequest(envir, 'Unknown parameter name supplied', 'parser')]
@@ -427,30 +432,31 @@ Service version:
         if len(parts) == 1:
             # There was no slash after "event", therefore no service.
             # In future, this could return the catalog!
-            return [bodyBadRequest(environ, "No service name given, try /event/catalogs")]
+            return [bodyBadRequest(environ,
+                                   "No service name given, try /event/catalogs")]
 
         service = parts[1].lower()
         service = re.escape(service)
         service = re.sub(r'([^a-zA-Z0-9-]+)', ' ', service)
 
         if len(parts) > 2:
-            return [bodyBadRequest(environ, "Extra URL component after service name")]
+            return [bodyBadRequest(environ,
+                                   "Extra URL component after service name")]
 
         # For testing, it is nice to allow services e.g. '/event/meteor' which
         # are not in the "published" catalog. But a site which is "live"
         # should not do that. Operators can configure which services they
         # offer.
-        if self.registeredonly and not service in self._EventServiceCatalog:
+        if self.registeredonly and service not in self._EventServiceCatalog:
             return [bodyBadRequest(environ, "Unknown service name", service)]
 
         if service in self.services.keys():
-            #NOT NEEDED?:
+            # NOT NEEDED?:
             parameters = cgi.parse_qs(environ.get('QUERY_STRING', ''))
-            ##Should be: parameters = params
+            # Should be: parameters = params
             return self.es[service].handler(environ, parameters)
         else:
             return [bodyBadRequest(environ, "Unknown service name", service)]
-
 
 
 # ----------------------------------------------------------------------
@@ -470,7 +476,8 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
      (x, y, z) = a*[ cos(lon)*cos(lat), sin(lon)*cos(lat), sin(lat) ]
     Spherical distance is arccos( v_0 dot v_1 ).
 
-    WARNING: Probably inaccurate near 0 and 180 deg distance, where cos(dotp) = 1.
+    WARNING: Probably inaccurate near 0 and 180 deg distance,
+    where cos(dotp) = 1.
 
     """
     deg2rad = math.pi / 180.0
@@ -479,15 +486,15 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
     lat_1 = lat_1 * deg2rad
     lon_1 = lon_1 * deg2rad
 
-    #x0 = math.cos(lon_0)*math.cos(lat_0)
-    #x1 = math.cos(lon_1)*math.cos(lat_1)
-    #y0 = math.sin(lon_0)*math.cos(lat_0)
-    #y1 = math.sin(lon_1)*math.cos(lat_1)
+    # x0 = math.cos(lon_0) * math.cos(lat_0)
+    # x1 = math.cos(lon_1) * math.cos(lat_1)
+    # y0 = math.sin(lon_0) * math.cos(lat_0)
+    # y1 = math.sin(lon_1) * math.cos(lat_1)
     delta_lon = (lon_1 - lon_0) % (2 * math.pi)
     term_1 = math.cos(lat_0) * math.cos(lat_1) * math.cos(delta_lon)
     z0 = math.sin(lat_0)
     z1 = math.sin(lat_1)
-    #dotp = x0 * x1 + y0 * y1 + z0 * z1
+    # dotp = x0 * x1 + y0 * y1 + z0 * z1
     dotp = term_1 + z0 * z1
 
     # Need the angle in (0, 180]:
@@ -495,17 +502,18 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
         d = math.pi  # anti-parallel, 180 degrees
     else:
         d = math.acos(dotp)
-    #elif (dotp < 0):
-    #    d = math.pi - math.acos(dotp)  # not needed, Python acos does this.
+    # elif (dotp < 0):
+    #     d = math.pi - math.acos(dotp)  # Not needed, Python acos does this.
 
     d = d / deg2rad
-    #print 'TEST', lat_0, lon_0, lat_1, lon_1, dotp, d
+    # print('TEST', lat_0, lon_0, lat_1, lon_1, dotp, d)
     assert(d >= 0.0)
     assert(d <= 180.0)
     return d
 
 
 verbosity = 2
+
 
 def repr_dialect(d):
     """Describe 'd', a Dialect object from the csv class."""
@@ -520,6 +528,7 @@ def repr_dialect(d):
 """ % (d.delimiter, d.doublequote,
        d.escapechar, repr(d.lineterminator),
        d.quotechar, d.quoting, d.skipinitialspace)
+
 
 def date_T(arg):
         """Dates should be 'yyyy-mm-ddThh:mm:ss', with no trailing Z or zone or milliseconds.
@@ -548,6 +557,7 @@ def date_T(arg):
         if dot > -1:
             tmp = tmp[0:dot]
         return tmp.replace(' ', 'T', 1)
+
 
 def tagged(tag, strings, attrs={}):
     """Mark up all the items in the list 'strings' with the same tag 'tag'.
@@ -584,9 +594,12 @@ def _urlString(environ):
     What is the URL which was used to visit me?
     """
     if environ['QUERY_STRING']:
-        return environ.get('wsgi.url_scheme', 'unk') + "://" + environ.get('HTTP_HOST', '') + environ['PATH_INFO'] + '?' + environ['QUERY_STRING']
+        return environ.get('wsgi.url_scheme', 'unk') + "://" \
+            + environ.get('HTTP_HOST', '') + environ['PATH_INFO'] \
+            + '?' + environ['QUERY_STRING']
     else:
-        return environ.get('wsgi.url_scheme', 'unk') + "://" + environ.get('HTTP_HOST', '') + environ['PATH_INFO']
+        return environ.get('wsgi.url_scheme', 'unk') + "://" \
+            + environ.get('HTTP_HOST', '') + environ['PATH_INFO']
 
 
 """The defaultParamMap dictionary defines a list of request
@@ -674,13 +687,14 @@ def process_parameters(paramMap, parameters):
     for name in parameters:
         if name in paramMap:
             image = paramMap[name]
-            ### print >>sys.stdout, "name '%s' -> '%s' [%s]" % (name, image, str(parameters[name]))
+            # print("name '%s' -> '%s' [%s]" % (name, image, str(parameters[name])),
+            #       file=sys.stdout)
             value = cgi.escape(parameters[name][0])
             d[name] = value
 
             if image[0] == 'func':
                 paramhandler = image[1]  # function handle
-                #logs.debug("parameter '%s' : handling with %s" % (name, paramhandler))
+                # logs.debug("parameter '%s' : handling with %s" % (name, paramhandler))
                 extra_pairs = paramhandler(name, parameters)
                 pairs.extend(extra_pairs)
 
@@ -725,11 +739,13 @@ def floatorwhat(arg, replacement):
     except ValueError:
         return replacement
 
+
 def floatorzero(arg):
     """Some catalogs can have an empty string for magnitude, depth, etc.
     Return 0 in that case.
     """
     return floatorwhat(arg, 0.0)
+
 
 def floatordash(arg):
     return floatorwhat(arg, '--')
@@ -789,44 +805,45 @@ class EventWriterCSV(EventWriter):
     lineterminator = '\n'
     count = None
     fid = None
-    #UNUSED?filters = (date_T, floatordash, float, float, floatordash, None, None)
+    # UNUSED?filters = (date_T, floatordash, float, float, floatordash, None, None)
 
     def __init__(self, data):
         """Why is an explicit init() method needed for
         EventWriterCSV, but not for EventWriterJSON?"""
 
-        #print "EventWriterCSV::init says hello world!"
-        #if data:
-        #    print len(data)
-        #else:
-        #    print
+        # print("EventWriterCSV::init says hello world!")
+        # if data:
+        #     print(len(data))
+        # else:
+        #     print()
         self.data = data
         self.helper = Helpers()
 
     def write_begin(self, limit):
         self.count = 0
-        #TMPFILE self.fid = open('local.csv', 'wb')
+        # TMPFILE self.fid = open('local.csv', 'wb')
         self.fid = tempfile.TemporaryFile('w+b')
         self.writer = csv.writer(self.fid)
-#*****USE self.output_header?
+# ****USE self.output_header?
         header = ("Event Time", "Mag", "Lat", "Lon", "ID", "Depth", "Region")
         self.writer.writerow(self.output_header)
-        return ''  ### self.delimiter.join(self.output_header) + self.lineterminator
+        return ''
+        # return self.delimiter.join(self.output_header) + self.lineterminator
 
     def write_one(self, index):
-        #DEBUG print "write_one", index, len(self.data)
+        # print('DEBUG', "write_one", index, len(self.data))
         if self.data and index >= 0 and index < len(self.data):
             self.count += 1
             ev = self.data[index]
             self.writer.writerow(ev)
 
-            #UNUSED new_row = self.helper.filtercols(ev, self.filters)
-            #return self.delimiter.join(new_row) + self.lineterminator
+            # UNUSED new_row = self.helper.filtercols(ev, self.filters)
+            # return self.delimiter.join(new_row) + self.lineterminator
         return ''
 
     def write_end(self, limit):
-        #TMPFILE self.fid.close()
-        #TMPFILE self.fid = open('local.csv', 'rb')
+        # TMPFILE self.fid.close()
+        # TMPFILE self.fid = open('local.csv', 'rb')
         self.fid.seek(0)
         s = ""
         for line in self.fid.readlines():
@@ -851,8 +868,8 @@ class EventWriterJSON(EventWriter):
     """
     def write_all(self, limit):
         last = min(limit, len(self.data))
-        #print "EventWriterJSON::write_all len=%i limit=%i last=%i" % (len(self.data),
-        #                                                              limit, last)
+        # print("EventWriterJSON::write_all len=%i limit=%i last=%i" % (len(self.data),
+        #                                                               limit, last))
         return json.dumps([self.output_header] + self.data[0:last])
 
 
@@ -870,14 +887,14 @@ class EventWriterFDSNText(EventWriter):
                       'EventLocationName')
 
     def write_one(self, index):
-        #DEBUG print "write_one", index, len(self.data)
+        # DEBUG print "write_one", index, len(self.data)
         if self.data and index >= 0 and index < len(self.data):
             self.count += 1
             ev = self.data[index]
             self.writer.writerow(ev)
 
-            #UNUSED new_row = self.helper.filtercols(ev, self.filters)
-            #return self.delimiter.join(new_row) + self.lineterminator
+            # UNUSED new_row = self.helper.filtercols(ev, self.filters)
+            # return self.delimiter.join(new_row) + self.lineterminator
         return ''
 
     def write_all(self, limit):
@@ -902,9 +919,9 @@ class EventWriterFDSNText(EventWriter):
 class EventData(object):
     """Container class for just the info we should output."""
 
-    column_names =  ("datetime", "magnitude", "magtype",
-                     "latitude", "longitude", "depth",
-                     "key", "region")
+    column_names = ("datetime", "magnitude", "magtype",
+                    "latitude", "longitude", "depth",
+                    "key", "region")
 
     def __init__(self, data=None):
         if data:
@@ -933,7 +950,7 @@ class EventData(object):
         for event in self.data:
             t.append(event[col])
 
-        assert len(t) == len(self.data)  ## Assumes no missing values
+        assert len(t) == len(self.data)  # Assumes no missing values
         return t
 
     def json_loads(self, s):
@@ -947,12 +964,12 @@ class EventData(object):
 
         try:
             tmp = json.loads(s)
-        except:
+        except Exception:
             logs.error("json_loads: Loading failed, len(s) = %i" % len(s))
             raise
 
         # Throw away header:
-        #self.data = tmp[1:]
+        # self.data = tmp[1:]
 
         # Throw away header, convert the rest:
         for row in tmp[1:]:
@@ -983,7 +1000,7 @@ class EventData(object):
 
     def write_all(self, fmt, limit):
         """All-in-one-hit serialisation."""
-        #print "EventData::write_all() fmt=", fmt
+        # print("EventData::write_all() fmt=", fmt)
         return self.handlers[fmt].write_all(limit)
 
 
@@ -1018,7 +1035,7 @@ class Helpers(object):
 
         """
         assert max(mapping) < len(row)
-        #assert min(mapping) >= 0  # Fails when 'None' is allowed.
+        # assert min(mapping) >= 0  # Fails when 'None' is allowed.
         new_row = []
         for j in mapping:
             if j is None:
@@ -1044,7 +1061,8 @@ class Helpers(object):
         assert len(row) == len(filters)
         new_row = []
         for j in range(len(row)):
-            #DEBUG print >>sys.stderr, j, filters[j], "applied to", row[j]
+            # print('DEBUG', j, filters[j], "applied to", row[j],
+            #       file=sys.stderr)
             if filters[j]:
                 try:
                     fun = filters[j]
@@ -1120,17 +1138,17 @@ class EventResponse(object):
 #
         try:
             fid = open(fname, 'rb')
-        except:
+        except Exception:
             logs.debug("Oops, temporary file '%s' couldn't be opened.", fname)
             raise
 
         logs.info('Reopened ' + fname)
         reader = csv.reader(fid, dialect)
-        #logs.error("Reader dialect: %s" % (repr_dialect(dialect)))
+        # logs.error("Reader dialect: %s" % (repr_dialect(dialect)))
 
         numrow = 0
         header = reader.next()
-        #print >>sys.stderr, "load_csv: Header:", header
+        # print("load_csv: Header:", header, file=sys.stderr)
         if len(header) > 1:
             # probably worked
             header_cols = header
@@ -1146,7 +1164,7 @@ class EventResponse(object):
             logs.error("Mapping: %s" % (str(self.input_mapping)))
             logs.error("Header after mapping: %s" % str(helper.mapcols(header_cols, self.input_mapping)))
         new_header = helper.mapcols(header_cols, self.input_mapping)
-        #s += "|".join(new_header) + "\n"
+        # s += "|".join(new_header) + "\n"
 
         for row in reader:
             if len(row) > 0:
@@ -1158,7 +1176,7 @@ class EventResponse(object):
                 if first.startswith('#'):
                     # Comment line, so ignore it
                     continue
-                #s += "|".join(row) + "\n"
+                # s += "|".join(row) + "\n"
                 new_row = helper.mapcols(row, self.input_mapping)
                 new_row = helper.filtercols(new_row, self.filters)
                 self.ed.append(new_row)
@@ -1172,14 +1190,13 @@ class EventResponse(object):
         lat = ev[self.cols['lat']]
         lon = ev[self.cols['lon']]
 
-         # FIXME: Why are lat/lon not already floats?
+        # :FIXME: Why are lat/lon not already floats?
         try:
             flat = float(lat)
             flon = float(lon)
         except ValueError:
             logs.warning("In _lookup_region: lat=%s lon=%s are not convertable to float" % (str(lat), str(lon)))
         return Seismology.Regions().getRegionName(flat, flon)
-
 
     def _fill_region(self, ev):
         """Should we look up a region for this event?
@@ -1203,7 +1220,7 @@ class EventResponse(object):
                 if self.lookupIfGiven:
                     new = self._lookup_region(ev)
             if new != old:
-                #logs.debug("(%s -> %s)" % (old, new))
+                # logs.debug("(%s -> %s)" % (old, new))
                 ev[col] = new
 
     def fill_keys(self, prefix="row", keyIfGiven=False):
@@ -1259,7 +1276,7 @@ class EventResponse(object):
                 return self.rows
 
         elif fmt in ('csv', 'json', 'fdsnws-text'):
-            ####REMOVE BEFORE CHCKreturn self.ed.write_all('csv', 14)
+            # REMOVE BEFORE CHCKreturn self.ed.write_all('csv', 14)
             return self.ed.write_all(fmt, limit)
 
         else:
@@ -1375,7 +1392,10 @@ class EventService(object):
 
     def handler(self, environ, start_response):
         """Overload this method to implement a service."""
-        return self.result_page(environ, start_response, '404 Not Found', 'text/plain', "Service '%s' is not implemented." % self.id)
+        return self.result_page(environ,
+                                start_response, '404 Not Found',
+                                'text/plain',
+                                "Service '%s' is not implemented." % self.id)
 
     def send_request(self, pairs):
         """Connect to the target service.
@@ -1397,7 +1417,8 @@ class EventService(object):
         pairs.append(self.extra_params)
         url = self.service_url + '?' + '&'.join(pairs)
         logs.info("Service '%s' fetching URL: %s" % (self.id, url))
-        #print >>sys.stderr, "Service '%s' fetching URL: %s" % (self.id, url)
+        # print("Service '%s' fetching URL: %s" % (self.id, url),
+        #       file=sys.stderr)
 
         dryrun = False  # Not implemented yet.
         if dryrun:
@@ -1412,9 +1433,9 @@ class EventService(object):
                 logs.error("Errors fetching from URL: %s" % (url))
                 logs.error(str(e))
                 raise   # urllib2.URLError(e)
-                #return self.error_page(environ, start_response,
-                #                       '503 Temporarily Unavailable',
-                #                       "No answer")
+                # return self.error_page(environ, start_response,
+                #                        '503 Temporarily Unavailable',
+                #                        "No answer")
 
             # TEMP FOR DEBUGGING - RACE/PERMISSION problems
             if (verbosity > 5):
@@ -1460,9 +1481,9 @@ class EventService(object):
         """Sub-classable event filter. By default, pass everything."""
         for ev in er.ed.data:
             # Magnitude:
-            #if ev[1] < 5.0:
-            #    print "Too small", ev[1]
-            #    er.ed.data.remove(ev)
+            # if ev[1] < 5.0:
+            #     print("Too small", ev[1])
+            #     er.ed.data.remove(ev)
             break
         return er
 
@@ -1545,8 +1566,9 @@ class EventService(object):
 
     def result_page(self, environ, start_response, response_code, content_type, data):
         """Return a web page for a successful request."""
-        #### start_response(response_code, [('Content-Type', content_type)])
+        # start_response(response_code, [('Content-Type', content_type)])
         return [data]
+
 
 # ------------------------------------------------------
 
@@ -1691,7 +1713,7 @@ class ESFile(EventService):
             # FIXME: This repeats code in date_T() - remove trailing Z, +00:00 and .nnnn
             val = val.strip()
             val = val.rstrip('Z')
-            #val = date_T(val)
+            # val = date_T(val)
             if val.endswith("+00:00"):
                 val = val[0:-len("+00:00")]
             dot = val.rfind(".")
@@ -1714,16 +1736,20 @@ class ESFile(EventService):
             value = row[i]
             if what == 'latitude':
                 result, row[i] = valid_latitude(value)
-                if not result: break
+                if not result:
+                    break
             elif what == 'longitude':
                 result, row[i] = valid_longitude(value)
-                if not result: break
+                if not result:
+                    break
             elif what == 'depth':
                 result, row[i] = valid_depth(value)
-                if not result: break
+                if not result:
+                    break
             elif what == 'time':
                 result, row[i] = valid_datetime(value)
-                if not result: break
+                if not result:
+                    break
             elif what == 'ignore':
                 pass
             else:
@@ -1775,7 +1801,7 @@ class ESFile(EventService):
             self.raise_client_400(environ, 'Input format can only be \'csv\' today')
             logs.warning('ESFile: Input format was "%s"' % input_fmt)
 
-        infile = str(parameters['input'][0])  ### Is that right??
+        infile = str(parameters['input'][0])  # Is that right??
         lines = infile.splitlines()
         logs.info('ESFile::handler: input has %i line(s)' % len(lines))
         thing = str(parameters['columns'][0])
@@ -1793,8 +1819,8 @@ class ESFile(EventService):
         logs.debug("ESFile::handler: Input file '%s'" % (infile))
         logs.debug("ESFile::handler: Columns: [%s] (%i)" % ("|".join(columns), len(columns)))
 
-##        if not os.path.exists(infile):
-##            self.raise_client_error(environ, '500 Internal Server Error', 'No such file')
+#         if not os.path.exists(infile):
+#             self.raise_client_error(environ, '500 Internal Server Error', 'No such file')
 
         # FIXME: Writing to a temp file again! Perhaps put it in an EventResponse.rows??
         infile = os.path.join(tempdir, 'user_input_csv.txt')
@@ -1818,9 +1844,10 @@ class ESFile(EventService):
             try:
                 dialect = csv.Sniffer().sniff(csvfd.read(1024))
                 logs.info("ESFile::handler: Sniffing file found dialect: %s" % repr_dialect(dialect))
-            except:
+            except Exception as e:
                 logs.notice("ESFile::handler: Sniffing file failed: %s" % (str(e)))
-                self.raise_client_400(environ, "Failed to detect a readable CSV file.")
+                self.raise_client_400(environ,
+                                      "Failed to detect a readable CSV file.")
             csvfd.seek(0)
 
             er = EventResponse(dialect, mapping, self.filter_table, self.options)
@@ -1853,7 +1880,7 @@ class ESFile(EventService):
                 if not (len(row) >= len(columns)):
                     self.raise_client_400(environ, "Input row %i seems too short: %i < %i" % (count, len(row), len(columns)))
 
-                ##if len(row) >= len(mapping):
+                # if len(row) >= len(mapping):
                 if len(row) >= len(columns):
                     new_row = self.check_event(columns, row)
                     if not new_row:
@@ -1879,12 +1906,15 @@ class ESFile(EventService):
 
         logs.debug('ESFile::handler: final data:\n' + str(er.ed.data))
 
-        ###output_fmt = 'json'  # :FIXME: Currently this overrides users's input
+        # output_fmt = 'json'  # :FIXME: Currently this overrides users's input
         content = er.write(limit, output_fmt)
         if (content):
-            return self.result_page(environ, start_response, '200 OK', 'text/plain', content)
+            return self.result_page(environ,
+                                    start_response, '200 OK',
+                                    'text/plain', content)
         else:
             self.raise_client_204(environ, 'No file specified?')
+
 
 # ------------------------------------------------------
 
@@ -1904,6 +1934,7 @@ def emsc_prevday(name, parameters):
     nextday = d - datetime.timedelta(1, 0, 0)
     outvalue = str(nextday.date())
     return ['%s=%s' % (outname, outvalue)]
+
 
 class ESEMSC(EventService):
     class my_dialect(csv.excel):
@@ -1954,8 +1985,9 @@ class ESEMSC(EventService):
         fmt = hold_dict.get('format', 'text')
 
         # EMSC provides time and date as separate columns in the CSV.
-        ## If I had CSV already, I could do this:
-        #for row in allrows:
+        # If I had CSV already, I could do this:
+        #
+        # for row in allrows:
         #    if len(row) > 1:
         #        row[1] = row[0] + 'T' + row[1];
         #        row.pop(0)
@@ -1976,7 +2008,9 @@ class ESEMSC(EventService):
                 break
         allrows = "\n".join(rows)
 
-        return self.send_response(environ, start_response, '', allrows, limit, fmt)
+        return self.send_response(environ,
+                                  start_response, '', allrows, limit, fmt)
+
 
 # ------------------------------------------------------
 
@@ -2003,8 +2037,11 @@ class ESMeteor(EventService):
                               'xxl']) + "\n")
         fmt = str(parameters.get('format', ['raw'])[0])
         if verbosity > 2:
-            logs.error("Meteor::handler(): fmt=%s map=%s" % (fmt, str(self.column_map)))
-        return self.send_response(environ, start_response, '', allrows, 100, fmt)
+            logs.error("Meteor::handler(): fmt=%s map=%s" % (fmt,
+                                                             str(self.column_map)))
+        return self.send_response(environ,
+                                  start_response, '', allrows, 100, fmt)
+
 
 # ------------------------------------------------------
 
@@ -2013,6 +2050,7 @@ class ESMeteor(EventService):
 # since the epoch, where the string is interpreted as UTC time "2012-01-01 00:00:00"
 # Ref: <http://www.python.org/doc//current/library/datetime.html>
 ZERO = datetime.timedelta(0)
+
 
 class UTC(datetime.tzinfo):
     """A UTC class"""
@@ -2026,7 +2064,9 @@ class UTC(datetime.tzinfo):
     def dst(self, dt):
         return ZERO
 
+
 utc = UTC()
+
 
 def millidate(name, parameters):
         """
@@ -2060,7 +2100,7 @@ def millidate(name, parameters):
             logs.debug("Converting '%s=%s' to..." % (name, value))
 
         try:
-            #dt = datetime.datetime.strptime(value, "%Y-%m-%d")
+            # dt = datetime.datetime.strptime(value, "%Y-%m-%d")
             dt = datetime.datetime.strptime(value, '%Y-%m-%d').replace(tzinfo=utc)
             seconds = datetime.datetime.strftime(dt, '%s')
 
@@ -2069,7 +2109,7 @@ def millidate(name, parameters):
                 seconds = datetime.datetime.strftime(datetime.datetime(1980, 1, 1), "%s")
             except ValueError:
                 # On Windows?, Python >= 2.7
-                #seconds = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
+                # seconds = (dt - datetime.datetime(1970, 1, 1)).total_seconds()
                 raise ValueError
         except ValueError:
             seconds = "1370000000"
@@ -2078,6 +2118,7 @@ def millidate(name, parameters):
             logs.debug(" ...to '%s=%s'." % (outname, outvalue))
 
         return ['%s=%s' % (outname, outvalue)]
+
 
 class ESComcat(EventService):
     """Quasi-replacement for the old NEIC service.
@@ -2109,7 +2150,8 @@ class ESComcat(EventService):
     def handler(self, environ, parameters):
         """The Comcat service from USGS (Replacement for NEIC?)
 
-        Uses an old format for start and end dates: milliseconds since 1970 (UTC).
+        Uses an old format for start and end dates: milliseconds
+        since 1970 (UTC).
 
         Doesn't offer the following:
           - constraints by circular region
@@ -2132,7 +2174,8 @@ class ESComcat(EventService):
 
         if len(bad_list) > 0:
             logs.notice('*** Bad keys were presented: %s' % str(bad_list))
-            self.raise_client_400(environ, "Unimplemented constraint(s): " + ", ".join(bad_list))
+            self.raise_client_400(environ,
+                                  "Unimplemented constraint(s): " + ", ".join(bad_list))
 
         limit = hold_dict.get('limit', self.defaultLimit)
         try:
@@ -2153,12 +2196,12 @@ class ESComcat(EventService):
             # UGLY HACK: Reverse lines (other than the header) to get
             # decreasing date order (newest events first)
             #
-            #print "Allrows before:\n", allrows
+            # print("Allrows before:\n", allrows)
             rows = allrows.splitlines()
             tmp = [rows[0]]
             tmp.extend(rows[-1:0:-1])
             allrows = '\n'.join(tmp)
-            #print "Allrows  after:\n", allrows
+            # print("Allrows  after:\n", allrows)
 
         if fmt.startswith("json"):
             header = ""
@@ -2167,10 +2210,14 @@ class ESComcat(EventService):
             header = "# " + url + "\n"
             header += "# Lines: " + str(numrows) + '\n'
 
-        return self.send_response(environ, start_response, header, allrows, limit, fmt)
+        return self.send_response(environ,
+                                  start_response, header, allrows, limit, fmt)
 
-        ##content = self.format_response(allrows, int(limit), fmt)
-        ##return self.result_page(environ, start_response, '200 OK', 'text/plain', header + content)
+        # content = self.format_response(allrows, int(limit), fmt)
+        # return self.result_page(environ,
+        #                         start_response, '200 OK',
+        #                         'text/plain', header + content)
+
 
 # ------------------------------------------------------
 
@@ -2179,7 +2226,8 @@ class ESNeic(EventService):
     extra_params = 'SEARCHMETHOD=1&FILEFORMAT=6&SEARCHRANGE=HH' + '&SUBMIT=Submit+Search'
 
     def date_helper(self, param, params):
-        """Split a date param with ISO date string into day, month and year params.
+        """Split a date param with ISO date string into day,
+        month and year params.
 
         Returns a tuple of split parameters like this:
 
@@ -2188,11 +2236,11 @@ class ESNeic(EventService):
         """
         value = params[param]
         try:
-            (y_str, m_str, d_str) = split(value, '-', 2)
+            (y_str, m_str, d_str) = value.split('-', 2)
             y = int(y_str)
             m = int(m_str)
             d = int(d_str)
-        except Exception as e:
+        except Exception:
             logs.error("Oops, trouble converting a '%s' argument" % param)
         if param == 'start':
             pairs = (('SYEAR=%04i' % y),
@@ -2229,20 +2277,25 @@ class ESNeic(EventService):
 
         if len(bad_list) > 0:
             logs.notice('*** Bad keys were presented: %s' % str(bad_list))
-            self.raise_client_400(environ, "Unimplemented constraint(s): " + ", ".join(bad_list))
+            self.raise_client_400(environ,
+                                  "Unimplemented constraint(s): " + ", ".join(bad_list))
 
-        #url = self.service_url + '?' + self.extra_params + '&'.join(pairs)
+        # url = self.service_url + '?' + self.extra_params + '&'.join(pairs)
         try:
             allrows, url = self.send_request(pairs)
         except urllib2.URLError as e:
             msg = "No answer from URL / %s" % (e)
-            self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
+            self.raise_client_error(environ,
+                                    '503 Temporarily Unavailable', msg)
 
         numrows = allrows.count('\n')
         header = "# " + url + "\n"
         header += "# Lines: " + str(numrows) + '\n'
 
-        return self.result_page(environ, start_response, '200 OK', 'text/plain', header + allrows)
+        return self.result_page(environ,
+                                start_response, '200 OK', 'text/plain',
+                                header + allrows)
+
 
 # ------------------------------------------------------
 
@@ -2272,10 +2325,11 @@ def geofon_prevday(name, parameters):
     outvalue = str(nextday.date())
     return ['%s=%s' % (outname, outvalue)]
 
+
 class ESGeofon(EventService):
     class geofon_dialect(csv.excel):
         delimiter = ';'
-    #column_map = (5, 2, 3, 6, 7, 8, 0, 1)    # if we provide mag type in column 3
+    # column_map = (5, 2, 3, 6, 7, 8, 0, 1)    # if we provide mag type in column 3
     column_map = (4, 2, None, 5, 6, 7, 0, 1)  # if not
     csv_dialect = geofon_dialect
     filter_table = (date_T, floatordash, None, float, float, floatordash, None, None)
@@ -2334,11 +2388,11 @@ class ESGeofon(EventService):
 
     def _trim_rows(self, circle_params, rows, limit):
         """It's a shame we need an EventData just to do this!"""
-        class funny_dialect(csv.excel):           ### comma separated?
+        class funny_dialect(csv.excel):           # Comma separated?
             delimiter = ';'
 
         er = EventResponse(funny_dialect, self.column_map, self.filter_table, self.options)
-        er.load_csv(rows, limit, funny_dialect)   ### sniffing failed, but it shouldn't have been needed!
+        er.load_csv(rows, limit, funny_dialect)   # Sniffing failed, but it shouldn't have been needed!
         logs.debug('trim_rows: Loaded %i row(s) from %i char(s)' % (len(er.ed), len(rows)))
 
         p_lat = circle_params['lat']
@@ -2351,7 +2405,7 @@ class ESGeofon(EventService):
             lon = ev[col['lon']]
             d = Math.delazi(p_lat, p_lon, lat, lon)[0]
             # Offline?
-            #d = Math().delazi(p_lat, p_lon, lat, lon)
+            # d = Math().delazi(p_lat, p_lon, lat, lon)
             if d >= circle_params['minradius'] and d <= circle_params['maxradius']:
                 er_new.ed.data.append(ev)
                 print("DEBUG: appending", ev)
@@ -2359,10 +2413,11 @@ class ESGeofon(EventService):
         print("DEBUG: writing", er_new.ed.data)
         rows = er_new.ed.write_all(fmt='csv', limit=limit)
 
-        ## Yuck! And there's no header yet!!
-        ## {convert er.ed back to string!}
-        #row = ""
-        #for ev in new_rows:
+        # Yuck! And there's no header yet!!
+        # {convert er.ed back to string!}
+        #
+        # row = ""
+        # for ev in new_rows:
         #    line = '|'.join(ev)
         #    rows += line + '\n'
 
@@ -2400,10 +2455,10 @@ class ESGeofon(EventService):
         # special treatment by the handler. They are NOT passed
         # along to the target service.
         good_keys = (
-                     'lat', 'lon',
-                     'minradius', 'maxradius',
-                     'minazimuth', 'maxazimuth',
-                     )
+            'lat', 'lon',
+            'minradius', 'maxradius',
+            'minazimuth', 'maxazimuth',
+        )
         for name in good_keys:
             if name in parameters:
                 paramMap[name] = '-DROP'  # not '-UNIMPLEMENTED'
@@ -2417,7 +2472,6 @@ class ESGeofon(EventService):
             self.raise_client_400(environ, "Unimplemented constraint(s): " + ", ".join(bad_list))
 
         # Q: Is depth two-sized for eqinfo service (depthmin/depthmax)?
-
 
         # PLE: The FDSN spec specifies defaults for maxlat ..
         # minlon, but we don't apply them here. We rely on the
@@ -2451,13 +2505,13 @@ class ESGeofon(EventService):
             # FIXME: This logic is common to all services, but
             # here we are building up only the geofon eqinfo form!
             max_lat, min_lat, max_lon, min_lon = self._bounding_rect(circle_params['lat'], circle_params['lon'], circle_params['maxradius'])
-            if not max_lat is None:
+            if max_lat is not None:
                 pairs.append('%s=%g' % (paramMap['maxlat'], max_lat))
-            if not max_lon is None:
+            if max_lon is not None:
                 pairs.append('%s=%g' % (paramMap['minlat'], min_lat))
-            if not max_lon is None:
+            if max_lon is not None:
                 pairs.append('%s=%g' % (paramMap['maxlon'], max_lon))
-            if not min_lon is None:
+            if min_lon is not None:
                 pairs.append('%s=%g' % (paramMap['minlon'], min_lon))
 
         # Unimplemented keys for which we would rather stop here than attempt:
@@ -2466,7 +2520,7 @@ class ESGeofon(EventService):
         # service, there's no immediate need to handle these,
         # since it won't attempt these constraints. But if we open
         # the event service wider, we must be ready for these...
-        #bad_keys = ['offset',
+        # bad_keys = ['offset',
         #            'magtype',
         #            'magnitudetype',
         #            'includeallmagnitudes',
@@ -2476,15 +2530,15 @@ class ESGeofon(EventService):
         #            'updatedafter']
 
         # Unimplemented keys which we simply suppress:
-        #drop_keys = ['catalog']
+        # drop_keys = ['catalog']
 
         # Keys which we can pass on without modification:
-        #pass_keys = ['eventid']
+        # pass_keys = ['eventid']
 
         fmt = hold_dict.get('format', 'text')  # ???
 
         fmts_okay = ('raw', 'text', 'csv', 'fdsnws-text', 'json', 'json-row')
-        if not fmt in fmts_okay:
+        if fmt not in fmts_okay:
             msg = "Supported output formats are %s" % (str(fmts_okay))
             self.raise_client_400(environ, msg)
 
@@ -2494,7 +2548,7 @@ class ESGeofon(EventService):
             limit = int(limit)
         except ValueError:
             logs.error("Error converting limit argument %s" % (str(limit)))
-            limit =  self.defaultLimit
+            limit = self.defaultLimit
 
         if limit > -1 and limit <= self.defaultLimit:
             pairs.append('nmax=%i' % (limit))
@@ -2511,21 +2565,21 @@ class ESGeofon(EventService):
             self.raise_client_204(environ, 'No events returned')
 
         # Now work on trimming away region outside the circle...
-        # July 25: This APPROACH IS WRONG. DOn't try hacking raw text, have send_response accept a structure
+        # July 25: This APPROACH IS WRONG. Don't try hacking raw text, have send_response accept a structure
         # which we can modify. Major change!
         #
-##        if area_circle:
-##            logs.info('Got %i row(s), starting to trim...' % (numrows))
-##            #print '\n\n\nAllrows IN:'
-##            #print allrows
-##            #print '\n\n'
-##
-##            allrows, numrows = self._trim_rows(circle_params, allrows, numrows)
-##            logs.info('Trimmed, now %i row(s)' % (numrows))
-##
-##            #print '\n\nAllrows OUT:'
-##            #print allrows
-##            #print '\n\n'
+#        if area_circle:
+#            logs.info('Got %i row(s), starting to trim...' % (numrows))
+#            #print '\n\n\nAllrows IN:'
+#            #print allrows
+#            #print '\n\n'
+#
+#            allrows, numrows = self._trim_rows(circle_params, allrows, numrows)
+#            logs.info('Trimmed, now %i row(s)' % (numrows))
+#
+#            #print '\n\nAllrows OUT:'
+#            #print allrows
+#            #print '\n\n'
 
         if fmt.startswith("json") or fmt == "csv" or fmt == "fdsnws-text":
             header = ""
@@ -2534,6 +2588,7 @@ class ESGeofon(EventService):
             header += "# Lines: " + str(numrows) + '\n'
 
         return self.send_response(environ, start_response, header, allrows, limit, fmt)
+
 
 # --------------------------- INGV ES --------------------------------
 
@@ -2626,20 +2681,25 @@ class ESFdsnws(EventService):
 
         # PLE: I'm not sure whether we need to send the header row ourselves.
         myallrow = allrows.split("\n")
-        #myallrow[0] = "#"+myallrow[0]
+        # myallrow[0] = "#"+myallrow[0]
 
         my_row_for_send = 'EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName\n'
 
         # rebuild the resultset
         for item in myallrow:
-            if(item):
-                if(item[0] == '#'):
+            if (item):
+                if (item[0] == '#'):
                     continue
 
                 this_row = item.split("|")
                 mytime = this_row[1].split(".")
-                my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[9]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
-                #CANDIDATE FIXME:
+                my_row_for_send += "" + mytime[0] + "|" + this_row[10] \
+                                   + "|" + this_row[9] + "|" + this_row[2] \
+                                   + "|" + this_row[3] + "|" + this_row[4] \
+                                   + "|\"" + this_row[0] + "\"|\"" \
+                                   + this_row[12] + "\"\n"
+                # schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
+                # CANDIDATE FIXME:
 #                my_row_for_send  += '|'.join((mytime[0],
 #                                              this_row[10], this_row[9],
 #                                              this_row[2], this_row[3],
@@ -2665,14 +2725,13 @@ def bodyBadRequest(environ, msg, service="[event]"):
 
     """
     return WI_Module(None)._EventsErrorTemplate % {'err_code': "400",
-                                    'err_desc': "Bad Request",
-                                    'service': service,
-                                    'details': msg,
-                                    'url': _urlString(environ),
-                                    'date_time': str(datetime.datetime.utcnow()),
-                                    'version': WI_Module(None)._EventsVersion,
-                                    }
-
+                                                   'err_desc': "Bad Request",
+                                                   'service': service,
+                                                   'details': msg,
+                                                   'url': _urlString(environ),
+                                                   'date_time': str(datetime.datetime.utcnow()),
+                                                   'version': WI_Module(None)._EventsVersion,
+                                                   }
 
 
 # ----------------------------------------------------------------------
@@ -2708,9 +2767,9 @@ def gen_test_table(urlbase, fmt='html'):
             value = "15.0"
 
         url = "%(base)s/event/%(service)s?%(name)s=%(value)s" % {"base": urlbase,
-                                                               "service": service,
-                                                               "name": paramName,
-                                                               "value": value}
+                                                                 "service": service,
+                                                                 "name": paramName,
+                                                                 "value": value}
         return url
 
     def get_one():
@@ -2762,8 +2821,8 @@ if __name__ == '__main__':
 
         doctest.testmod()
 
-        #print "About me:"
-        #print str(wi)
+        # print "About me:"
+        # print str(wi)
 
         port = 8005
         hostport = 'localhost:%i' % port
@@ -2772,9 +2831,9 @@ if __name__ == '__main__':
         print(" or <%s/event/catalogs>" % (hostport))
         print(" or <%s/event/meteor>" % (hostport))
 
-        #make_html_test_table(hostport, "test_events.html")
+        # make_html_test_table(hostport, "test_events.html")
 
         import wsgiref
         from wsgiref.simple_server import make_server
-        #srv = make_server('localhost', port, application)
-        #srv.serve_forever()
+        # srv = make_server('localhost', port, application)
+        # srv.serve_forever()
