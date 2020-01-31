@@ -36,6 +36,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 """
+from __future__ import print_function
 
 import cgi
 import csv
@@ -62,17 +63,17 @@ except ImportError:
         Substitute for seiscomp.logs class??
         """
         def __init__(self):
-            print >>sys.stderr, "Error importing seiscomp.logs."
-            print >>sys.stderr, "Sending errors here instead."
+            print("Error importing seiscomp.logs.", file=sys.stderr)
+            print("Sending errors here instead.", file=sys.stderr)
 
         def info(s):
-            print >>sys.stderr, "[info] %s" % s
+            print("[info] %s" % s, file=sys.stderr)
 
         def error(s):
-            print >>sys.stderr, "[error] %s" % s
+            print("[error] %s" % s, file=sys.stderr)
 
         def debug(s):
-            print >>sys.stderr, "[debug] %s" % s
+            print("[debug] %s" % s, file=sys.stderr)
 
 def hush(args):
     pass
@@ -202,7 +203,7 @@ Service version:
             logs.info('%24s: %s' % (k, str(options[k])))
 
         self.es = dict()
-        for s, props in self.services.iteritems():
+        for s, props in self.services.items():
 
             start_time = datetime.datetime.now()
 
@@ -252,7 +253,7 @@ Service version:
             elif h == 'parser':
                 es = ESFile(s, options)
             else:
-                raise SyntaxError, "Uncaught handler %s" % h
+                raise SyntaxError("Uncaught handler %s" % h)
             self.es[s] = es
 
             end_time = datetime.datetime.now()
@@ -261,7 +262,8 @@ Service version:
             for p in ('handler', 'baseURL', 'extraParams'):
                 logs.debug('%24s: %s' % (p, props.get(p)))
 
-        if (abort): raise SyntaxError, "Configuration problem(s), see the logs."
+        if (abort):
+	    raise SyntaxError("Configuration problem(s), see the logs.")
 
     def dumpConfig(self, envir, params):
         return ("Event services configuration at %s\n" % str(datetime.datetime.now()) + str(self),)
@@ -292,7 +294,7 @@ Service version:
                         "hasMagnitude": True,
                         "description": None}
 
-        d = dict.fromkeys(self._EventServiceCatalog.keys())
+        d = dict.fromkeys(list(self._EventServiceCatalog.keys()))
         for k in d.keys():
             d[k] = dict(handler_capabilities_default)
             d[k]["description"] = self._EventServiceCatalog[k][0]
@@ -661,7 +663,8 @@ def process_parameters(paramMap, parameters):
     """
     holdParamsList = ('format', 'limit')
 
-    if (verbosity >= 5): print "ParamMap:", paramMap
+    if (verbosity >= 5):
+        print("ParamMap:", paramMap)
 
     d = {}
     pairs = []
@@ -1008,9 +1011,9 @@ class Helpers(object):
         >>> row = ['a', 'b', 'c', 'd', 'e']
         >>> mapping = (4, 0, 2)
         >>> h = Helpers()
-        >>> print h.mapcols(row, mapping)
+        >>> print(h.mapcols(row, mapping))
         ['e', 'a', 'c']
-        >>> print h.mapcols(row, (4, None, 0, 2))
+        >>> print(h.mapcols(row, (4, None, 0, 2)))
         ['e', '', 'a', 'c']
 
         """
@@ -1102,7 +1105,7 @@ class EventResponse(object):
         numrows = 0
         for row in rows.splitlines():
             numrows += 1
-            print >>fid, row
+            print(row, file=fid)
             if (not limit) or numrows > 2 * limit:
                 break
         fid.close()
@@ -1416,7 +1419,7 @@ class EventService(object):
             # TEMP FOR DEBUGGING - RACE/PERMISSION problems
             if (verbosity > 5):
                 fid = open(os.path.join(tempdir, 'latest_response.dat'), 'w')
-                print >>fid, rows
+                print(rows, file=fid)
                 fid.close()
         return rows, url
 
@@ -1724,7 +1727,7 @@ class ESFile(EventService):
             elif what == 'ignore':
                 pass
             else:
-                raise ValueError, 'Improper column spec - can\'t check the row'
+                raise ValueError('Improper column spec - can\'t check the row')
         if result:
             return row
         else:
@@ -1763,7 +1766,7 @@ class ESFile(EventService):
 
         # Process parameters:
         for k in ('columns', 'input'):
-            if not parameters.has_key(k):
+            if k not in parameters:
                 self.raise_client_400(environ, "Required parameter '%s' was not specified" % (k))
         input_fmt = parameters.get('informat', ['csv'])[0]
         output_fmt = parameters.get('format', ['json'])[0]
@@ -1798,7 +1801,7 @@ class ESFile(EventService):
         logs.debug('ESFile::handler: Writing to %s' % (infile))
         with open(infile, 'w') as fid:
             for t in lines:
-                print >>fid, t
+                print(t, file=fid)
 
         ed = EventData()
         helper = Helpers()
@@ -1894,7 +1897,7 @@ def emsc_prevday(name, parameters):
     if name == 'end':
         outname = 'end_date'
     else:
-        raise SyntaxError, 'name not supported'
+        raise SyntaxError('name not supported')
 
     value = parameters[name][0]
     d = datetime.datetime.strptime(value, "%Y-%m-%d")
@@ -2050,7 +2053,7 @@ def millidate(name, parameters):
         elif name == 'end':
             outname = 'maxEventTime'
         else:
-            raise SyntaxError, 'name not supported'
+            raise SyntaxError('name not supported')
 
         value = parameters[name][0]
         if verbosity > 3:
@@ -2257,7 +2260,7 @@ def geofon_prevday(name, parameters):
     if name == 'end':
         outname = 'datemax'
     else:
-        raise SyntaxError, 'name not supported'
+        raise SyntaxError('name not supported')
 
     value = parameters[name][0]
     if verbosity > 3:
@@ -2289,7 +2292,7 @@ class ESGeofon(EventService):
 
         Returns a dictionary with keys like the FDSN names and valid values.
         """
-        if not (d.has_key('lat') and d.has_key('lon')):
+        if not ('lat' in d and 'lon' in d):
             msg = "both 'lat' and 'lon' are required for area-circle geographic constaints"
             self.raise_client_400(environ, msg)
 
@@ -2351,9 +2354,9 @@ class ESGeofon(EventService):
             #d = Math().delazi(p_lat, p_lon, lat, lon)
             if d >= circle_params['minradius'] and d <= circle_params['maxradius']:
                 er_new.ed.data.append(ev)
-                print "DEBUG: appending", ev
+                print("DEBUG: appending", ev)
 
-        print "DEBUG: writing", er_new.ed.data
+        print("DEBUG: writing", er_new.ed.data)
         rows = er_new.ed.write_all(fmt='csv', limit=limit)
 
         ## Yuck! And there's no header yet!!
@@ -2423,7 +2426,7 @@ class ESGeofon(EventService):
 
         area_rectangle = False
         for k in ('maxlat', 'minlat', 'maxlon', 'minlon'):
-            area_rectangle = area_rectangle or parameters.has_key(k)
+            area_rectangle = area_rectangle or k in parameters
 
         # The eqinfo service doesn't implement annular regions, so
         # we have to take care of it. We start by constraining to
@@ -2432,7 +2435,7 @@ class ESGeofon(EventService):
 
         area_circle = False
         for k in ('lat', 'lon', 'maxazimuth', 'minazimuth', 'maxradius', 'minradius'):
-            area_circle = area_circle or d.has_key(k)
+            area_circle = area_circle or k in d
 
         # We refuse to accept any area_rectangle
         # (minlat, ... maxlon) constraints when in area_circle mode.
@@ -2739,16 +2742,16 @@ def gen_test_table(urlbase, fmt='html'):
 
 def make_html_test_table(hostport, filename):
     fid = open(filename, 'w+')
-    print >>fid, gen_test_table("http://" + hostport)
+    print(gen_test_table("http://" + hostport), file=fid)
     fid.close()
 
 
 def start_response(arg1, arg2):
     verbose = True
     if verbose:
-        print "Server Response:", arg1
-        print arg2[0][0], ':', arg2[0][1]
-        print
+        print("Server Response:", arg1)
+        print(arg2[0][0], ':', arg2[0][1])
+        print()
 
 
 # ----------------------------------------------------------------------
@@ -2764,10 +2767,10 @@ if __name__ == '__main__':
 
         port = 8005
         hostport = 'localhost:%i' % port
-        print "Starting wsgiref on port %(p)i" % {'p': port}
-        print "Now visit e.g. <%s/event/geofon?maxlat=-20>" % (hostport)
-        print " or <%s/event/catalogs>" % (hostport)
-        print " or <%s/event/meteor>" % (hostport)
+        print("Starting wsgiref on port %(p)i" % {'p': port})
+        print("Now visit e.g. <%s/event/geofon?maxlat=-20>" % (hostport))
+        print(" or <%s/event/catalogs>" % (hostport))
+        print(" or <%s/event/meteor>" % (hostport))
 
         #make_html_test_table(hostport, "test_events.html")
 
