@@ -132,13 +132,13 @@ class ListStats(list):
                 #         if max(sta[8], item[8]) > min(end1, end2):
                 #             continue
 
-                    # There is an overlap and therefore we guess that it is
-                    # the same station
-                    logging.warning('<ValueError')
-                    logging.warning(sta)
-                    logging.warning(item)
-                    logging.warning('ValueError>')
-                    raise ValueError
+                # There is an overlap and therefore we guess that it is
+                # the same station
+                logging.warning('<ValueError')
+                logging.warning(sta)
+                logging.warning(item)
+                logging.warning('ValueError>')
+                raise ValueError
 
         # Add network if not present
         logging.debug('Added')
@@ -275,15 +275,15 @@ def parseStationXML(invfile, archive='N/A'):
                                0, None, None, cha.get('locationCode')])
                 # SampleRateRatio: NumberSamples; NumberSeconds
                 try:
-                    denom = int(cha.find(namesp + 'SampleRateRatio').find(namesp + 'NumberSamples').text)
+                    denom = float(cha.find(namesp + 'SampleRateRatio').find(namesp + 'NumberSamples').text)
                     numer = int(cha.find(namesp + 'SampleRateRatio').find(namesp + 'NumberSeconds').text)
                 except Exception:
                     try:
                         # Otherwise SampleRate
-                        denom = int(cha.find(namesp + 'SampleRate').text)
+                        denom = float(cha.find(namesp + 'SampleRate').text)
                         numer = 1
                     except Exception:
-                        denom = numer = None
+                        denom = numer = 0
 
                 # Datalogger: Description
                 try:
