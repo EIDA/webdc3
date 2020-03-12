@@ -132,13 +132,13 @@ class ListStats(list):
                 #         if max(sta[8], item[8]) > min(end1, end2):
                 #             continue
 
-                # There is an overlap and therefore we guess that it is
-                # the same station
-                logging.warning('<ValueError')
-                logging.warning(sta)
-                logging.warning(item)
-                logging.warning('ValueError>')
-                raise ValueError
+                    # There is an overlap and therefore we guess that it is
+                    # the same station
+                    logging.warning('<ValueError')
+                    logging.warning(sta)
+                    logging.warning(item)
+                    logging.warning('ValueError>')
+                    raise ValueError
 
         # Add network if not present
         logging.debug('Added')
