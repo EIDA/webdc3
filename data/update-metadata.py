@@ -482,7 +482,7 @@ def getNetworks(stationserver='http://localhost/fdsnws/station/1'):
 
     # Parse and extract list of networks
     listnets = list()
-    for line in buf.readlines():
+    for line in buf.splitlines():
         if line.startswith('#'):
             continue
         listnets.append(line.split('|')[0])
@@ -513,6 +513,7 @@ def singlenodeInventory(stationserver='http://localhost/fdsnws/station/1',
         # Query StationWS
         url = '%s/query?level=%s&net=%s' % (stationserver, level, net)
         try:
+            logging.debug('Requesting inventory from network %s' % net)
             buf = downloadURL(url)
             logging.info('Writing to tmp file %d' % tmpfile)
             with open('%s-singlenode-%07d.xml' % (foutput, tmpfile), 'wt') as fout:
