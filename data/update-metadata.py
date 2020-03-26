@@ -471,6 +471,61 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
     return
 
 
+def getNetworks(stationserver='http://localhost/fdsnws/station/1'):
+    """Request a list of networks from a FDSN StationWS"""
+    url = "%s/query?level=network&format=text" % stationserver
+    try:
+        buf = downloadURL(url)
+    except Exception as e:
+        logging.error('Problem reading list of networks from StationWS %s' % stationserver)
+        raise Exception(str(e))
+
+    # Parse and extract list of networks
+    listnets = list()
+    for line in buf.readlines():
+        if line.startswith('#'):
+            continue
+        listnets.append(line.split('|')[0])
+
+    return listnets
+
+
+def singlenodeInventory(stationserver='http://localhost/fdsnws/station/1',
+                        level='station', foutput='inventory'):
+    """Connects to a FDSN Station-WS download the inventory in StationXML format.
+    The data is saved in the files with names starting as foutput. If old files
+    exist they will be deleted.
+
+    """
+
+    if foutput.endswith('.xml'):
+        foutput = foutput[:-4]
+
+    # Remove old temp files
+    for f in glob.glob('%s-*.xml' % (foutput)):
+        os.remove(f)
+
+    listnets = getNetworks(stationserver)
+
+    tmpfile = 0
+
+    for net in listnets:
+        # Query StationWS
+        url = '%s/query?level=%s&net=%s' % (stationserver, level, net)
+        try:
+            buf = downloadURL(url)
+            logging.info('Writing to tmp file %d' % tmpfile)
+            with open('%s-singlenode-%07d.xml' % (foutput, tmpfile), 'wt') as fout:
+                fout.write(buf)
+                tmpfile += 1
+        except Exception:
+            pass
+
+        # FIXME To make shorter the process
+        # break
+    return
+
+
 def url2archive(url):
 
     o = urlparse(url)
@@ -525,7 +580,7 @@ def main():
     parser = argparse.ArgumentParser(description=desc)
 
     defaultRS = 'http://www.orfeus-eu.org/eidaws/routing/1'
-    parser.add_argument('-r', '--routing',default=defaultRS,
+    parser.add_argument('-r', '--routing', default=defaultRS,
                         help='Routing Service from which the inventory should be read.')
     parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
                         help='Filename where inventory should be saved.')
@@ -535,6 +590,8 @@ def main():
                         help='Do not download inventory and re-use the available files.')
     parser.add_argument('-sp', '--skip-parse', action='store_true',
                         help='Do not parse the StationXML files downloaded from the endpoints.')
+    parser.add_argument('--singlenode', default=None,
+                        help='Get inventory from a single StationWS instead of a Routing Service.')
     args = parser.parse_args()
 
     logging.basicConfig(level=args.log)
@@ -544,8 +601,12 @@ def main():
     if args.skip_download:
         logging.warning('Skipping download of inventory from endpoints')
     else:
-        downloadInventory(routingserver=args.routing, level='channel',
-                          foutput=foutput)
+        if args.singlenode is None:
+            downloadInventory(routingserver=args.routing, level='channel',
+                              foutput=foutput)
+        else:
+            singlenodeInventory(stationserver=args.singlenode, level='channel',
+                                foutput=foutput)
         logging.info('Inventory downloaded')
 
 
@@ -590,15 +651,17 @@ def main():
             pickle.dump((list(ptNets), list(ptStats), list(ptLocs), list(ptChans), ptStreamIdx),
                         cache)
 
-    vnraw = downloadURL('%s/virtualnets' % args.routing)
-    vnjson = json.loads(vnraw)
-
     logging.info('%d networks' % len(ptNets))
     logging.info('%d stations' % len(ptStats))
     logging.info('%d locations' % len(ptLocs))
     logging.info('%d channels' % len(ptChans))
 
-    parseVirtualNets(vnjson, ptNets, ptStats)
+    # Skip virtual networks of reading inventory from a single node
+    if args.singlenode is None:
+        vnraw = downloadURL('%s/virtualnets' % args.routing)
+        vnjson = json.loads(vnraw)
+
+        parseVirtualNets(vnjson, ptNets, ptStats)
 
     logging.info('%d networks (including virtual networks)' % len(ptNets))
 
