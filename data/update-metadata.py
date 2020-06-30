@@ -552,6 +552,8 @@ def url2archive(url):
         return 'NOA'
     elif o.hostname.endswith('uib.no'):
         return 'UIB'
+    elif o.hostname.endswith('icgc.cat'):
+        return 'ICGC'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
 
