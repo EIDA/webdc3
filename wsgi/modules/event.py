@@ -315,13 +315,6 @@ Service version:
                 d[k]["preferred"] = True
 
         indent = None
-        if indent:
-            joint = ",\n" + indent * " "
-        else:
-            joint = ", "
-        prefService = self._EventServicePreferred
-
-        indent = None
         tmp = json.dumps(d, indent=indent)
 
         # DEBUG: Check the output string is loadable.
