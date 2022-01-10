@@ -1201,19 +1201,60 @@ function RequestControl(htmlTagId) {
 		datapack.renderStation(_controlDiv.find("#" + id + "-stations-div"), _controlDiv.find("#" + id + "-stations-count"));
 	}
 
+	function _presets(param) {
+		switch (param.requesttype) {
+			case "FDSNWS-dataselect": return {
+				service: "dataselect",
+				options: {},
+				bulk: false,
+				merge: true,
+				contentType: "application/vnd.fdsn.mseed",
+				filename: param.description.replace(' ', '_') + ".mseed"
+			}
+
+			case "FDSNWS-station-xml": return {
+				service: "station",
+				options: { format: "xml", level: param.level },
+				bulk: true,
+				merge: false,
+				contentType: "application/xml",
+				filename: param.description.replace(' ', '_') + ".xml"
+			}
+
+			case "FDSNWS-station-text": return {
+				service: "station",
+				options: { format: "text", level: param.level },
+				bulk: true,
+				merge: true,
+				contentType: "text/plain",
+				filename: param.description.replace(' ', '_') + ".txt"
+			}
+
+			default: return {}
+		}
+	}
+
 	function _submit(info) {
-		wiConsole.info("Fetching the list of time windows...")
+		wiConsole.info("Fetching the list of time windows...");
 		wiService.metadata.timewindows(function(tw) {
-			wiConsole.info("...done")
+			wiConsole.info("...done");
 
 			if (tw.length > 0) {
 				info.request.timewindows = JSON.stringify(tw);
-				wiStatusListControl.setUser(info.request.user);
 
-				if (info.review)
-					wiStatusListControl.reviewRequest(info.request);
-				else
-					wiStatusListControl.submitRequest(info.request);
+				if (info.review) {
+					wiRequestReviewControl.review(info.request,
+						function() {
+							wiFDSNWS_Control.submitRequest($.extend(info.request, _presets(info.request)));
+							return true;
+						},
+						function() {
+							return confirm("Discard request?");
+						}
+					)
+				} else {
+					wiFDSNWS_Control.submitRequest($.extend(info.request, _presets(info.request)));
+				}
 			}
 			else {
 				wiConsole.warning("None of the requested streams were available in the given time period.");

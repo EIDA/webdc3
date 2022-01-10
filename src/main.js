@@ -1,7 +1,7 @@
 /*
  * WebDC 3
  *
- * (C) 2013-2016 Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+ * Copyright (C) 2013-2016 Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
  *
  */
 
@@ -10,7 +10,6 @@ import initConfig from './config'
 import initMapping from './mapping'
 import initService from './service'
 import initFdsnws from './fdsnws'
-import initStatus from './status'
 import initRequest from './request'
 import initEvents from './events'
 import initStation from './station'
@@ -18,7 +17,7 @@ import initSubmit from './submit'
 import initReview from './review'
 import initInterface from './interface'
 
-var VERSION = "1.1 (2016.127)"
+var VERSION = "1.2 (2019.331)"
 
 window.WIError = function(message) {
 	this.name = undefined // omit exception name on the console
@@ -44,7 +43,6 @@ $(document).ready(function() {
 	.then(initMapping)
 	.then(initService)
 	.then(initFdsnws)
-	.then(initStatus)
 	.then(initRequest)
 	.then(initEvents)
 	.then(initStation)

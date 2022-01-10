@@ -11,7 +11,7 @@
 """
 Metadata module for the ArcLink web interface
 
-Copyright (C) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+Copyright (C) 2013-2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Exports the functions needed by the Javascript running in the web-browser.
 All the functions must be called via an URL with the following format

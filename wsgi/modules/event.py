@@ -10,7 +10,7 @@
 """
 Interface to various event services.
 
-Copyright (C) 2013--2015 GEOFON team, Helmoltz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
+Copyright (C) 2013-2015 GEOFON team, Helmholtz-Zentrum Potsdam - Deutsches GeoForschungsZentrum GFZ
 
 Provides a thin wrapper to event services.
 Implemented as part of a WSGI application.
@@ -90,12 +90,12 @@ except ImportError:
                 else:
                     name = "Region S"
 
-                name += "%i" % (int(abs(flat)/10.0))
+                name += "%i" % (int(abs(flat) / 10.0))
                 if flon > 0:
                     name += "E"
                 else:
                     name += "W"
-                name += "%i" % (int(abs(flon)/22.5))
+                name += "%i" % (int(abs(flon) / 22.5))
                 return name
 
 try:
@@ -132,7 +132,7 @@ Service version:
 """
 
     def __init__(self, wi):
-        if wi == None:
+        if wi is None:
             return
 
         known_handlers = ('comcat', 'emsc', 'fdsnws', 'geofon', 'meteor', 'neic', 'parser')
@@ -157,7 +157,7 @@ Service version:
             h = self.services[k].get('handler', None)
             # Exception for old config files:
 # FIXME - unneeded??
-            if (h == None) and (k in known_handlers):
+            if (h is None) and (k in known_handlers):
                 h = k
 ##            # Assign a handler if none was provided in configuration
 # #           if not self.services[k].has_key('handler'):
@@ -174,7 +174,8 @@ Service version:
         logs.info("Only serve registered event services: %s" % (self.registeredonly))
         logs.info("Registered event service(s):")
         for s in sorted(self.services):
-            logs.info("%24s: %s" % ("'"+s+"'", self._EventServiceCatalog.get(s, (None,))[0]))
+            logs.info("%24s: %s" % ("'" + s + "'",
+                                    self._EventServiceCatalog.get(s, (None,))[0]))
         logs.info("Preferred event service: %s" % (self._EventServicePreferred))
 
         #NOT NEEDED: self.defaultLimit = config['defaultLimit']
@@ -214,7 +215,7 @@ Service version:
             # This exception means users don't have to update their
             # old webinterface.cfg. It should be removed in future.
             #
-            if s in known_handlers and props.get("handler", None) == None:
+            if s in known_handlers and props.get("handler", None) is None:
                 h = s
                 logs.notice("Assuming handler '%s'; you should set this explicitly in webinterface.cfg with:" % h)
                 logs.notice("  event.service.%s.handler = '%s'" % (s, h))
@@ -241,7 +242,7 @@ Service version:
             elif h == 'comcat':
                 es = ESComcat(s, options, props['baseURL'], props['extraParams'])
             elif h == 'emsc':
-                es = ESEMSC(s, options,   props['baseURL'], props['extraParams'])
+                es = ESEMSC(s, options, props['baseURL'], props['extraParams'])
             elif h == 'fdsnws':
                 es = ESFdsnws(s, options, props['baseURL'], props['extraParams'])
             elif h == 'meteor':
@@ -311,13 +312,24 @@ Service version:
         # A hack here to force the preferred key to come first:
         indent = None
         if indent:
-            joint = ",\n" + indent*" "
+            joint = ",\n" + indent * " "
         else:
             joint = ", "
         prefService = self._EventServicePreferred
+
+        if 'isc' in d.keys():
+            rest = d.pop('isc')
+        else:
+            rest = None
+
         left = json.dumps({prefService: d.pop(prefService)}, indent=indent)[0:-1]
         right = json.dumps(d, indent=indent).lstrip("{")
         tmp = left.rstrip() + joint + right.lstrip()
+
+        if (rest is not None):
+            left = tmp[0:-1]  # Only remove the final '}'
+            right = json.dumps({'isc': rest}, indent=indent).lstrip('{')
+            tmp = left.rstrip() + joint + right.lstrip()
 
         # DEBUG: Check the output string is loadable.
         tmp2 = json.loads(tmp)
@@ -360,7 +372,8 @@ Service version:
 
         """
         params_white_list = ('informat', 'format', 'columns', 'input')
-        es = self.es['parser'] # Re-use existing service ##es = ESFile("file", options)
+        es = self.es['parser']
+        # Re-use existing service ##es = ESFile("file", options)
         for name in params.keys():
             if name not in params_white_list:
                 return [bodyBadRequest(envir, 'Unknown parameter name supplied', 'parser')]
@@ -452,13 +465,13 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
     All angles are in *degrees*.
 
     Position vectors are:
-     (x,y,z) = a*[ cos(lon)*cos(lat), sin(lon)*cos(lat), sin(lat) ]
+     (x, y, z) = a*[ cos(lon)*cos(lat), sin(lon)*cos(lat), sin(lat) ]
     Spherical distance is arccos( v_0 dot v_1 ).
 
     WARNING: Probably inaccurate near 0 and 180 deg distance, where cos(dotp) = 1.
 
     """
-    deg2rad = math.pi/180.0
+    deg2rad = math.pi / 180.0
     lat_0 = lat_0 * deg2rad
     lon_0 = lon_0 * deg2rad
     lat_1 = lat_1 * deg2rad
@@ -468,12 +481,12 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
     #x1 = math.cos(lon_1)*math.cos(lat_1)
     #y0 = math.sin(lon_0)*math.cos(lat_0)
     #y1 = math.sin(lon_1)*math.cos(lat_1)
-    delta_lon = (lon_1 - lon_0 ) % (2*math.pi)
-    term_1 = math.cos(lat_0)*math.cos(lat_1)*math.cos(delta_lon)
+    delta_lon = (lon_1 - lon_0) % (2 * math.pi)
+    term_1 = math.cos(lat_0) * math.cos(lat_1) * math.cos(delta_lon)
     z0 = math.sin(lat_0)
     z1 = math.sin(lat_1)
-    #dotp = x0*x1 + y0*y1 + z0*z1
-    dotp = term_1 + z0*z1
+    #dotp = x0 * x1 + y0 * y1 + z0 * z1
+    dotp = term_1 + z0 * z1
 
     # Need the angle in (0, 180]:
     if dotp == -1:
@@ -483,7 +496,7 @@ def _delazi(lat_0, lon_0, lat_1, lon_1):
     #elif (dotp < 0):
     #    d = math.pi - math.acos(dotp)  # not needed, Python acos does this.
 
-    d = d/deg2rad
+    d = d / deg2rad
     #print 'TEST', lat_0, lon_0, lat_1, lon_1, dotp, d
     assert(d >= 0.0)
     assert(d <= 180.0)
@@ -502,9 +515,9 @@ def repr_dialect(d):
      |  quotechar = '%s'
      |  quoting = '%s'
      |  skipinitialspace = '%s'
-""" % ( d.delimiter, d.doublequote,
-        d.escapechar, repr(d.lineterminator),
-        d.quotechar, d.quoting, d.skipinitialspace)
+""" % (d.delimiter, d.doublequote,
+       d.escapechar, repr(d.lineterminator),
+       d.quotechar, d.quoting, d.skipinitialspace)
 
 def date_T(arg):
         """Dates should be 'yyyy-mm-ddThh:mm:ss', with no trailing Z or zone or milliseconds.
@@ -534,7 +547,7 @@ def date_T(arg):
             tmp = tmp[0:dot]
         return tmp.replace(' ', 'T', 1)
 
-def tagged(tag, strings, attrs = {}):
+def tagged(tag, strings, attrs={}):
     """Mark up all the items in the list 'strings' with the same tag 'tag'.
 
     Inputs:
@@ -740,7 +753,7 @@ class EventWriter(object):
 
     def write_one(self, index):
         if index >= 0 and index < len(self.data):
-            return str(index)+': '+str(self.data[index])
+            return str(index) + ': ' + str(self.data[index])
         else:
             return ''
 
@@ -940,7 +953,7 @@ class EventData(object):
 
         # Throw away header, convert the rest:
         for row in tmp[1:]:
-            for q in range(1,5):
+            for q in range(1, 5):
                 row[q] = floatorwhat(row[q], None)
             self.data.append(row)
 
@@ -1052,7 +1065,7 @@ class EventResponse(object):
         self.cols = {'otm': 0, 'mag': 1, 'mtyp': 2,
                      'lat': 3, 'lon': 4, 'dep': 5,
                      'id': 6, 'region': 7}
-        self.ed = EventData() #####
+        self.ed = EventData()
         self.lookupIfEmpty = options['lookupIfEmpty']
         self.lookupIfGiven = options['lookupIfGiven']
 
@@ -1063,7 +1076,7 @@ class EventResponse(object):
         """
         self.rows = rows
 
-    def load_csv(self, rows, limit, dialect = None):
+    def load_csv(self, rows, limit, dialect=None):
         """
         Inputs:
           rows - string, data from target service.
@@ -1090,11 +1103,11 @@ class EventResponse(object):
         for row in rows.splitlines():
             numrows += 1
             print >>fid, row
-            if (not limit) or numrows > 2*limit:
+            if (not limit) or numrows > 2 * limit:
                 break
         fid.close()
 
-        if dialect == None:
+        if dialect is None:
             sniffer = csv.Sniffer()
             guess = sniffer.sniff(rows)
             logs.debug("Guessed dialect: %s" % (repr_dialect(guess)))
@@ -1108,7 +1121,7 @@ class EventResponse(object):
             logs.debug("Oops, temporary file '%s' couldn't be opened.", fname)
             raise
 
-        logs.info('Reopened '+fname)
+        logs.info('Reopened ' + fname)
         reader = csv.reader(fid, dialect)
         #logs.error("Reader dialect: %s" % (repr_dialect(dialect)))
 
@@ -1190,7 +1203,7 @@ class EventResponse(object):
                 #logs.debug("(%s -> %s)" % (old, new))
                 ev[col] = new
 
-    def fill_keys(self, prefix = "row", keyIfGiven = False):
+    def fill_keys(self, prefix="row", keyIfGiven=False):
         """Use this function to assign event IDs.
 
         prefix - string, used to make ids like "{prefix}{nnn}"
@@ -1204,7 +1217,7 @@ class EventResponse(object):
         if num_rows < 1:
             return
 
-        seq_fmt = "%%0%1ii" % (int(math.log10(num_rows))+1)
+        seq_fmt = "%%0%1ii" % (int(math.log10(num_rows)) + 1)
         col = self.cols['id']
         for row in range(num_rows):
             ev = self.ed.data[row]
@@ -1234,8 +1247,8 @@ class EventResponse(object):
         elif fmt == 'text':
             # Like 'raw', but supports the 'limit' constraint.
             row_end = 0
-            for i in range(limit+1):  # Allow one more for header.
-                row_end = self.rows.find('\n', row_end+1)
+            for i in range(limit + 1):  # Allow one more for header.
+                row_end = self.rows.find('\n', row_end + 1)
             if row_end >= 0 and row_end < len(self.rows):
                 logs.error("Truncated %i to %i (%i rows)" % (len(self.rows), row_end, limit))
                 return self.rows[0:row_end]
@@ -1289,7 +1302,7 @@ class EventService(object):
 
     _EventsErrorTemplate = WI_Module(None)._EventsErrorTemplate
 
-    def __init__(self, name, options, service_url = '', extra_params = ''):
+    def __init__(self, name, options, service_url='', extra_params=''):
         self.id = name
         self.service_url = service_url
         self.extra_params = extra_params
@@ -1336,7 +1349,7 @@ class EventService(object):
                 min_lat = None
 
         else:
-            d_lon = min(180.0, max_radius/math.cos(arg*math.pi/180.0))
+            d_lon = min(180.0, max_radius / math.cos(arg * math.pi / 180.0))
             # Division by zero for arg = +/- 90.
             # In this case the circle *touches* a pole.
 
@@ -1395,7 +1408,7 @@ class EventService(object):
             except urllib2.URLError as e:
                 logs.error("Errors fetching from URL: %s" % (url))
                 logs.error(str(e))
-                raise ##urllib2.URLError(e)
+                raise   # urllib2.URLError(e)
                 #return self.error_page(environ, start_response,
                 #                       '503 Temporarily Unavailable',
                 #                       "No answer")
@@ -1407,7 +1420,7 @@ class EventService(object):
                 fid.close()
         return rows, url
 
-    def format_response(self, rows, limit, fmt = 'json-row'):
+    def format_response(self, rows, limit, fmt='json-row'):
         """Load the data into a clean structure.
 
         Inputs:
@@ -1488,7 +1501,7 @@ class EventService(object):
         except SyntaxError as e:
             self.raise_client_400(environ, str(e))
 
-    def error_body(self, environ, response_code, message = "Unspecified"):
+    def error_body(self, environ, response_code, message='Unspecified'):
         """Standardised error response.
 
         See the FDSN web service specification at
@@ -1503,7 +1516,7 @@ class EventService(object):
                                             'date_time': str(datetime.datetime.utcnow()),
                                             'version': WI_Module(None)._EventsVersion}
 
-    def raise_client_error(self, environ, response_code, message = "Unspecified"):
+    def raise_client_error(self, environ, response_code, message='Unspecified'):
         """Use this for error pages to be delivered to the client.
 
         For this to work, the WSGI application() must catch the error,
@@ -1733,11 +1746,11 @@ class ESFile(EventService):
         (2, None, None, 0, 1, 4, None, None)
 
         """
-        cols = 8*[None]
+        cols = 8 * [None]
         d = {'latitude': 3,
              'longitude': 4,
              'depth': 5,
-             'time': 0 }
+             'time': 0}
         for k, v in d.items():
             try:
                 i = columns.index(k)
@@ -1861,7 +1874,7 @@ class ESFile(EventService):
         er.fill_regions()
         er.fill_keys('user' + str(int(datetime.datetime.now().strftime("%s")) % 1000))
 
-        logs.debug('ESFile::handler: final data:\n'+str(er.ed.data))
+        logs.debug('ESFile::handler: final data:\n' + str(er.ed.data))
 
         ###output_fmt = 'json'  # :FIXME: Currently this overrides users's input
         content = er.write(limit, output_fmt)
@@ -1941,7 +1954,7 @@ class ESEMSC(EventService):
         ## If I had CSV already, I could do this:
         #for row in allrows:
         #    if len(row) > 1:
-        #        row[1] = row[0]+'T'+row[1];
+        #        row[1] = row[0] + 'T' + row[1];
         #        row.pop(0)
 
         # But at this stage 'allrows' is just a string.
@@ -1956,8 +1969,8 @@ class ESEMSC(EventService):
         rows = []
         for row in allrows.splitlines():  # Same separator as the lineterminator used in their CSV?
             rows.append("T".join(row.split(self.csv_dialect.delimiter, 1)))
-            if (len(rows)) > 2*limit:
-                break;
+            if (len(rows)) > 2 * limit:
+                break
         allrows = "\n".join(rows)
 
         return self.send_response(environ, start_response, '', allrows, limit, fmt)
@@ -1977,10 +1990,14 @@ class ESMeteor(EventService):
 
     def handler(self, environ, parameters):
 
-        columns='''"Event ID";"F-E Region";Magnitude;MagType;Status;"Origin time";Latitude;Longitude;"Depth (km)";Flags'''.split(';')
+        columns = '''"Event ID";"F-E Region";Magnitude;MagType;Status;"Origin time";Latitude;Longitude;"Depth (km)";Flags'''.split(';')
         sep = '|'
         allrows = sep.join(columns) + "\n"
-        allrows += (sep.join(['ev123abc','Chelyabinsk',str(2.0),'Mw','M','2013-04-01T00:00:00Z', str(55.15), str(61.41), str(-5.0), 'xxl']) + "\n")
+        allrows += (sep.join(['ev123abc', 'Chelyabinsk',
+                              str(2.0), 'Mw', 'M',
+                              '2013-04-01T00:00:00Z',
+                              str(55.15), str(61.41), str(-5.0),
+                              'xxl']) + "\n")
         fmt = str(parameters.get('format', ['raw'])[0])
         if verbosity > 2:
             logs.error("Meteor::handler(): fmt=%s map=%s" % (fmt, str(self.column_map)))
@@ -2053,7 +2070,7 @@ def millidate(name, parameters):
                 raise ValueError
         except ValueError:
             seconds = "1370000000"
-        outvalue = str(1000*(int(seconds) + 3600))  # FUDGE FIXME
+        outvalue = str(1000 * (int(seconds) + 3600))  # FUDGE FIXME
         if verbosity > 3:
             logs.debug(" ...to '%s=%s'." % (outname, outvalue))
 
@@ -2601,7 +2618,7 @@ class ESFdsnws(EventService):
 
         # check response for "no data" returned
         check_string = "Error 413"
-        if (check_string in allrows) or (len(allrows) < 5 ):
+        if (check_string in allrows) or (len(allrows) < 5):
             self.raise_client_204(environ, 'No events returned')
 
         # PLE: I'm not sure whether we need to send the header row ourselves.
@@ -2613,13 +2630,19 @@ class ESFdsnws(EventService):
         # rebuild the resultset
         for item in myallrow:
             if(item):
-                if(item[0]=="#"):
+                if(item[0] == '#'):
                     continue
 
                 this_row = item.split("|")
                 mytime = this_row[1].split(".")
                 my_row_for_send += ""+mytime[0]+"|"+this_row[10]+"|"+this_row[9]+"|"+this_row[2]+"|"+this_row[3]+"|"+this_row[4]+"|\""+this_row[0]+"\"|\""+this_row[12]+"\"\n"  #schema: 1 | 10 | 9 | 2 | 3 | 4 | 0 | 12
-
+                #CANDIDATE FIXME:
+#                my_row_for_send  += '|'.join((mytime[0],
+#                                              this_row[10], this_row[9],
+#                                              this_row[2], this_row[3],
+#                                              this_row[4],
+#                                              '"' + this_row[0] + '"',
+#                                              '"' + this_row[12] + '"\n'))
         fmt = str(parameters.get('format', ['text'])[0])
 
         return self.send_response(environ, start_response, header, my_row_for_send, limit, fmt)
@@ -2693,18 +2716,18 @@ def gen_test_table(urlbase, fmt='html'):
                 url = make_url(urlbase, col, row)
                 yield url
 
-    if fmt=='html':
+    if fmt == 'html':
         s = "<table>"
         s += tagged("tr", tagged("th", _EventServiceCatalog))
         for row in defaultParamNames:
             s += "<tr>"
             for col in _EventServiceCatalog:
                 url = make_url(urlbase, col, row)
-                s+= tagged("td", tagged("a", row, {'href': url}))
+                s += tagged("td", tagged("a", row, {'href': url}))
             s += "</tr>"
         s += "</table>"
 
-    elif fmt=="list":
+    elif fmt == "list":
         s = "# == Link Table for Event Service =="
         for link in get_one():
             s += link
@@ -2716,7 +2739,7 @@ def gen_test_table(urlbase, fmt='html'):
 
 def make_html_test_table(hostport, filename):
     fid = open(filename, 'w+')
-    print >>fid, gen_test_table("http://"+hostport)
+    print >>fid, gen_test_table("http://" + hostport)
     fid.close()
 
 
@@ -2724,7 +2747,7 @@ def start_response(arg1, arg2):
     verbose = True
     if verbose:
         print "Server Response:", arg1
-        print arg2[0][0],":", arg2[0][1]
+        print arg2[0][0], ':', arg2[0][1]
         print
 
 

@@ -37,12 +37,7 @@ function interface_init() {
 			$('#wi-ConsoleLabel').removeClass('wi-console-error-tab')
 		}
 		else if ($(item.target).val() == 'download') {
-			wiStatusQueryControl.checkCookie()
 			$('#wi-DownloadLabel').removeClass('wi-download-alert-tab')
-		}
-		else {
-			wiStatusQueryControl.clear()
-			wiStatusFullControl.clear()
 		}
 	})
 
@@ -63,8 +58,8 @@ function interface_init() {
 			wiConsole.resetLevel()
 	})
 
-	wiStatusListControl.setCallback(function() {
-		if ($('#wi-StatusListControl').is(':hidden'))
+	wiFDSNWS_Control.setCallback(function() {
+		if ($('#wi-FDSNWS-Control').is(':hidden'))
 			$('#wi-DownloadLabel').addClass('wi-download-alert-tab')
 	})
 

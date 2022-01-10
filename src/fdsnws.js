@@ -174,6 +174,7 @@ function FDSNWS_Download(controlDiv, db, authToken, data, options, bulk, merge, 
 	function doAjax(ajax, url, p, username, password) {
 		var q = $.extend({}, p)
 		delete q['id']
+		delete q['priority']
 
 		handle = ajax({
 			method: 'GET',
@@ -729,7 +730,7 @@ function FDSNWS_Control(controlDiv) {
 		})
 	}
 
-	function loadRequests(done, fail) {
+	function loadRequests() {
 		return new Promise(function(resolve, reject) {
 			var t = db.transaction(["requests"])
 
@@ -763,48 +764,81 @@ function FDSNWS_Control(controlDiv) {
 		callback()
 
 		var timewindows = JSON.parse(param.timewindows)
-		var postData = 'service=' + param.service + '\nformat=json\n'
 
-		$.each(timewindows, function(i, item) {
-			var start = item[0]
-			var end = item[1]
-			var net = item[2]
-			var sta = item[3]
-			var cha = item[4]
-			var loc = item[5]
+		// If using a routing service
+		if (routing) {
+			var postData = 'service=' + param.service + '\nformat=json\n'
 
-			if (loc == '')
-				loc = '--'
+			$.each(timewindows, function(i, item) {
+				var start = item[0]
+				var end = item[1]
+				var net = item[2]
+				var sta = item[3]
+				var cha = item[4]
+				var loc = item[5]
 
-			postData += net + ' ' + sta + ' ' + loc + ' ' + cha + ' ' + start + ' ' + end + '\n'
-		})
+				if (loc == '')
+					loc = '--'
 
-		$.ajax({
-			type: 'POST',
-			url: routerURL,
-			data: postData,
-			contentType: 'text/plain',
-			dataType: 'json',
-			success: function(data) {
-				if (!data) {
-					wiConsole.error("fdsnws.js: no routes received")
+				postData += net + ' ' + sta + ' ' + loc + ' ' + cha + ' ' + start + ' ' + end + '\n'
+			})
+
+			$.ajax({
+				type: 'POST',
+				url: routerURL,
+				data: postData,
+				contentType: 'text/plain',
+				dataType: 'json',
+				success: function(reqData) {
+					if (!reqData) {
+						wiConsole.error("fdsnws.js: no routes received")
+						reqDiv.remove()
+						return
+					}
+
+					reqData.options = param.options
+					reqData.bulk = param.bulk
+					reqData.merge = param.merge
+					reqData.filename = param.filename
+					reqData.contentType = param.contentType
+					req.load(reqData)
+					req.create()
+				},
+				error: function(jqXHR, textStatus) {
+					wiConsole.error("fdsnws.js: routing failed: " + ajaxErrorMessage(jqXHR, textStatus))
 					reqDiv.remove()
-					return
 				}
+			})
+		// If using a local FDSNWS without routing
+		} else {
+			var reqData = [{
+				url: fdsnwsURL + '/' + param.service + '/1/query',
+				name: param.service,
+				params: []
+			}]
 
-				data.options = param.options
-				data.bulk = param.bulk
-				data.merge = param.merge
-				data.filename = param.filename
-				data.contentType = param.contentType
-				req.load(data)
-				req.create()
-			},
-			error: function(jqXHR, textStatus) {
-				wiConsole.error("fdsnws.js: routing failed: " + ajaxErrorMessage(jqXHR, textStatus))
-				reqDiv.remove()
-			}
-		})
+			$.each(timewindows, function(i, item) {
+				var start = item[0]
+				var end = item[1]
+				var net = item[2]
+				var sta = item[3]
+				var cha = item[4]
+				var loc = item[5]
+
+				if (loc == '')
+					loc = '--'
+
+				reqData[0]['params'].push({ net: net, sta: sta, loc: loc, cha: cha, start: start, end: end })
+			})
+
+			reqData.options = param.options
+			reqData.bulk = param.bulk
+			reqData.merge = param.merge
+			reqData.filename = param.filename
+			reqData.contentType = param.contentType
+			req.load(reqData)
+			req.create()
+		}
 	}
 
 	function setCallback(cb) {
@@ -824,8 +858,13 @@ function FDSNWS_Control(controlDiv) {
 			var text = openpgp.message.readArmored(tok).getText()
 
 			if (!text) {
-				wiConsole.error("fdsnws.js: invalid auth token: No auth data")
-				return
+				try {
+					text = openpgp.cleartext.readArmored(tok).getText()
+				}
+				catch(e) {
+					wiConsole.error("fdsnws.js: invalid auth token: No auth data")
+					return
+				}
 			}
 
 			var auth = $.parseJSON(text)
@@ -845,7 +884,10 @@ function FDSNWS_Control(controlDiv) {
 
 	buildControl()
 
+	// Get routing configuration
+	var routing = (configurationProxy.value('fdsnws.routing', 'true') == 'true')
 	var routerURL = configurationProxy.value('fdsnws.routerURL', '/eidaws/routing/1/query')
+	var fdsnwsURL = configurationProxy.value('fdsnws.fdsnwsURL', '/fdsnws').replace(/\/+$/, '')
 
 	// Public interface
 	this.init = init
