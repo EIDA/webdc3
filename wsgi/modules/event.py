@@ -293,6 +293,7 @@ Service version:
                         "description": None}
 
         d = dict.fromkeys(self._EventServiceCatalog.keys())
+        prefService = self._EventServicePreferred
         for k in d.keys():
             d[k] = dict(handler_capabilities_default)
             d[k]["description"] = self._EventServiceCatalog[k][0]
@@ -309,7 +310,10 @@ Service version:
             elif handler == "fdsnws":
                 d[k]["hasDepth"] = True
 
-        # A hack here to force the preferred key to come first:
+            # Set preferred attribute for the preferred key (only):
+            if k == prefService:
+                d[k]["preferred"] = True
+
         indent = None
         if indent:
             joint = ",\n" + indent * " "
@@ -317,19 +321,8 @@ Service version:
             joint = ", "
         prefService = self._EventServicePreferred
 
-        if 'isc' in d.keys():
-            rest = d.pop('isc')
-        else:
-            rest = None
-
-        left = json.dumps({prefService: d.pop(prefService)}, indent=indent)[0:-1]
-        right = json.dumps(d, indent=indent).lstrip("{")
-        tmp = left.rstrip() + joint + right.lstrip()
-
-        if (rest is not None):
-            left = tmp[0:-1]  # Only remove the final '}'
-            right = json.dumps({'isc': rest}, indent=indent).lstrip('{')
-            tmp = left.rstrip() + joint + right.lstrip()
+        indent = None
+        tmp = json.dumps(d, indent=indent)
 
         # DEBUG: Check the output string is loadable.
         tmp2 = json.loads(tmp)
