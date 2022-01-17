@@ -46,10 +46,31 @@ function EventSearchControl(htmlTagId) {
 		var select = _controlDiv.find("#escCatalog");
 		select.empty();
 
-		for(var key in _catalogList) {
-			var item = _catalogList[key];
-			select.append('<option value="' + key + '">' + item.description + '</option>');
+	    var keys = [];
+	    /**
+	     * If no preference is set in `webinterface.cfg`, there
+	     * will be no preferred attribute in the catalog
+	     * output. If more than one is set as preferred, the last
+	     * one wins. The remaining items are sorted by
+	     * description.
+	     */
+	    var preferred = '';
+	    for (const k in _catalogList) {
+		if (_catalogList.hasOwnProperty(k)) {
+		    if (_catalogList[k].preferred !== undefined) {
+			preferred = k;
+		    }
+		    keys.push(Object.assign(_catalogList[k], {'id': k}));
 		}
+	    }
+	    keys.sort(function(a, b) {
+		if (a.id === preferred) return -1;
+		return a.description > b.description;
+	    });
+	    for (var i = 0; i < keys.length; i++) {
+		var item = keys[i];
+		select.append('<option value="' + item.id + '">' + item.description + '</option>');
+	    }
 
 		updateControlState();
 	}
