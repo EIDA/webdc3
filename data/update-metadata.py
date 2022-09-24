@@ -56,24 +56,28 @@ def makestationcode(sta, year):
 
 
 class ListChans(list):
-    __slots__ = ()
+    # __slots__ = ()
 
     def __init__(self):
         super(ListChans, self).__init__()
+        self.keys = set()
 
     def extend(self, chas):
         for cha in chas:
             self.append(cha)
 
     def append(self, cha):
-        logging.debug('Try to add channel: %s' % cha)
-        for ind, item in enumerate(self):
-            # If network.station.location-year code is already in the list
-            if (item[0] == cha[0]) and (item[1] == cha[1]):
-                return
+        logging.debug('Try to add channel: %s' % (cha,))
+        if (cha[0], cha[1]) in self.keys:
+            return
+        # for ind, item in enumerate(self):
+        #     # If network.station.location-year code is already in the list
+        #     if (item[0] == cha[0]) and (item[1] == cha[1]):
+        #         return
 
         # Add location if not present
         logging.debug('Added')
+        self.keys.add((cha[0], cha[1]))
         super(ListChans, self).append(cha)
 
 
@@ -611,7 +615,6 @@ def main():
             singlenodeInventory(stationserver=args.singlenode, level='channel',
                                 foutput=foutput)
         logging.info('Inventory downloaded')
-
 
     # File with incomplete inventory (no virtual networks)
     auxfile = 'webinterface-novn.bin'
