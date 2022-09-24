@@ -560,6 +560,8 @@ def url2archive(url):
         return 'ICGC'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
+    elif o.hostname.endswith('ncedc.org'):
+        return 'NCEDC'
 
     raise Exception('Unknown data centre: %s' % o.hostname)
 
