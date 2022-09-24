@@ -636,6 +636,10 @@ def main():
             basefn, archive, auxidx = filename[:-4].split('-')
             idx = int(auxidx)
 
+            if os.path.getsize(filename) < 15:
+                logging.error('Error checking %s. File empty?' % filename)
+                continue
+
             with open(filename) as fin:
                 logging.info('Opening tmp file %s' % filename)
                 nets2add, stats2add, locs2add, chans2add = parseStationXML(fin, archive=archive)
