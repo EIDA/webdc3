@@ -649,7 +649,7 @@ def main():
                 ptChans.extend(chans2add)
 
         ptNets.sort()
-        ptStats.sort()
+        ptStats.sort(key=lambda (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11): (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9 if s9 is not None else datetime.datetime.max, s10, s11))
         ptLocs.sort()
         ptChans.sort()
 
@@ -844,3 +844,4 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
 
 
 main()
+
