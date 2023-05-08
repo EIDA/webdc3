@@ -263,6 +263,7 @@ function MapControl(htmlTagId) {
 		controls.push(new OpenLayers.Control.PanPanel());
 		controls.push(new OpenLayers.Control.ZoomPanel());
 		controls.push(new OpenLayers.Control.Navigation());
+		controls.push(new OpenLayers.Control.Attribution());
 
 		/*
 		 * consider:
