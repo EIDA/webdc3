@@ -843,5 +843,5 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
     return
 
 
-main()
-
+if __name__ == '__main__':
+    main()
