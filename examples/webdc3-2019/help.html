@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>WebDC3 web interface at GEOFON - Help</title>
+
+	<!-- Those should be loaded from the page -->
+
+	<link rel="stylesheet" href="css/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="css/smoothness/jquery.ui.theme.css" />
+	<link rel="stylesheet" href="css/bootstrap-3.3.7.css" />
+
+	<script src="tools/jquery/jquery-ui.js"></script>
+	<script src="tools/jquery/jquery.cookie.js"></script>
+	<!-- Done -->
+
+	<!-- Load GFZ style first; we override as necessary later.-->
+	<link rel="stylesheet" type="text/css" href="https://www.gfz-potsdam.de/typo3conf/ext/gfz_frontend/Resources/Public/CSS/font-awesome/css/font-awesome.min.css" media="all" />
+	<link href="examples/webdc3-2019/webdc3-2019.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="examples/webdc3-2019/geofon.css" />
+</head>
+
+<body class="homepage">
+
+<div class="geofon-header-wrapper container-fluid">
+  <div id="geofon-header">
+      <h1>
+        <a href="/">GEOFON and EIDA Data Archives</a>
+      </h1>
+        <a href="http://www.orfeus-eu.org/data/eida">
+          <div class="inner-right">
+	    <img src="images/eida-orfeus3_blue.png" alt="Logo EIDA" height="50" width="140">
+	  </div>
+	</a>
+  <div class="rigth">
+    <div class="gfz-list-h">
+      <ul>
+        <li><a href="http://geofon.gfz-potsdam.de/">GEOFON</a></li>
+        <li><a href="http://www.orfeus-eu.org/data/eida">EIDA</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/imprint">Imprint</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/data-protection">Data Protection</a></li>
+      </ul>
+    </div>
+    <a href="//www.gfz-potsdam.de">
+    <div class="gfz-brand" style="float: right;">
+      <img alt="Workmark GFZ Potsdam" style="height: 70px;" src="http://dataservices.gfz-potsdam.de/mesi/images/GFZ-Logo-white.png">
+    </div>
+    </a>
+  </div>
+
+  </div><!-- #geofon-header -->
+</div><!-- .geofon-header-wrapper -->
+
+<div id="wrapper_borderOverall"><!-- wrapper_borderOveralll -->
+<div id="borderOverall"><!-- borderOverall -->
+<div id="holder">
+	<div id="header">
+		<h1>WebDC3 Interface to EIDA Data Archives at GEOFON</h1>
+	</div>
+
+	<div id="menu">
+		<div class="wi-control-item" style="float: left">
+			<a class="btn btn-default" role="button" href="index.html">Main page</a>
+		</div>
+		<div class="wi-control-item" style="float: right">
+			<a class="btn btn-default" role="button" href="help.html">Help</a>
+		</div>
+		<br class="clear" />
+	</div>
+
+	<div id="contents"><div class="all">
+
+	<h2>Getting started</h2>
+	<p>This site is a portal to the seismic waveform data archives at GEOFON, including the EIDA data holdings.
+	With it, you can request</p>
+	<ol>
+		<li><a href="#waveform">Seismological data</a> (waveforms) and</li>
+		<li><a href="#station">Station lists</a> (Station XML).</li>
+	</ol>
+	<p>from different data centers spread across Europe.</p>
+
+	<p>If you encounter difficulties using the WebDC software, please contact the authors at geofon@gfz-potsdam.de .</p>
+
+	<p>The portal allows you to create requests which combine the stations'
+	locations with earthquake lists provided by
+	<a href="http://geofon.gfz-potsdam.de/">GFZ</a>
+	or other agencies.
+	See the "<a href="#EventControls">Event Controls</a>" box.
+	In this case the event time and coordinates are used to
+	compute approximated arrival times ("onset times") for the P or S wave of the selected earthquakes
+	at the selected stations.</p>
+
+	<h2>About the web interface</h2>
+	  <ol>
+		<li id="waveform">Waveform data:
+		    Using FDSN web services you can download mini-SEED data.
+		    These can be easily converted to other major seismological formats using the
+		    <a class="external-link" href="http://www.iris.edu/manuals/rdseed.htm">rdseed</a> tool.</li>
+		<li id="station">Metadata:
+		    You can also download FDSN Station XML and text output.
+		    These formats contain only the station and stream information ("inventory").
+		    They contain information like coordinates, names, codes and instrument responses for certain stations or networks.
+		    While an inventory XML file is a plain text file that can be inspected by any text editor,
+		    it is recommended that you use a real generic XML parser to extract the desired information from it.
+		    A handy tool that allows you to convert XML files to a more linear format is Dan Egnor's
+		    <a class="external-link" href="http://www.ofb.net/~egnor/xml2">xml2</a>.
+		    </li>
+	  </ol>
+		<div class="alert alert-warning" id="SeisComPXML">
+		    <i class="fa fa-hand-o-right"></i>
+		    <a class="alert-link" href="http://seiscomp3.org">SeisComP</a> users
+		    can use FDSN Station XML to configure stations.
+		    It can be imported directly from <code>scconfig</code>, or converted with <code>scinv</code>.
+		</div>
+		<div class="alert alert-danger" id="RestrictedData">
+		  <p>For restricted datasets, you will need a token from the EIDA authentication service.
+		See <a class="alert-link" href="http://geofon.gfz-potsdam.de/waveform/arclink.php#access-to-restricted-data">our help page</a>.
+		Delivery of encrypted files is no longer necessary or possible.
+		</p>
+
+		<p>If you feel you should have access to a data set, contact the responsible principal investigator(s), or the data centre holding the data.
+<br />
+	<a class="alert-link" href="http://geofon.gfz-potsdam.de/contact.php">Contacting GEOFON <i class="fa fa-circle-arrow-right"></i></a>
+		</p>
+	  </div>
+	  <h2>Using the web interface</h2>
+	  <p>The web interface is built up from boxes.
+          Here are some of the features
+	   of each box.</p>
+
+<div role="navigation" style="padding-bottom: 2em;">
+  <ul class="nav nav-pills nav-justified">
+    <li><a href="#EventSearchControl">Event Controls</a></li>
+    <li><a href="#StationSearchControl">Station Controls</a></li>
+    <li><a href="#MappingControl">Event and Station Map</a></li>
+    <li><a href="#RequestManagerControl">Event and Station List</a></li>
+    <li><a href="#SubmitControl">Submit</a></li>
+    <li><a href="#StatusListControl">Recent Requests</a></li>
+<!-- <a href="#StatusFullControl">StatusFullControl</a> is the part of the StatusQueryControl box which shows results. -->
+    <li><a href="#StatusQueryControl">Manage Requests</a></li>
+    <li><a href="#Console">Console</a></li>
+  </ul>
+</div>
+	  
+<dl>
+  <dt id="EventSearchControl">The "Event Controls" box</dt>
+  <dd><p>Use this to select events to compose your request.
+This powerful tool is an event browser which can query several sources of
+information.</p>
+
+<p>Catalog Services:
+At GFZ you can choose events from one of the following public catalog services:</p>
+<ol>
+<li>GFZ - The GEOFON catalog (<a href="http://geofon.gfz-potsdam.de/eqinfo/">http://geofon.gfz-potsdam.de/eqinfo/</a>.)</li>
+<li>EMSC - The EMSC catalog (<a class="external-link" href="http://www.emsc-csem.org/Earthquake/">http://www.emsc-csem.org/Earthquake/</a>.)</li>
+<li>USGS - The ANSS Comprehensive Catalog (ComCat) service
+   (<a href="https://earthquake.usgs.gov/data/comcat/">https://earthquake.usgs.gov/data/comcat/</a>.)
+</li>
+<li>XXXX NEIC - A temporary replacement for the NEIC service, at USGS
+   (<a class="external-link" href="http://earthquake.usgs.gov/earthquakes/eqarchives/epic/">http://earthquake.usgs.gov/earthquakes/eqarchives/epic/</a>)
+   based on the new Comprehensive Catalog (ComCat). XXXX</li>
+</ol>
+<p>Select "Catalog Services" under "Event Information".
+Then use the pull-down menu under "Catalog Service" to choose the desired
+catalog. Now you can filter events by:</p>
+<ul>
+  <li>Date interval</li>
+  <li>Magnitude range</li>
+  <li>Depth</li>
+  <li>Location</li>
+</ul>
+<p>User Supplied:
+Alternatively you can upload your own catalog...
+</p>
+</dd>
+
+  <dt id="StationSearchControl">The "Station Controls" box</dt>
+<dd><p>Use this to add channels to your request. The selection of stations can
+    be made according to</p>
+<ul>
+<li>by geographical coordinates</li>
+<li>the currently selected events - distance and (back)azimuth are in degrees</li>
+<li>or by network/station codes.</li>
+</ul>
+<p>Symbols used on the pull-down lists are:
+* = temporary network; + = restricted access (see <a href="#RestrictedData">here</a>)
+</p>
+<p>You can limit the selection to particular types of streams/channels, either</p>
+<ul>
+<li>by channel code, e.g. BH (for BHE, BHZ, BH1, etc.).
+  Location codes appear before the channel code, e.g. 00BH.
+	You can select multiple types of channel
+  codes by selecting with the SHIFT and/or CTRL keys.</li>
+<li>by sampling rate - for every station, this will return those streams with
+  a reported sample rate closest to that specified.</li>
+</ul>
+</dd>
+
+  <dt id="MappingControl">The "Event and Station Map" box</dt>
+  <dd><p>Here the events and stations you choose will be displayed.
+      Use the mouse to drag the map around.
+      Use the left SHIFT + Mouse to drag areas for limiting the search of events and stations when the appropriate modules are enabled.</p>
+  </dd>
+
+  <dt id="RequestManagerControl">The "Event and Station List" box</dt>
+  <dd><p>The tables here show the events and stations you choose.
+Use these tables to check which events and stations have been selected by your search criteria.
+You can interactively remove unwanted items.
+Your final request will be built from the currently displayed information.
+You can refine the selection of streams for stations using the "Advanced Stream Filters Control".</p>
+<p>Triangles on the column headers allow you to sort rows by the values in those columns.</p>
+<p>The "O/R" column shows whether the station is "open" (field is empty) or "<a href="#RestrictedData">restricted</a>" (shown by a red "<span style="color: red;">R</span>").</p>
+</dd>
+
+  <dt id="SubmitControl">The "Submit" box</dt>
+  <dd><p>Use this to send your request to a server.
+   You can check the status of your requests using the controls under the "Download data" tab.</p></dd>
+
+  <dt id="StatusListControl">The "FDSNWS Requests" box</dt>
+  <dd><p>Here you can check the status of the requests made during your current use of this service.
+ The usual request group operations (Start/Stop/Save/Delete) as well as download links are available on the status popup.
+ Use this box to download a small number of recent data volumes.</p></dd>
+
+  <dt id="Console">The "Console" box</dt>
+  <dd><p>Warnings and other messages appear here. Unwanted messages can be
+      removed by reloading the page, or using the "Clear Console" button.</p></dd>
+
+</dl>
+		<br class="clear"/>
+</div></div>
+
+<div id="footer">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div id="copyright">WebDC3 Interface ©&#160; (2013&ndash;2019) Helmholtz-Zentrum Potsdam&#160;-&#160;<strong><a href="http://www.gfz-potsdam.de/" title="Opens website of GFZ Potsdam in new window" target="_blank">Deutsches GeoForschungsZentrum GFZ</a></strong><br />
+	doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <a href="http://www.gfz-potsdam.de/en/home/" title="Go to GFZ Homepage">
+        <div><img src="images/GFZ_Wortmarke_SVG_min2_en.svg" height="44px" style="margin-top: 10px" alt="Logo GFZ Potsdam"/></div>
+      </a>
+    </div>
+    <div class="col-md-3" style="margin-right: -15px; padding-right: 10px;">
+      <a href="http://www.helmholtz.de/" title="Opens website of Helmholtz Association in new window" target="_blank">
+        <div id="logoHelmholtzGemeinschaft"><img src="images/logo_helmholtz_gemeinschaft_de.gif" alt="Logo der Helmholtz-Gemeinschaft" height="70px"/></div>
+      </a>
+    </div>
+  </div><!-- .row -->
+</div>
+</div><!-- / footer -->
+
+</div>
+</div><!-- / borderOverall -->
+</div><!-- / wrapper_borderOverall -->
+</body>
+</html>

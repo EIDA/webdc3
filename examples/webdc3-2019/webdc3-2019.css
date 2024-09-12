@@ -1,0 +1,808 @@
+@charset "utf-8";
+/* CSS Dokument */
+
+
+/* REGELWERK
+***************************************************/
+/* 
+ * body.homepage <- Klasse nur fuer Homepage
+ * body.subpage-2column <- Klassen fuer zweispaltige Folgeseiten
+ * body.subpage-3column <- Klassen fuer dreispaltige Folgeseiten
+ */
+
+/* 
+ * Styleregeln fuer Blockelemente (p, div, td, li etc.)
+ * befinden sich in der Datei gfz_text.css.
+ * Desweiteren sind dort spezielle RTE classes untergebracht.
+ */
+
+/* 
+ * Styleregeln für Extensions liegen in extra Dateien.
+ * Beispiel: Formatierungen fuer das Plugin cal liegen 
+ * im Extension-Ordner in der Datei cal.css
+ */
+
+/* GrundLayout CSS
+***************************************************/
+body {
+  background: #fff;
+  color: #000;
+  font: 100%;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.clearfix::after {
+  clear: both;
+  content: " ";
+  display: block;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  visibility: hidden;
+  width: 0;
+}
+
+#wrapper_borderOverall {  
+  background: transparent;
+  background-color: transparent; 
+  margin: 0 auto;
+  overflow: hidden;
+  width: 990px;
+}
+
+#borderOverall {
+  background: #FFF;
+  margin: 10px;
+  padding: 10px;
+}
+
+
+
+
+/* Scrollbar horizontal bei ueberbreiten iframes ausblenden
+#mainContent_2columnLayout iframe {
+  overflow-x: hidden;
+}
+*/
+
+
+#wrapper_toTop {
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  text-align: right;  
+}
+
+
+/* NUR Homepage
+***************************************************/
+
+.homepage hr {
+  margin: 25px 0 25px 10px;
+}
+
+
+
+
+/* header
+***************************************************/
+#header {
+  height: 100px;
+  position: relative;
+}
+
+#header img { /* keine runden Ecken im Kopfbereich (Logo, Wortmarke, Druckersymbol etc.) */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */
+}
+
+
+
+/* wordmarkGFZ
+***************************************************/
+#wordmarkGFZ {
+  position: absolute;
+  right: -8px;
+  bottom: 0;
+}
+
+
+/* mainNav
+***************************************************/
+#mainNav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#mainNav li {
+  color: #00589C;
+  display: inline-block;
+  font-size: 15.4px;
+  font-size: 0.963rem;
+  font-weight: bold;
+}
+
+#mainNav a:hover {
+  text-decoration: none;
+}
+
+#mainNav .divider {
+  font-weight: normal;
+  margin: 0 16px 0 16px;
+}
+
+
+/* leftColumn (Seitennavigation)
+***************************************************/
+#wrapper_leftColumn {  
+  float: left;
+  width: 230px;
+}
+
+#leftColumn {
+  -webkit-hyphens: auto; /* Safari, Chrome */
+  -moz-hyphens: auto; /* Firefox */
+  -ms-hyphens: auto;
+  hyphens: auto; /* CSS3 */
+  margin: 10px 20px 0 10px;
+  overflow-x: hidden;
+}
+
+/*** LISTEN ***/
+#leftColumn ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;  
+}
+
+#leftColumn ul ul {  
+  margin: 8px 0 0 0;
+  width: 200px; 
+}
+
+/*** LISTENELEMENTE ***/
+#leftColumn ul li {
+  background: #00589C;
+  border-bottom: 1px solid #4CA8CD;
+  color: #FFF;
+  display: block;
+  font-size: 11px;
+  font-size: 0.688rem;
+  font-weight: bold;
+  padding: 8px 8px 8px 0;  
+}
+
+#leftColumn ul ul li {
+  background: #BBDCEB;  
+  font-weight: normal;
+}
+
+#leftColumn ul ul ul li {
+  background: #E0EFF6;  
+  padding: 8px 8px 8px 13px; 
+}
+
+/*** LINKS ***/
+#leftColumn ul li a {
+  background: url(../images/arrows/arr_right_orange_blue1_no.gif) no-repeat;
+  color: #FFF;
+  margin: 0 0 0 10px;
+  padding: 0 0 0 15px;
+  display: block;  
+}
+
+#leftColumn ul ul li a {
+  background: url(../images/arrows/arr_right_black_blue3_no.gif) no-repeat;
+  color: #000;   
+}
+
+#leftColumn ul ul ul li a {
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+  color: #666;
+}
+
+#leftColumn ul li.active a { /* Erste Ebene aktiv */
+  background: url(../images/arrows/arr_down_orange_blue1_no.gif) no-repeat;
+}
+
+#leftColumn ul li.up a { /* Erste Ebene aktiv - speziell fuer Sektionen */
+  background: url(../images/arrows/arr_up_orange_blue1_no.gif) no-repeat 0 1px;
+}
+
+#leftColumn ul li.active ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_black_blue3_no.gif) no-repeat;
+}
+
+#leftColumn ul li.active ul li ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+}
+
+#leftColumn ul li.active ul li.active a { /* Zweite Ebene aktiv */
+  background: url(../images/arrows/arr_down_orange_blue3_no.gif) no-repeat;
+  color: #F60;
+  font-weight: bold;  
+}
+
+#leftColumn ul li.active ul li.active ul li a { /* Werte fuer nachgeordnete Ebenen ueberschreiben */
+  background: url(../images/arrows/arr_right_gray_blue4_no.gif) no-repeat;
+  color: #666;
+  font-weight: normal;
+}
+
+/*** SPEZIELL ***/
+#leftColumn ul li.has-children,
+#leftColumn ul ul li.has-children {
+  padding: 8px 8px 0 0;
+}
+
+#leftColumn ul li li.last {
+  border-bottom: none !important;
+}
+
+
+
+/* rightColumn (Boxen)
+***************************************************/
+#rightColumn {  
+  margin: 4px 10px 0 10px;
+}
+
+.homepage #rightColumn {  
+  margin: 20px 10px 0 10px;
+}
+
+.boxRight { /* einzelne Box */
+  background: #E0EFF6;
+  -moz-box-shadow: 2px 2px 6px #999; /* Firefox */
+  -webkit-box-shadow: 2px 2px 6px #999; /* Safari, Chrome */ 
+  box-shadow: 2px 2px 6px #999; /* CSS3 */
+  -webkit-hyphens: auto; /* Safari, Chrome */
+  -moz-hyphens: auto; /* Firefox */
+  -ms-hyphens: auto;
+  hyphens: auto; /* CSS3 */
+  overflow: hidden;
+  padding: 0 0 8px 0;
+  margin-bottom: 20px; 
+}
+
+.boxRight h2 {
+  background: #BBDCEB;
+  font-size: 11px;
+  font-size: 0.688rem;  
+  padding: 8px;  
+}
+
+.boxRight h2:first-child { /* nur erste H2 mit dunkelblauem HG */
+  background: #00589C;
+  color: #FFF;
+  margin: 0 0 10px 0; 
+}
+
+.boxRight h2:first-child a {
+   color: #FFF;
+}
+
+.boxRight a:hover {
+  text-decoration: none;
+}
+
+.boxRight p,
+.boxRight table {
+  font-size: 10px;
+  font-size: 0.625rem;
+  padding: 0 10px;
+}
+
+.boxRight ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.boxRight li {
+  padding: 0 0 4px 0;
+  font-size: 10px;
+  font-size: 0.625rem;
+}
+
+.boxRight li a {
+  background: url(../images/arrows/arr_right_orange_blue4_no.gif) no-repeat;
+  display: block;
+  padding: 0 0 0 14px;  
+}
+
+.boxRight .csc-textpic-image {
+   padding: 0 10px;
+}
+
+.boxRight table,
+.boxRight table tbody td {
+  border: none;
+}
+
+.homepage .boxRight li a { /* nur Startseite: andere Pfeile */
+  background: url(../images/arrows/arr_right_blue1_blue4_no.gif) no-repeat;
+}
+
+.homepage .boxRight li a:hover { /* nur Startseite: andere Pfeile */
+  background: url(../images/arrows/arr_right_orange_blue4_no.gif) no-repeat;  
+}
+
+
+/* footer
+***************************************************/
+#footer {
+  clear: both;  
+  margin: 0 10px 0 230px;
+  padding: 20px 0;
+  text-align: right;  
+}
+
+
+
+#copyright {
+  color: #999;
+  float: left;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  position: relative;
+  text-align: center;
+  top: 30px;
+  width: 60%;
+}
+
+.homepage #copyright {
+  text-align: left;
+}
+
+.homepage #copyright {
+  /* width: 64%;  */
+}
+
+#logoHelmholtzGemeinschaft {
+  /* float: right; */
+}
+
+
+
+.homepage #footer {
+  /* margin: 0 10px 0 10px; */
+}
+
+
+/* Spezielle Formate
+***************************************************/
+.toTop a:hover { /* keine Unterstreichung beim To-Top-Link */
+  text-decoration: none;
+}
+
+.invisible { /* Verstecken */
+  display: none;
+}
+
+.orange { /* fuer Texte */
+  color: #F60;
+}
+
+.orange a { /* fuer Links */
+  color: #F60;
+}
+
+.align-justify { /* Blocksatz */
+  text-align: justify;
+}
+
+#fancybox-title-over { /* Fancybox Overlay farblich anpassen */
+  background-image: none;
+  /* Fallback for web browsers that doesn't support RGBa */
+  background: rgb(0, 0, 0);
+  /* RGBa with 0.6 opacity */
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.csc-textpic-caption { /* fuer Bildunterschriften */
+  color: #666;
+  font-size: 8.8px;
+  font-size: 0.55rem;
+  line-height: 1.4;
+  margin: 5px 0 0 0;  
+}
+
+.csc-textpic-image table,
+.csc-textpic-image td { /* hellgrauen Rand ausblenden */
+  border: 0px !important;
+}
+
+DIV.csc-textpic .csc-textpic-imagewrap .csc-textpic-image {
+  margin: 15px 0 10px 0; /* Bild in Text mit Bild nach unten schieben */
+}
+
+.csc-frame-imgNoRoundCorners img { /* spezielles Format fuer Bilder ohne Rundungen */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */ 
+}
+
+/* fuer jfmulticontent */
+.equalize{  overflow: visible;  display: table;  table-layout: fixed;}
+
+.csc-frame-nachruf img { /* spezielles Format fuer Nachruf-Box (rechts) */
+  -moz-border-radius: 0 !important; /* Firefox */
+  -webkit-border-radius: 0 !important; /* Safari, Chrome */
+  -khtml-border-radius: 0 !important; /* Konqueror */
+  border-radius: 0 !important; /* CSS3 */ 
+}
+
+.csc-frame-nachruf {
+  background: #EEE;
+}
+
+.csc-frame-nachruf h2 {
+  background: #000 !important;
+}
+
+
+/*************************
+  EXT: pits_rssnews begin
+ *************************/
+#pits_rss {
+  font-family: inherit !important; 
+  font-size: 11px !important;
+  font-size: 0.688rem !important;
+  width: 90% !important;
+}
+
+#pits_rss ul {
+  padding: 0;  
+}
+
+.rss_desc a {
+  font-size: 11px !important;
+  font-size: 0.688rem !important;
+}
+/*************************
+  EXT: pits_rssnews end
+ *************************/
+
+/*************************
+     FONTAWESOME begin
+ *************************/
+.fa-twitter,
+.fa-facebook,
+.fa-rss,
+.fa-youtube-play {
+  color: #55ACEE;
+  font-size: 150%;
+  vertical-align: top;
+}
+/*************************
+     FONTAWESOME end
+ *************************/
+
+/***********************************
+  MODIFICATION: logos to svg start
+ ***********************************/
+#wordmarkGFZ {
+  height: 53px;
+  right: 0;
+  width: 175px;
+}
+
+#logoGFZ {  
+  height: 84px;
+  left: -12px;
+  top: 10px;
+  width: 120px;
+}
+
+/* 
+Quelle: https://blog.mozilla.org/webdev/2009/02/20/cross-browser-inline-block/
+Quelle: http://css-tricks.com/snippets/css/cross-browser-inline-block/
+*/
+a.svg {
+  position: relative;  
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: top;
+  *display: inline;
+}
+
+a.svg:after {
+  content: ""; 
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left:0;
+}
+
+#logoGFZ a.svg {
+  width: 120px;
+  min-height: 84px;
+  height: 84px;  
+}
+
+#logoHelmholtzGemeinschaft a.svg {
+  width: 100px;
+  min-height: 36px;
+  height: 36px; 
+  width: 113px;
+  min-height: 57px;
+  height: 57px; 
+}
+
+/***********************************
+  MODIFICATION: logos to svg end
+ ***********************************/
+
+/***************************
+     MODERNIZR begin
+****************************/
+
+.no-svg #wordmarkGFZ object,
+.no-svg #logoGFZ object,
+.no-svg #logoHelmholtzGemeinschaft object {
+  display: none;
+}
+
+.no-svg #wordmarkGFZ {
+  background: url(../images/wordmark_gfz_de.gif) no-repeat;
+  height: 79px;
+  left: auto;
+  position: absolute;
+  top: 40px;
+  width: 175px;
+}
+
+.no-svg .en #wordmarkGFZ {
+  background: url(../images/wordmark_gfz_en.gif) no-repeat;
+}
+
+.no-svg #logoGFZ {
+  background: url(../images/logo_gfz_de.gif) no-repeat;
+  height: 84px;
+  left: -20px;
+  position: absolute;
+  width: 120px;
+}
+
+.no-svg .en #logoGFZ {
+  background: url(../images/logo_gfz_en.gif) no-repeat;
+}
+
+.no-svg #logoHelmholtzGemeinschaft {
+  background: url(../images/logo_helmholtz_gemeinschaft_de.gif) no-repeat;
+  background: url(../images/HG20J_LOGO_DE_Blau_klein_RGB.jpg) no-repeat;
+  height: 36px;
+  width: 100px;
+}
+
+.no-svg .en #logoHelmholtzGemeinschaft {
+  background: url(../images/logo_helmholtz_gemeinschaft_en.gif) no-repeat;
+  background: url(../images/HG20J_LOGO_ENG_Blau_klein_RGB.jpg) no-repeat;
+}
+
+/***************************
+     MODERNIZR end
+****************************/
+
+/* ------------------------------ */
+/* From new (2018/2019) GFZ style */
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/1e9b84fcbc477139e16061c80f0d873d/SourceSansProBold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/abbaecf00224cd1086837404c418af32/SourceSansProExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d911d4041f365469aa2ca97/a663a1ba5f49629a86f7486aaf0f5359/SourceSansProLight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Source Sans Pro';
+  src: url('https://fontlibrary.org/assets/fonts/source-sans-pro/d288e5a9d9111d4041f365469aa2ca97/d165cf1a72ee7db500ecfc9d7672a834/SourceSansProRegular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@media (min-width: 46.875em) {
+  .geofon-header-wrapper {
+        background-color: #00589c;
+    width: 100%;
+        display: -webkit-box;
+    display: -moz-box;
+        display: -ms-flexbox;
+    display: -webkit-flex;
+        display: flex;
+    justify-content: center;
+        padding: 0;
+  }
+    .geofon-header-wrapper #geofon-header {
+          background-color: #00589c;
+        color: #fff;
+      padding: 10px;
+            display: -webkit-box;
+          display: -moz-box;
+        display: -ms-flexbox;
+      display: -webkit-flex;
+            display: flex;
+          flex-direction: row;
+        justify-content: space-between;
+      align-items: center;
+            position: relative;
+          height: 140px;
+        width: 1170px;
+      max-width: 1170px;
+         }
+    .gfz-header-wrapper .rigth {
+            border: 1px solid pink;
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+      }
+
+        .blue-top .rigth {
+        border: 1px solid pink;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+  }
+        .gfz-list-h ul li {
+          display: inline; }
+        .gfz-list-h ul li:first-child:before {
+            content: " "; }
+          .gfz-list-h ul li:before {
+              content: " | "; }
+            .gfz-list-h ul li a {
+                color: #fff;
+            font-size: 12pt;
+                padding: 8px; }
+      .gfz-list-h ul li a:hover {
+                    text-decoration: none;
+                  color: #b9b9b9;
+                cursor: pointer; }
+     .blue-top .rigth .gfz-list-h ul li i {
+                 color: #fff;
+      }
+       }
+       .gfz-navbar-wrapper {
+         display: none;
+   background-color: pink; /* #00589c; */
+     height: 60px;
+     }
+       @media (min-width: 60.625em) {
+           .gfz-navbar-wrapper {
+         background-color: green;
+       display: block; } }
+         .gfz-navbar-wrapper.sticky .content-max {
+     top: 0;
+         left: 0;
+     right: 0;
+         position: fixed;
+     background-color: #00589c;
+         z-index: 10;
+     min-width: 100vw; }
+         .gfz-navbar-wrapper.sticky .content-max nav {
+       max-width: 1170px;
+             margin: auto; }
+         .gfz-navbar-wrapper.sticky .content-max > .navbar-default > .navbar-header .navbar-brand {
+       display: none; }
+           .gfz-navbar-wrapper.sticky .content-max > .navbar-default > .navbar-header .gfz-brand {
+         margin: 0 44px;
+       padding-top: 5px;
+             position: inherit;
+           top: 0;
+         left: 0;
+       display: block; }
+         .gfz-navbar-wrapper .navbar-default {
+     margin: 4px 0 0;
+         background-color: #00589c;
+     border: 0;
+         z-index: 10; }
+     .gfz-navbar-wrapper .navbar-default .navbar-nav > li > a {
+           text-transform: uppercase;
+         color: #ffffff;
+       background-color: #00589c;
+             padding-bottom: 0;
+           display: flex;
+         flex-direction: column;
+       font-size: 1.2em; }
+             .gfz-navbar-wrapper .navbar-default .navbar-nav > li > a:hover {
+             background-color: #00589c;
+             cursor: pointer;
+             color: #b9b9b9; }
+           .gfz-navbar-wrapper .navbar-default .navbar-nav > li > a:after {
+           content: "";
+           border-left: 10px solid transparent;
+           border-right: 10px solid transparent;
+           border-bottom: 10px solid transparent;
+           margin: 11px auto auto; }
+       .gfz-navbar-wrapper .navbar-default .input-group {
+             display: flex;
+           flex-direction: row;
+         justify-content: flex-end; }
+       .gfz-navbar-wrapper .navbar-default .input-group input {
+               border-radius: 0;
+               transition: width 0.4s;
+               width: 0;
+               display: inline;
+               padding: 0 0.2em;
+               margin: 0;
+               border: 0;
+               background-color: inherit; }
+             .gfz-navbar-wrapper .navbar-default .input-group .input-group-addon {
+             background-color: inherit;
+             padding: 6px 0;
+             border: 0; }
+             .gfz-navbar-wrapper .navbar-default .input-group .input-group-addon i {
+               margin-left: 0.2em;
+                 font-size: 1.3em;
+           color: #ffffff;
+             float: right; }
+           .gfz-navbar-wrapper .navbar-default .input-group:hover input {
+           color: #ffffff;
+           width: 15em;
+           background-color: #003e6e;
+           margin-right: 0.2em; }
+         .gfz-navbar-wrapper .navbar-default .input-group:hover .input-group-addon {
+         padding: 6px 0;
+         margin-left: 0.2em;
+         border: 0; }
+         .gfz-navbar-wrapper .navbar-default .input-group:hover .input-group-addon i {
+           margin-left: 0.2em; }
+     .gfz-navbar-wrapper .navbar-brand {
+         display: none;
+     color: #ffffff;
+         margin: 0 65px; }
+     @media (min-width: 46.875em) {
+           .gfz-navbar-wrapper .navbar-brand {
+           display: inline; } }
+       .gfz-navbar-wrapper .navbar-brand:hover {
+             color: #b9b9b9; }
+       .gfz-navbar-wrapper .gfz-brand {
+           display: block;
+       position: absolute;
+           left: 50%;
+       margin-left: -50px;
+           /* 50% of your logo width */
+           display: inline; }
+       .gfz-navbar-wrapper .gfz-brand svg {
+             width: 3.6em; }
+           .gfz-navbar-wrapper .gfz-brand svg path,
+         .gfz-navbar-wrapper .gfz-brand svg polygon {
+         fill: #ffffff; }
+     .gfz-navbar-wrapper .gfz-brand:hover svg {
+           width: 3.6em; }
+         .gfz-navbar-wrapper .gfz-brand:hover svg path,
+       .gfz-navbar-wrapper .gfz-brand:hover svg polygon {
+               fill: #b9b9b9; }
+           @media (min-width: 46.875em) {
+         .gfz-navbar-wrapper .gfz-brand {
+         display: none;
+       }
+            }
