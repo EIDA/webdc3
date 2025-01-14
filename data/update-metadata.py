@@ -558,6 +558,8 @@ def url2archive(url):
         return 'UIB'
     elif o.hostname.endswith('icgc.cat'):
         return 'ICGC'
+    elif o.hostname.endswith('bgs.ac.uk'):
+        return 'BGS'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
     elif o.hostname.endswith('ncedc.org'):
