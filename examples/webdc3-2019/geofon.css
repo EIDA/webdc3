@@ -1,0 +1,350 @@
+/* * HTML tags customization ************************************************ */
+/* 
+ * PLE Aug 2013: Grabbed some features from
+ *   https://www-extern.gfz-potsdam.de/startseite/
+ * but it is preferable to use their style sheet (template.css) directly.
+ * Reduced outer width to 970 px; 10 px padding on left and right leaves only 950 (was 1024).
+ *
+ * "Features" include:
+ *   - constrained page width
+ *   - shadows on boxes
+ *   - rounded corners
+ *   - ..
+ */
+ 
+html {
+	height: 100%;
+	overflow-y: auto;
+}
+
+body {
+  /* color: #000; */
+	height: 100%;
+	font-family: "Source Sans Pro", Verdana, sans-serif;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Probably should only apply to the Event and Station List */
+#wi-RequestManagerControl td {
+  vertical-align: middle;
+}
+
+h1 {
+	padding: 0;
+	margin: 0;
+}
+
+p {
+	margin: 0px;
+	padding: 0;
+}
+
+/* ************************************************************************** */
+
+/* Tweaks to make GFZ styles fit here */
+
+/* The "header" element uses absolute positioning for the images,
+ * and normal positioning for the text.
+ * Padding, instead of vertical centering, is used to shift the <h1>
+ * text downwards from the top of the header.
+ */
+
+#header {
+  height: 65px; /* Is 100px for GFZ page, but we have no top nav stuff. */
+  position: relative; /* Repeats GFZ template but defends against its absence? */
+}
+
+#geofon-header h1 {
+
+  font-size: 28px;
+}
+
+#geofon-header a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Make sure border is removed; border-radius is not enough.
+ * Set in gfz_text.css
+ *
+ */
+img {
+	border: 0; /* html5: border-Attribut nicht mehr erlaubt */
+}
+
+.inner-left {
+    position: absolute;
+    left: 130px;
+    bottom: 0px;
+}
+
+.inner-right {
+    position: absolute;
+    right: 170px;
+    bottom: 45px;
+}
+
+/* Footer needs centering since we don't adopt GFZ 2column layout. */
+.homepage #footer {
+  margin: 0px 0px;
+}
+
+.homepage #copyright {
+  width: 942px;
+  text-align: center;
+  top: 0px;
+}
+/* Linked text should be grey in the footer */
+#footer a {
+  color: #999;
+}
+
+/* ************************************************************************** */
+
+/* * Top page elements ****************************************************** */
+#holder {
+	margin: auto;
+	background-color: #fff;
+	width: 942px; /* 950? */
+	min-height: 100%;
+	position: relative;
+	padding: 8px;
+}
+
+#header {
+	padding: 10px;
+	margin: auto;
+	/* width: 1024px; */
+	clear: both;
+}
+
+#menu {
+	padding: 0;
+	/* margin: auto; */
+	/* width: 1024px; */
+	clear: both;
+}
+
+#contents {
+	margin: auto;
+	/* width: 1024px; */
+	border: 0px Solid black;
+	padding: 15px 0 20px 0;  /* 20px = height of footer */
+	clear: both;
+}
+
+#footer {
+	/* height: 20px; */
+	/* margin: auto; */
+	padding-top: 20px;
+	text-align: center;
+	clear: both;
+}
+/* ************************************************************************** */
+
+/* * Main Boxes on contents section ***************************************** */
+#menu ul {
+	padding:0px;
+	margin: 5px 0 0 0;
+	list-style:none;
+}
+
+#menu ul li {
+	display: inline;
+}
+
+#menu ul li a {
+	padding: 0 5px 0 0;
+	display: inline-block;
+}
+
+#menu ul li.last {
+	padding: 0 0 0 5px;
+	float: right;
+}
+
+#contents .right {
+	width: 666px; /* was 744px -74 = 670 */
+	float: right;
+	clear: right;
+}
+
+#contents .all {
+	width: 100%;
+	margin: auto auto;
+	clear: left;
+}
+
+#contents .left { 
+	width: 276px; /* was 280px */
+	float: left;
+	clear: left;
+}
+
+#contents .right .box {
+	margin: 0 0 5px 5px;
+}
+
+#contents .left .box { 
+	margin: 0 5px 5px 0;
+}
+
+#contents .all .box { 
+	margin: 0 0 5px 0;
+}
+
+/* ************************************************************************** */
+
+/* * Modules customization ************************************************** */
+.right .titlebox {
+	padding: 10px 10px 5px 10px;
+	color: rgb(255, 255, 255);
+	background: rgb(0, 88, 156);
+	margin-bottom: 0px;  /* remove space between content and header? ?? */
+}
+
+.left .titlebox {
+	padding: 10px 10px 10px 10px;
+	color: rgb(255, 255, 255);
+	background: rgb(0, 88, 156);
+	margin-bottom: 0px;  /* remove space between content and header? ?? */
+	overflow: visible;
+}
+
+.all .titlebox {
+	padding: 10px 10px 5px 10px;
+	color: rgb(255, 255, 255);
+	background: rgb(0, 88, 156);
+	text-align: left;
+	margin-bottom: 0px;  /* remove space between content and header? ?? */
+}
+
+/* Shouldn't be needed?? But positions help pop-ups correctly on the left. */
+.helpframe {
+	display: inline;
+	float: right;
+	position: relative;
+}
+
+.help {
+	display: inline;
+	float: right;
+	padding: 0px 2px 2px 2px;
+	text-align: right;
+	color: #EEE;
+	font-size: 1.0em;
+}
+
+.frame {
+/*	border-left: 1px Solid black;  */
+/*	border-right: 1px Solid black;  */
+/*	border-bottom: 1px Solid black;  */
+	min-height: 100px;
+	padding: 10px;
+	margin-top: 0px; /* remove space between content and header? ?? */
+}
+
+.consoleframe {
+/*	border-left: 1px Solid black;  */
+/*	border-right: 1px Solid black;  */
+/*	border-bottom: 1px Solid black;  */
+	height: 400px;
+	overflow-y: auto;
+	padding: 10px;
+	margin-bottom: 10px;
+	text-align: left;
+}
+
+.statusframe {
+/*	border-left: 1px Solid black;  */
+/*	border-right: 1px Solid black;  */
+/*	border-bottom: 1px Solid black;  */
+	min-height: 100px;
+	padding: 1px 10px 0px 10px;
+	display: none;
+}
+
+.clear {
+	clear: both;
+}
+
+.tab {
+	display: none;
+}
+
+/* ********************************** */
+/* For GFZ-style help page */
+
+dt {
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+  background: rgb(0, 88, 156);
+
+  /*
+   * border: 1px Solid black;
+   * border-left: 1px solid silver;
+   * border-right: 1px solid silver;
+   * border-top: 1px solid silver;
+   */
+  padding: 10px;
+}
+
+dd {
+  color: black;
+  background-color: #fcf8e3;  /* BS warning */
+  padding: 10px 10px 32px 10px;
+  border: 1px solid #faebcc;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  margin: 0 0 1em 0;
+}
+
+
+/* * Rolling mouse cursor *************************************************** */
+body.busy, body.busy * {
+  cursor: wait !important;
+}
+
+/* From GFZ styling */
+a:after {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  margin: 0 0 0 5px;
+  text-decoration: none;
+}
+a.external-link:after {
+  content: '\f08e';
+}
+
+/* Remove .alert .alert-danger etc. when we use bootstrap.css */
+.alert {
+  padding: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.alert-warning {
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+  color: #8a6d3b;
+}
+.alert-warning .alert-link {
+  color: #66512c;
+}
+.alert-danger {
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442;
+}
+.alert-danger .alert-link {
+    color: #843534;
+}
+
+.alert .alert-link {
+    font-weight: 700;
+}
+.alert-link a:focus, .alert-link a:hover {
+  text-decoration: underline;
+}
+

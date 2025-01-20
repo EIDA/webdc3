@@ -1,0 +1,83 @@
+/* Style changes after loading the generic wimodule.css file */
+/*
+ * .wi-table-header-cell {
+ *	background: #f00;
+ *	color: yellow;
+ * }
+ */
+
+/* Magic for help pop-ups: */
+
+.boxRight h2 {
+	/* override geofon.css */
+	display: inline;
+}
+
+.help {
+	/* override geofon.css */
+	display: block;
+	right: 8px;
+}
+
+.help a {
+	color: silver;
+	cursor: help;
+	text-decoration: none;
+	padding: 1px 6px;
+	margin-right: 8px;
+	border: 1px Solid silver;
+	float: right;
+}
+
+.help a:hover {
+	background-color: #fcf8e3;
+	border: 1px Solid #faebcc;
+	color: #8a6d3b;
+	float: right;
+	z-index: 999;
+}
+
+.help a span {
+	display: none;
+}
+
+.help a:hover span {
+/* Like BS .alert-warning */
+	display: block;
+	overflow: visible;
+	position: absolute;
+	top: auto;
+	right:0px;
+	text-align: right;
+	background-color: #fcf8e3;
+	color: #8a6d3b;
+	padding: 4px;
+	border: 1px solid;
+	border-color: #faebcc;
+	border-radius: 4px;
+	width: 24em;
+	z-index: 999;
+}
+
+/* wi controls use class="wi-short-spacer" as an introducer before
+ * a short selector e.g. a pull-down menu.
+ * Embed it in a "wi-short-div" and use absolute positioning for
+ * the object on the right. The "wi-short-spacer" has normal
+ * positioning so it sets the height of the "wi-short-div".
+ */
+.wi-short-div {
+	position: relative;
+}
+
+.wi-short-spacer {
+	margin: 0 0 0.5em 0;
+	width: 48%;
+}
+
+.wi-short-right {
+	position: absolute;
+	width: 48%;
+	top: 0px;
+	right: 0px;
+}
+

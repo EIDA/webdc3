@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>WebDC3 at eida.gfz-potsdam.de</title>
+	<!-- Use this file for GEOFON/GFZ customisation of webinterface. -->
+	<!-- Use generic.html for changes to the "unbranded" version. -->
+	<!-- GEOFON/GFZ-specific content should go in examples/webdc3. -->
+
+	<!-- Javascript polyfill for older browsers -->
+	<script src="tools/polyfill.min.js"></script>
+	<!-- Done -->
+
+	<!-- Those should be loaded from the page -->
+	<script src="tools/jquery/jquery-1.9.1.js"></script>
+
+	<link rel="stylesheet" href="css/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="css/smoothness/jquery.ui.theme.css" />
+
+	<script src="tools/jquery/jquery-ui.js"></script>
+	<script src="tools/jquery/jquery.cookie.js"></script>
+	<!-- Done -->
+
+	<!-- Those should be loaded from the page -->
+	<script src="tools/openlayers/OpenLayers.js"></script>
+	<!-- Done -->
+
+	<!-- For FDSNWS -->
+	<script src="tools/jquery-ajax-native.js"></script>
+	<script src="tools/digest-ajax.js"></script>
+	<script src="tools/openpgp.min.js"></script>
+	<!-- Done -->
+
+	<!-- For debugging -->
+	<script src="tools/stacktrace.js"></script>
+	<!-- Done -->
+
+	<!-- Load GFZ style first; we override as necessary later.-->
+	<link href="examples/webdc3-2019/webdc3-2019.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css"
+	      href="examples/webdc3-2019/geofon.css" />
+	<script src="wsgi/loader" onerror="javascript:window.location='error.html'"></script>
+	<link rel="stylesheet" type="text/css" href="examples/webdc3-2019/wi-geofon.css" />
+</head>
+
+<body class="homepage">
+
+<div class="geofon-header-wrapper container-fluid">
+  <div id="geofon-header">
+      <h1>
+        <a href="/">GEOFON and EIDA Data Archives</a>
+      </h1>
+        <a href="http://www.orfeus-eu.org/data/eida">
+          <div class="inner-right">
+	    <img src="images/eida-orfeus3_blue.png" alt="Logo EIDA" height="50" width="140">
+	  </div>
+	</a>
+  <div class="rigth">
+    <div class="gfz-list-h">
+      <ul>
+        <li><a href="http://geofon.gfz-potsdam.de/">GEOFON</a></li>
+        <li><a href="http://www.orfeus-eu.org/data/eida">EIDA</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/imprint">Imprint</a></li>
+        <li><a href="http://geofon.gfz-potsdam.de/data-protection">Data Protection</a></li>
+        <!-- li
+
+            <a href="https://www.gfz-potsdam.de">Deutsch</a>
+            <i aria-hidden="true" class="fa fa-globe"></i>
+        /li> -->
+      </ul>
+    </div>
+    <a href="//www.gfz-potsdam.de">
+    <div class="gfz-brand" style="float: right;">
+      <img alt="Workmark GFZ Potsdam" style="height: 70px;" src="http://dataservices.gfz-potsdam.de/mesi/images/GFZ-Logo-white.png">
+    </div>
+    </a>
+  </div>
+
+  </div><!-- #geofon-header -->
+</div><!-- .geofon-header-wrapper -->
+
+<div><!-- wrapper_borderOveralll -->
+<div><!-- borderOverall -->
+<div id="holder" class="borderOverall">
+
+	<div id="menu">
+		<div class="wi-control-item" style="float: left">
+			<div id="wi-TabControl" style="display:none">
+				<input type="radio" value="eventExplorer" id="wi-EventExplorerTab" name="tab" /><label for="wi-EventExplorerTab">Explore events</label>
+				<input type="radio" value="stationExplorer" id="wi-StationExplorerTab" name="tab" /><label for="wi-StationExplorerTab">Explore stations</label>
+				<input type="radio" value="submit" id="wi-SubmitTab" name="tab" /><label for="wi-SubmitTab">Submit request</label>
+				<input type="radio" value="download" id="wi-DownloadTab" name="tab" /><label id="wi-DownloadLabel" for="wi-DownloadTab">Download data</label>
+				<input type="radio" value="console" id="wi-ConsoleTab" name="tab" checked="checked"/><label id="wi-ConsoleLabel" for="wi-ConsoleTab">View console</label>
+			</div>
+		</div>
+
+		<div class='wi-control-item' style="float: right">
+			<a href="help.html" target="_blank">Help</a>
+		</div>
+		<div class='wi-control-item' style="float: right">
+			<a href="http://geofon.gfz-potsdam.de/software/webdc3">doc</a>&nbsp;
+		</div>
+
+		<br class="clear" />
+	</div>
+
+	<div id="contents">
+		<div class="all">
+			<div class="box tab console" style="display: block">
+				<div class="titlebox boxRight">
+					<h2>Console</h2>
+					<div class="help"><a href="help.html#Console" target="_blank">?<span>Warnings and other messages appear here.</span></a></div>
+				</div>
+				<div id="wi-Console" class="consoleframe boxRight"></div>
+			</div>
+
+			<div class="box tab download">
+				<div class="titlebox boxRight">
+					<h2>FDSNWS Requests</h2>
+					<div class="help"><a href="help.html#FDSNWS-Control" target="_blank">?<span>Here you can see the status of your FDSNWS requests and download data volumes...</span></a></div>
+				</div>
+				<div id="wi-FDSNWS-Control" class="frame boxRight"></div>
+			</div>
+
+			<div class="box tab download">
+				<div class="titlebox boxRight">
+					<h2>Recent ArcLink Requests</h2>
+					<div class="help"><a href="help.html#StatusListControl" target="_blank">?<span>Here you can see the status of your recent ArcLink requests and download data volumes...</span></a></div>
+				</div>
+				<div id="wi-StatusListControl" class="frame boxRight"></div>
+			</div>
+
+			<div class="box tab download">
+				<div class="titlebox boxRight">
+					<h2>Manage ArcLink Requests</h2>
+					<div class="help"><a href="help.html#StatusQueryControl" target="_blank">?<span>Here you can manage and download all your ArcLink requests.</span></a></div>
+				</div>
+				<div id="wi-StatusQueryControl" class="frame boxRight" style="margin-bottom: 0"></div>
+				<div id="wi-StatusFullControl" class="statusframe boxRight"></div>
+			</div>
+		</div>
+
+		<div class="left">
+			<div class="box tab eventExplorer">
+				<div class="titlebox boxRight">
+					<h2>Events Controls</h2>
+					<div class="helpframe">
+					<div class="help"><a href="help.html#EventSearchControl" target="_blank">?<span>Use this to select events to compose your request...</span></a></div>
+					</div>
+				</div>
+				<div id="wi-EventSearchControl" class="frame boxRight"></div>
+			</div>
+
+			<div class="box tab stationExplorer">
+				<div class="titlebox boxRight">
+					<h2>Stations Controls</h2>
+					<div class="helpframe">
+						<div class="help"><a href="help.html#StationSearchControl" target="_blank">?<span>Use this to add channels to your request. The selection can be made based on the currently selected events or by network and station codes...</span></a></div>
+					</div>
+				</div>
+				<div id="wi-StationSearchControl" class="frame boxRight"></div>
+			</div>
+
+			<div class="box tab submit">
+				<div class="titlebox boxRight">
+					<h2>Make Request</h2>
+					<div class="helpframe">
+						<div class="help"><a href="help.html#SubmitControl" target="_blank">?<span>Send your request to the Arclink server.</span></a></div>
+					</div>
+				</div>
+				<div id="wi-SubmitControl" class="frame boxRight"></div>
+			</div>
+		</div>
+
+		<div class="right">
+			<div class="box tab eventExplorer stationExplorer submit">
+				<div class="titlebox boxRight">
+					<h2>Event and Station Map</h2>
+					<div class="help"><a href="help.html#MappingControl" target="_blank">?<span>The events and stations you choose will be displayed here. Use the mouse to drag the map around. Use the left SHIFT + Mouse to draw areas for limiting the search of events and stations when...</span></a></div>
+				</div>
+				<div id="wi-MappingControl" class="frame boxRight"></div>
+			</div>
+
+			<div class="box tab eventExplorer stationExplorer submit">
+				<div class="titlebox boxRight">
+					<h2>Event and Station List</h2>
+					<div class="help"><a href="help.html#RequestManagerControl" target="_blank">?<span>These tables show the events and stations which have been selected by your search criteria. You can interactively remove unwanted items. Your final request will be built from the currently displayed information.</span></a></div>
+				</div>
+				<div id="wi-RequestManagerControl" class="frame boxRight"></div>
+			</div>
+		</div>
+
+		<br class="clear"/>
+	</div>
+
+<div id="footer">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div id="copyright">WebDC3 Interface ©&#160; (2013&ndash;2019) Helmholtz-Zentrum Potsdam&#160;-&#160;<strong><a href="http://www.gfz-potsdam.de/" title="Opens website of GFZ Potsdam in new window" target="_blank">Deutsches GeoForschungsZentrum GFZ</a></strong><br />
+	doi:<a href="http://dx.doi.org/10.5880/GFZ.2.4/2016.001">10.5880/GFZ.2.4/2016.001</a>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <a href="http://www.gfz-potsdam.de/en/home/" title="Go to GFZ Homepage">
+        <div><img src="images/GFZ_Wortmarke_SVG_min2_en.svg" height="44px" style="margin-top: 10px" alt="Logo GFZ Potsdam"/></div>
+      </a>
+    </div>
+    <div class="col-md-3" style="margin-right: -15px; padding-right: 10px;">
+      <a href="http://www.helmholtz.de/" title="Opens website of Helmholtz Association in new window" target="_blank">
+        <div id="logoHelmholtzGemeinschaft"><img src="images/logo_helmholtz_gemeinschaft_de.gif" alt="Logo der Helmholtz-Gemeinschaft" height="70px"/></div>
+      </a>
+    </div>
+  </div><!-- .row -->
+</div>
+</div><!-- / footer -->
+
+</div>
+
+
+</div><!-- / borderOverall -->
+</div><!-- / wrapper_borderOverall -->
+</body>
+</html>
