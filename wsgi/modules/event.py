@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Event services functionality.
 #
@@ -37,7 +37,6 @@ GNU General Public License for more details.
 
 """
 
-import cgi
 import csv
 import doctest
 import datetime
@@ -47,7 +46,7 @@ import os
 import tempfile
 import re
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 sys.path.append('..')  # for wsgicomm...
 import wsgicomm
@@ -62,17 +61,17 @@ except ImportError:
         Substitute for seiscomp.logs class??
         """
         def __init__(self):
-            print >>sys.stderr, "Error importing seiscomp.logs."
-            print >>sys.stderr, "Sending errors here instead."
+            print("Error importing seiscomp.logs.", file=sys.stderr)
+            print("Sending errors here instead.", file=sys.stderr)
 
         def info(s):
-            print >>sys.stderr, "[info] %s" % s
+            print("[info] %s" % s, file=sys.stderr)
 
         def error(s):
-            print >>sys.stderr, "[error] %s" % s
+            print("[error] %s" % s, file=sys.stderr)
 
         def debug(s):
-            print >>sys.stderr, "[debug] %s" % s
+            print("[debug] %s" % s, file=sys.stderr)
 
 def hush(args):
     pass
@@ -152,7 +151,7 @@ Service version:
             logs.notice('logs.info is enabled')
 
         self.services = dict.fromkeys(config['catalogs']['ids'], {})
-        for k in config['service'].keys():
+        for k in list(config['service'].keys()):
             self.services[k] = config['service'][k]
             h = self.services[k].get('handler', None)
             # Exception for old config files:
@@ -202,7 +201,7 @@ Service version:
             logs.info('%24s: %s' % (k, str(options[k])))
 
         self.es = dict()
-        for s, props in self.services.iteritems():
+        for s, props in self.services.items():
 
             start_time = datetime.datetime.now()
 
@@ -252,7 +251,7 @@ Service version:
             elif h == 'parser':
                 es = ESFile(s, options)
             else:
-                raise SyntaxError, "Uncaught handler %s" % h
+                raise SyntaxError("Uncaught handler %s" % h)
             self.es[s] = es
 
             end_time = datetime.datetime.now()
@@ -261,7 +260,7 @@ Service version:
             for p in ('handler', 'baseURL', 'extraParams'):
                 logs.debug('%24s: %s' % (p, props.get(p)))
 
-        if (abort): raise SyntaxError, "Configuration problem(s), see the logs."
+        if (abort): raise SyntaxError("Configuration problem(s), see the logs.")
 
     def dumpConfig(self, envir, params):
         return ("Event services configuration at %s\n" % str(datetime.datetime.now()) + str(self),)
@@ -292,9 +291,8 @@ Service version:
                         "hasMagnitude": True,
                         "description": None}
 
-        d = dict.fromkeys(self._EventServiceCatalog.keys())
-        prefService = self._EventServicePreferred
-        for k in d.keys():
+        d = dict.fromkeys(list(self._EventServiceCatalog.keys()))
+        for k in list(d.keys()):
             d[k] = dict(handler_capabilities_default)
             d[k]["description"] = self._EventServiceCatalog[k][0]
             handler = self._EventServiceCatalog[k][1]
@@ -310,12 +308,27 @@ Service version:
             elif handler == "fdsnws":
                 d[k]["hasDepth"] = True
 
-            # Set preferred attribute for the preferred key (only):
-            if k == prefService:
-                d[k]["preferred"] = True
-
+        # A hack here to force the preferred key to come first:
         indent = None
-        tmp = json.dumps(d, indent=indent)
+        if indent:
+            joint = ",\n" + indent * " "
+        else:
+            joint = ", "
+        prefService = self._EventServicePreferred
+
+        if 'isc' in list(d.keys()):
+            rest = d.pop('isc')
+        else:
+            rest = None
+
+        left = json.dumps({prefService: d.pop(prefService)}, indent=indent)[0:-1]
+        right = json.dumps(d, indent=indent).lstrip("{")
+        tmp = left.rstrip() + joint + right.lstrip()
+
+        if (rest is not None):
+            left = tmp[0:-1]  # Only remove the final '}'
+            right = json.dumps({'isc': rest}, indent=indent).lstrip('{')
+            tmp = left.rstrip() + joint + right.lstrip()
 
         # DEBUG: Check the output string is loadable.
         tmp2 = json.loads(tmp)
@@ -360,7 +373,7 @@ Service version:
         params_white_list = ('informat', 'format', 'columns', 'input')
         es = self.es['parser']
         # Re-use existing service ##es = ESFile("file", options)
-        for name in params.keys():
+        for name in list(params.keys()):
             if name not in params_white_list:
                 return [bodyBadRequest(envir, 'Unknown parameter name supplied', 'parser')]
 
@@ -427,9 +440,9 @@ Service version:
         if self.registeredonly and not service in self._EventServiceCatalog:
             return [bodyBadRequest(environ, "Unknown service name", service)]
 
-        if service in self.services.keys():
+        if service in list(self.services.keys()):
             #NOT NEEDED?:
-            parameters = cgi.parse_qs(environ.get('QUERY_STRING', ''))
+            parameters = urllib.parse.parse_qs(environ.get('QUERY_STRING', ''))
             ##Should be: parameters = params
             return self.es[service].handler(environ, parameters)
         else:
@@ -647,7 +660,7 @@ def process_parameters(paramMap, parameters):
     """
     holdParamsList = ('format', 'limit')
 
-    if (verbosity >= 5): print "ParamMap:", paramMap
+    if (verbosity >= 5): print("ParamMap:", paramMap)
 
     d = {}
     pairs = []
@@ -658,7 +671,7 @@ def process_parameters(paramMap, parameters):
         if name in paramMap:
             image = paramMap[name]
             ### print >>sys.stdout, "name '%s' -> '%s' [%s]" % (name, image, str(parameters[name]))
-            value = cgi.escape(parameters[name][0])
+            value = urllib.parse.quote(parameters[name][0])
             d[name] = value
 
             if image[0] == 'func':
@@ -680,7 +693,7 @@ def process_parameters(paramMap, parameters):
                 pairs.append("%s=%s" % (paramMap[name], d[name]))
 
         if name in holdParamsList:
-            value = cgi.escape(parameters[name][0])
+            value = urllib.parse.quote(parameters[name][0])
             hold_d[name] = value
 
     return pairs, bad_list, hold_d
@@ -1083,12 +1096,12 @@ class EventResponse(object):
         helper = Helpers()
 
         # Save a copy. FIXME
-        fid = tempfile.NamedTemporaryFile('wb', prefix='wi', suffix='csv.txt', dir=tempdir, delete=False)
+        fid = tempfile.NamedTemporaryFile('wt', prefix='wi', suffix='csv.txt', dir=tempdir, delete=False) #change wb to wt RCP (??)
         fname = fid.name
         numrows = 0
         for row in rows.splitlines():
             numrows += 1
-            print >>fid, row
+            print(row, file=fid) #added encoding RCP
             if (not limit) or numrows > 2 * limit:
                 break
         fid.close()
@@ -1102,7 +1115,7 @@ class EventResponse(object):
 # FIXME: open('r'), read(size), fid.seek(0) start reader ??
 #
         try:
-            fid = open(fname, 'rb')
+            fid = open(fname, 'rt') #change rb to rt (RCP)
         except:
             logs.debug("Oops, temporary file '%s' couldn't be opened.", fname)
             raise
@@ -1112,7 +1125,7 @@ class EventResponse(object):
         #logs.error("Reader dialect: %s" % (repr_dialect(dialect)))
 
         numrow = 0
-        header = reader.next()
+        header = next(reader)
         #print >>sys.stderr, "load_csv: Header:", header
         if len(header) > 1:
             # probably worked
@@ -1388,10 +1401,10 @@ class EventService(object):
         else:
             try:
                 ua = 'Python-urllib/%i.%i (webdc3)' % (sys.version_info[0:2])
-                req = urllib2.Request(url, headers={'User-Agent': ua})
-                response = urllib2.urlopen(req)
+                req = urllib.request.Request(url, headers={'User-Agent': ua})
+                response = urllib.request.urlopen(req)
                 rows = response.read()
-            except urllib2.URLError as e:
+            except urllib.error.URLError as e:
                 logs.error("Errors fetching from URL: %s" % (url))
                 logs.error(str(e))
                 raise   # urllib2.URLError(e)
@@ -1402,8 +1415,9 @@ class EventService(object):
             # TEMP FOR DEBUGGING - RACE/PERMISSION problems
             if (verbosity > 5):
                 fid = open(os.path.join(tempdir, 'latest_response.dat'), 'w')
-                print >>fid, rows
+                print(rows, file=fid)
                 fid.close()
+        rows = rows.decode() #want str RCP
         return rows, url
 
     def format_response(self, rows, limit, fmt='json-row'):
@@ -1604,7 +1618,7 @@ class ESFile(EventService):
 
         """
         def valid_latitude(val):
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 words = val.split()
                 try:
                     result = float(words[0])
@@ -1624,7 +1638,7 @@ class ESFile(EventService):
                 return (abs(result) <= 90.0), result
 
         def valid_longitude(val):
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 words = val.split()
                 try:
                     result = float(words[0])
@@ -1668,7 +1682,7 @@ class ESFile(EventService):
                            '%Y-%m-%dT%H:%M:%S',
                            )
 
-            if not isinstance(val, basestring):
+            if not isinstance(val, str):
                 return False, None
 
             # FIXME: This repeats code in date_T() - remove trailing Z, +00:00 and .nnnn
@@ -1710,7 +1724,7 @@ class ESFile(EventService):
             elif what == 'ignore':
                 pass
             else:
-                raise ValueError, 'Improper column spec - can\'t check the row'
+                raise ValueError('Improper column spec - can\'t check the row')
         if result:
             return row
         else:
@@ -1737,7 +1751,7 @@ class ESFile(EventService):
              'longitude': 4,
              'depth': 5,
              'time': 0}
-        for k, v in d.items():
+        for k, v in list(d.items()):
             try:
                 i = columns.index(k)
                 cols[v] = i
@@ -1749,7 +1763,7 @@ class ESFile(EventService):
 
         # Process parameters:
         for k in ('columns', 'input'):
-            if not parameters.has_key(k):
+            if k not in parameters:
                 self.raise_client_400(environ, "Required parameter '%s' was not specified" % (k))
         input_fmt = parameters.get('informat', ['csv'])[0]
         output_fmt = parameters.get('format', ['json'])[0]
@@ -1784,7 +1798,7 @@ class ESFile(EventService):
         logs.debug('ESFile::handler: Writing to %s' % (infile))
         with open(infile, 'w') as fid:
             for t in lines:
-                print >>fid, t
+                print(t, file=fid)
 
         ed = EventData()
         helper = Helpers()
@@ -1797,7 +1811,7 @@ class ESFile(EventService):
 
         # Count number of imported events
         count = 0
-        with open(infile, 'rb') as csvfd:
+        with open(infile, 'rt') as csvfd: #change from rb to rt (RCP) (unsure if needed)
             try:
                 dialect = csv.Sniffer().sniff(csvfd.read(1024))
                 logs.info("ESFile::handler: Sniffing file found dialect: %s" % repr_dialect(dialect))
@@ -1815,7 +1829,7 @@ class ESFile(EventService):
             # Is there a header? Heuristic: if there's any item
             # starting with a digit [0-9] or '+' or '-' in this
             # row, it's probably not a header!
-            header = reader.next()
+            header = next(reader)
             is_header = True
             for word in header:
                 if re.match('^[0-9+-]', word):
@@ -1826,6 +1840,8 @@ class ESFile(EventService):
 
             for row in reader:
                 logs.debug("Row %i: %i item(s), content: %s" % (count, len(row), str(row)))
+
+                row = row.decode() #to str (RCP) (unsure if needed)
 
                 if len(row) < min_columns:
                     # Skip rows which don't have enough data, with NO WARNING.
@@ -1880,7 +1896,7 @@ def emsc_prevday(name, parameters):
     if name == 'end':
         outname = 'end_date'
     else:
-        raise SyntaxError, 'name not supported'
+        raise SyntaxError('name not supported')
 
     value = parameters[name][0]
     d = datetime.datetime.strptime(value, "%Y-%m-%d")
@@ -1924,7 +1940,7 @@ class ESEMSC(EventService):
         # Make the request
         try:
             allrows, url = self.send_request(pairs)
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
@@ -2036,7 +2052,7 @@ def millidate(name, parameters):
         elif name == 'end':
             outname = 'maxEventTime'
         else:
-            raise SyntaxError, 'name not supported'
+            raise SyntaxError('name not supported')
 
         value = parameters[name][0]
         if verbosity > 3:
@@ -2128,7 +2144,7 @@ class ESComcat(EventService):
 
         try:
             allrows, url = self.send_request(pairs)
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
@@ -2217,7 +2233,7 @@ class ESNeic(EventService):
         #url = self.service_url + '?' + self.extra_params + '&'.join(pairs)
         try:
             allrows, url = self.send_request(pairs)
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
@@ -2243,7 +2259,7 @@ def geofon_prevday(name, parameters):
     if name == 'end':
         outname = 'datemax'
     else:
-        raise SyntaxError, 'name not supported'
+        raise SyntaxError('name not supported')
 
     value = parameters[name][0]
     if verbosity > 3:
@@ -2275,7 +2291,7 @@ class ESGeofon(EventService):
 
         Returns a dictionary with keys like the FDSN names and valid values.
         """
-        if not (d.has_key('lat') and d.has_key('lon')):
+        if not ('lat' in d and 'lon' in d):
             msg = "both 'lat' and 'lon' are required for area-circle geographic constaints"
             self.raise_client_400(environ, msg)
 
@@ -2337,9 +2353,9 @@ class ESGeofon(EventService):
             #d = Math().delazi(p_lat, p_lon, lat, lon)
             if d >= circle_params['minradius'] and d <= circle_params['maxradius']:
                 er_new.ed.data.append(ev)
-                print "DEBUG: appending", ev
+                print("DEBUG: appending", ev)
 
-        print "DEBUG: writing", er_new.ed.data
+        print("DEBUG: writing", er_new.ed.data)
         rows = er_new.ed.write_all(fmt='csv', limit=limit)
 
         ## Yuck! And there's no header yet!!
@@ -2390,7 +2406,7 @@ class ESGeofon(EventService):
         for name in good_keys:
             if name in parameters:
                 paramMap[name] = '-DROP'  # not '-UNIMPLEMENTED'
-                d[name] = cgi.escape(parameters[name][0])
+                d[name] = urllib.parse.quote(parameters[name][0])
 
         # Then build the parameter string for the underlying service:
         pairs, bad_list, hold_dict = process_parameters(paramMap, parameters)
@@ -2409,7 +2425,7 @@ class ESGeofon(EventService):
 
         area_rectangle = False
         for k in ('maxlat', 'minlat', 'maxlon', 'minlon'):
-            area_rectangle = area_rectangle or parameters.has_key(k)
+            area_rectangle = area_rectangle or k in parameters
 
         # The eqinfo service doesn't implement annular regions, so
         # we have to take care of it. We start by constraining to
@@ -2418,7 +2434,7 @@ class ESGeofon(EventService):
 
         area_circle = False
         for k in ('lat', 'lon', 'maxazimuth', 'minazimuth', 'maxradius', 'minradius'):
-            area_circle = area_circle or d.has_key(k)
+            area_circle = area_circle or k in d
 
         # We refuse to accept any area_rectangle
         # (minlat, ... maxlon) constraints when in area_circle mode.
@@ -2484,7 +2500,7 @@ class ESGeofon(EventService):
 
         try:
             allrows, url = self.send_request(pairs)
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
@@ -2593,7 +2609,7 @@ class ESFdsnws(EventService):
         # send a request
         try:
             allrows, url = self.send_request(pairs)
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             msg = "No answer from URL / %s" % (e)
             self.raise_client_error(environ, '503 Temporarily Unavailable', msg)
 
@@ -2725,16 +2741,16 @@ def gen_test_table(urlbase, fmt='html'):
 
 def make_html_test_table(hostport, filename):
     fid = open(filename, 'w+')
-    print >>fid, gen_test_table("http://" + hostport)
+    print(gen_test_table("http://" + hostport), file=fid)
     fid.close()
 
 
 def start_response(arg1, arg2):
     verbose = True
     if verbose:
-        print "Server Response:", arg1
-        print arg2[0][0], ':', arg2[0][1]
-        print
+        print("Server Response:", arg1)
+        print(arg2[0][0], ':', arg2[0][1])
+        print()
 
 
 # ----------------------------------------------------------------------
@@ -2750,10 +2766,10 @@ if __name__ == '__main__':
 
         port = 8005
         hostport = 'localhost:%i' % port
-        print "Starting wsgiref on port %(p)i" % {'p': port}
-        print "Now visit e.g. <%s/event/geofon?maxlat=-20>" % (hostport)
-        print " or <%s/event/catalogs>" % (hostport)
-        print " or <%s/event/meteor>" % (hostport)
+        print("Starting wsgiref on port %(p)i" % {'p': port})
+        print("Now visit e.g. <%s/event/geofon?maxlat=-20>" % (hostport))
+        print(" or <%s/event/catalogs>" % (hostport))
+        print(" or <%s/event/meteor>" % (hostport))
 
         #make_html_test_table(hostport, "test_events.html")
 

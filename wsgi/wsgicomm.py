@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Resources to communicate via a WSGI module
 #
@@ -129,12 +129,26 @@ def send_plain_response(status, body, start_response):
     start_response(status, response_headers)
     return [ body ]
 
+def send_plain_response_encoded(status, body, start_response):
+    """Sends a plain response in WSGI style.
+    
+    Begun by Javier Quinteros <javier@gfz-potsdam.de>, GEOFON team, June 2013
+    
+    """
+    body = body.encode('utf-8') #RCP
+    response_headers = [('Content-Type', 'text/plain'),
+                   ('Content-Length', str(len(body)))]
+    start_response(status, response_headers)
+    return [ body ]
+
+
 def send_file_response(status, body, start_response):
     """Sends a file or similar object.
 
     Caller must set the filename, size and content_type attributes of body.
 
     """
+    #body = body.encode('utf-8') #RCP ???
     response_headers = [('Content-Type', body.content_type),
                    ('Content-Length', str(body.size)),
                         ('Content-Disposition', 'attachment; filename=%s' % (body.filename))]

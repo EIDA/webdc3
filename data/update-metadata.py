@@ -34,8 +34,9 @@
 import os
 import glob
 import datetime
-import urllib2 as ul
-from urlparse import urlparse
+#import urllib2 as ul
+import urllib.request, urllib.error, urllib.parse
+from urllib.parse import urlparse
 import xml.etree.cElementTree as ET
 import logging
 import argparse
@@ -56,28 +57,24 @@ def makestationcode(sta, year):
 
 
 class ListChans(list):
-    # __slots__ = ()
+    __slots__ = ()
 
     def __init__(self):
         super(ListChans, self).__init__()
-        self.keys = set()
 
     def extend(self, chas):
         for cha in chas:
             self.append(cha)
 
     def append(self, cha):
-        logging.debug('Try to add channel: %s' % (cha,))
-        if (cha[0], cha[1]) in self.keys:
-            return
-        # for ind, item in enumerate(self):
-        #     # If network.station.location-year code is already in the list
-        #     if (item[0] == cha[0]) and (item[1] == cha[1]):
-        #         return
+        logging.debug('Try to add channel: %s' % cha)
+        for ind, item in enumerate(self):
+            # If network.station.location-year code is already in the list
+            if (item[0] == cha[0]) and (item[1] == cha[1]):
+                return
 
         # Add location if not present
         logging.debug('Added')
-        self.keys.add((cha[0], cha[1]))
         super(ListChans, self).append(cha)
 
 
@@ -194,7 +191,7 @@ def parseStationXML(invfile, archive='N/A'):
     context = iter(context)
 
     # get the root element
-    event, root = context.next()
+    event, root = next(context)
 
     # Check that it is really an inventory
     if root.tag[-len('FDSNStationXML'):] != 'FDSNStationXML':
@@ -309,12 +306,13 @@ def parseStationXML(invfile, archive='N/A'):
 
 
 def downloadURL(url, params=None):
-    req = ul.Request(url, params)
+    req = urllib.request.Request(url, params)
     try:
-        u = ul.urlopen(req)
+        u = urllib.request.urlopen(req)
         # What is read has to be decoded in python3
         buf = u.read()
-    except ul.URLError as e:
+        buf = buf.decode('utf-8') #RCP decoding for python3
+    except urllib.error.URLError as e:
         logging.error('The URL does not seem to be a valid Routing-WS %s %s' % (url, params))
         if hasattr(e, 'reason'):
             logging.error('Reason: %s\n' % (e.reason))
@@ -424,14 +422,16 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
         foutput = foutput[:-4]
 
     url = routingserver + '/query?format=post&service=station'
+    #url = 'http://auspass.edu.au:8080/query?format=post&service=station' #RCP just shortcut to ours 
     logging.info('Getting routes from %s' % urlparse(routingserver).hostname)
-    req = ul.Request(url)
+    req = urllib.request.Request(url)
     try:
-        u = ul.urlopen(req)
+        u = urllib.request.urlopen(req)
         # Read 
         buf = u.read()
+        buf = buf.decode('utf-8') #RCP py3 decoding
 
-    except ul.URLError as e:
+    except urllib.error.URLError as e:
         logging.error('The URL does not seem to be a valid Routing-WS %s' % url)
         if hasattr(e, 'reason'):
             logging.error('Reason: %s\n' % (e.reason))
@@ -450,7 +450,7 @@ def downloadInventory(routingserver='http://www.orfeus-eu.org/eidaws/routing/1',
         os.remove(f)
 
     tmpfile = 0
-    for dc in inv.keys():
+    for dc in list(inv.keys()):
         archive = url2archive(dc)
 
         idx = 0
@@ -558,12 +558,8 @@ def url2archive(url):
         return 'UIB'
     elif o.hostname.endswith('icgc.cat'):
         return 'ICGC'
-    elif o.hostname.endswith('bgs.ac.uk'):
-        return 'BGS'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
-    elif o.hostname.endswith('ncedc.org'):
-        return 'NCEDC'
 
     raise Exception('Unknown data centre: %s' % o.hostname)
 
@@ -583,7 +579,7 @@ def str2date(dStr):
     dateParts = dStr.replace('-', ' ').replace('T', ' ')
     dateParts = dateParts.replace(':', ' ').replace('.', ' ')
     dateParts = dateParts.replace('Z', '').split()
-    return datetime.datetime(*map(int, dateParts))
+    return datetime.datetime(*list(map(int, dateParts)))
 
 
 def main():
@@ -591,6 +587,8 @@ def main():
     parser = argparse.ArgumentParser(description=desc)
 
     defaultRS = 'http://www.orfeus-eu.org/eidaws/routing/1'
+
+
     parser.add_argument('-r', '--routing', default=defaultRS,
                         help='Routing Service from which the inventory should be read.')
     parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
@@ -601,7 +599,7 @@ def main():
                         help='Do not download inventory and re-use the available files.')
     parser.add_argument('-sp', '--skip-parse', action='store_true',
                         help='Do not parse the StationXML files downloaded from the endpoints.')
-    parser.add_argument('--singlenode', default=None,
+    parser.add_argument('--singlenode', default='http://localhost/fdsnws/station/1', #forcing this RCP
                         help='Get inventory from a single StationWS instead of a Routing Service.')
     args = parser.parse_args()
 
@@ -619,6 +617,7 @@ def main():
             singlenodeInventory(stationserver=args.singlenode, level='channel',
                                 foutput=foutput)
         logging.info('Inventory downloaded')
+
 
     # File with incomplete inventory (no virtual networks)
     auxfile = 'webinterface-novn.bin'
@@ -638,10 +637,6 @@ def main():
             basefn, archive, auxidx = filename[:-4].split('-')
             idx = int(auxidx)
 
-            if os.path.getsize(filename) < 15:
-                logging.error('Error checking %s. File empty?' % filename)
-                continue
-
             with open(filename) as fin:
                 logging.info('Opening tmp file %s' % filename)
                 nets2add, stats2add, locs2add, chans2add = parseStationXML(fin, archive=archive)
@@ -651,7 +646,7 @@ def main():
                 ptChans.extend(chans2add)
 
         ptNets.sort()
-        ptStats.sort(key=lambda (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11): (s0, s1, s2, s3, s4, s5, s6, s7, s8, s9 if s9 is not None else datetime.datetime.max, s10, s11))
+        ptStats.sort()
         ptLocs.sort()
         ptChans.sort()
 
@@ -680,7 +675,7 @@ def main():
     logging.info('%d networks (including virtual networks)' % len(ptNets))
 
     # Recover the summary of the last run (#nets, #stations, etc)
-    with open('history.csv', 'rb') as histo:
+    with open('history.csv', 'rt') as histo: #RCP change rb to rt
         q = deque(histo, 5)
 
     nnet = 0
@@ -696,14 +691,14 @@ def main():
             break
 
         try:
-            lastline = last.next()
+            lastline = next(last)
         except StopIteration:
             logging.error('Error reading from the last lines of history.csv')
             raise Exception('Error reading from the last lines of history.csv')
 
         try:
             dt, strnnet, strnsta, strnloc, strncha = lastline
-            print('Last: %s.%s.%s.%s' % (nnet, nsta, nloc, ncha))
+            print(('Last: %s.%s.%s.%s' % (nnet, nsta, nloc, ncha)))
         except ValueError:
             logging.error('Wrong formatted line in history.csv?\n%s' % lastline)
             continue
@@ -723,7 +718,7 @@ def main():
         raise Exception('Too few stations compared to the last update! %s vs %s' % (nsta, len(ptStats)))
 
     # Update the time series with the results from this run
-    with open('history.csv', 'ab') as histo:
+    with open('history.csv', 'at') as histo: # RCP change ab to at
         logging.info('Writing results to history.csv')
         csvwriter = csv.writer(histo)
         csvwriter.writerow([datetime.datetime.now(), len(ptNets), len(ptStats),
@@ -845,5 +840,4 @@ def fixIndexes(ptNets, ptStats, ptLocs, ptChans):
     return
 
 
-if __name__ == '__main__':
-    main()
+main()

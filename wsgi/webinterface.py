@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Arclink web interface
 #
@@ -26,7 +26,7 @@ version. For more information, see http://www.gnu.org/
 
 import os
 import glob
-import imp
+import importlib
 import cgi
 import sys
 
@@ -41,6 +41,9 @@ import seiscomp3.Logging
 from seiscomp import logs
 from wsgicomm import *
 from inventorycache import InventoryCache
+
+#import six #RCP... deal with encoding issues
+
 
 # Verbosity level a la SeisComP logging.level: 1=ERROR, ... 4=DEBUG
 # (global parameters, settable in wsgi file)
@@ -124,14 +127,18 @@ class WebInterface(object):
         return s
 
     def __load_module(self, path):
-        modname = os.path.splitext(os.path.basename(path))[0].replace('.', '_')
+        modname = os.path.splitext(os.path.basename(path))[0].replace(".", "_")
 
         if modname in self.__modules:
             logs.error("'%s' is already loaded!" % modname)
             return
+            
+        if os.path.dirname(path) not in sys.path:
+            sys.path.insert(0, os.path.dirname(path))
 
         try:
-            mod = imp.load_source('__wi_' + modname, path)
+            mod = importlib.import_module(modname)
+            mod.__file__ = path
 
         except:
             logs.error("Error loading '%s'" % modname)
@@ -149,7 +156,7 @@ class WebInterface(object):
     def getConfigBool(self, name, default):
         try:
             return self.__cfg.getBool(name)
-        except Exception, e:
+        except Exception as e:
             return default
 
     def getConfigTree(self, prefix=''):
@@ -189,7 +196,7 @@ class WebInterface(object):
             return str(self.__cfg.getString(name))
 
         #except seiscomp3.Config.OptionNotFoundException:
-        except Exception, e:
+        except Exception as e:
             return default
 
     def getConfigList(self, name, default = None):
@@ -197,7 +204,7 @@ class WebInterface(object):
             return list(self.__cfg.getStrings(name))
 
         #except seiscomp3.Config.OptionNotFoundException:
-        except Exception, e:
+        except Exception as e:
             return default
 
     def getConfigInt(self, name, default = None):
@@ -209,7 +216,7 @@ class WebInterface(object):
             return default
 
         #except seiscomp3.Config.OptionNotFoundException:
-        except Exception, e:
+        except Exception as e:
             return default
 
     def getConfigFloat(self, name, default = None):
@@ -221,7 +228,7 @@ class WebInterface(object):
             return default
 
         #except seiscomp3.Config.OptionNotFoundException:
-        except Exception, e:
+        except Exception as e:
             return default
 
 
@@ -270,7 +277,7 @@ def application(environ, start_response):
     try:
         form = cgi.FieldStorage(fp=environ['wsgi.input'], environ=environ)
 
-    except ValueError, e:
+    except ValueError as e:
         if str(e) == "Maximum content length exceeded":
             # Add some user-friendliness (this message triggers an alert box on the client)
             return send_plain_response("400 Bad Request", "maximum request size exceeded", start_response)
@@ -278,7 +285,7 @@ def application(environ, start_response):
         return send_plain_response("400 Bad Request", str(e), start_response)
 
     if form:
-        for k in form.keys():
+        for k in list(form.keys()):
             if k in multipar:
                 parameters[k] = form.getlist(k)
 
@@ -311,10 +318,11 @@ def application(environ, start_response):
             error_page += '\n' + extra
         return send_plain_response(error.status, error_page, start_response)
 
-    if isinstance(res_string, basestring):
+
+    if isinstance(res_string, str):
         status = '200 OK'
         body = res_string
-        return send_plain_response(status, body, start_response)
+        return send_plain_response_encoded(status, body, start_response)
 
     elif hasattr(res_string, 'filename'):
         status = '200 OK'
@@ -323,5 +331,5 @@ def application(environ, start_response):
 
     status = '200 OK'
     body = "\n".join(res_string)
-    return send_plain_response(status, body, start_response)
+    return send_plain_response_encoded(status, body, start_response)
 

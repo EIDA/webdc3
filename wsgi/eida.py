@@ -20,14 +20,14 @@ class Nodes(object):
         return self._nodes[dcid]
 
     def __iter__(self):
-        return self._nodes.itervalues()
+        return iter(self._nodes.values())
 
     def xml(self, ids = None):
         doc = E()
         arclinkNet = doc.createElement("arclink-network")
         doc.appendChild(arclinkNet)
         for node in self:
-            if ids is not None and node.dcid.upper() not in map(string.upper, ids):
+            if ids is not None and node.dcid.upper() not in list(map(string.upper, ids)):
                 continue
             arclinkNet.appendChild(node._xml(doc))
         xml = doc.toprettyxml()
@@ -47,7 +47,7 @@ class Nodes(object):
         group = []
         
         name = name.upper()
-        if name in map(string.upper, self._groups):
+        if name in list(map(string.upper, self._groups)):
             group.extend(self._groups[name.upper()])
         return group
 
@@ -136,14 +136,14 @@ class Node(object):
 
     def networkList(self):
         pack = []
-        for ones in self.networks.values():
+        for ones in list(self.networks.values()):
             for obj in ones:
                 pack.append(obj)
         return pack
 
     def stationGroupList(self):
         pack = []
-        for ones in self.stationGroups.values():
+        for ones in list(self.stationGroups.values()):
             for obj in ones:
                 pack.append(obj)
         return pack
@@ -237,22 +237,22 @@ class Node(object):
         self._remove(self.stationGroups, code, start)
 
     def info(self, where=sys.stderr):
-        print >>where,"%s" % (self.dcid)
-        print >>where," Name: %s" % (self.name)
-        print >>where," Contact: %s" % (self.contact),
-        print >>where,"\tEmail: %s" % (self.email)
-        print >>where," Address: %-15s" % (self.address),
-        print >>where,"\tPort: %s" % (self.port)
+        print("%s" % (self.dcid), file=where)
+        print(" Name: %s" % (self.name), file=where)
+        print(" Contact: %s" % (self.contact), end=' ', file=where)
+        print("\tEmail: %s" % (self.email), file=where)
+        print(" Address: %-15s" % (self.address), end=' ', file=where)
+        print("\tPort: %s" % (self.port), file=where)
         
         nList = self.networkList()
         sgList = self.stationGroupList()
         
-        print >>where," %d network%s\t %d station group%s" % (len(nList),"" if len(nList) == 1 else "s", len(sgList), "" if len(sgList) == 1 else "s")
+        print(" %d network%s\t %d station group%s" % (len(nList),"" if len(nList) == 1 else "s", len(sgList), "" if len(sgList) == 1 else "s"), file=where)
         i=1
         for (n,s,e) in nList:
-            print >>where,"  [%d] %s (%s) (%s)" % (i,n,s,e)
+            print("  [%d] %s (%s) (%s)" % (i,n,s,e), file=where)
             i=i+1
         for (n,s,e) in sgList:
-            print >>where,"  [%d] %s (%s) (%s)" % (i,n,s,e)
+            print("  [%d] %s (%s) (%s)" % (i,n,s,e), file=where)
             i=i+1
-        print >>where,""
+        print("", file=where)

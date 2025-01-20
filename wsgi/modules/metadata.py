@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Metadata module for the Arclink web interface
 #
@@ -58,7 +58,8 @@ import wsgicomm
 import seiscomp3.Seismology
 import seiscomp3.Math as Math
 from seiscomp import logs
-from seiscomp.xmlparser import DateTimeAttr
+from seiscomp3.xmlparser import DateTimeAttr #RCP changed to seiscomp3
+from functools import reduce
 
 
 class MyJSONEncoder(json.JSONEncoder):
@@ -67,7 +68,6 @@ class MyJSONEncoder(json.JSONEncoder):
             return DateTimeAttr.toxml(obj)
 
         return json.JSONEncoder.default(self, obj)
-
 
 class WI_Module(object):
     def __init__(self, wi):
@@ -321,7 +321,7 @@ class WI_Module(object):
                 if n == net[0]:
                     # A normal network has pointers to first and last child
                     if((net[1] is not None) and (net[2] is not None)):
-                        list_of_children = range(net[1], net[2])
+                        list_of_children = list(range(net[1], net[2]))
                     # A virtual network has a list of children
                     else:
                         list_of_children = net[3]
@@ -412,13 +412,13 @@ class WI_Module(object):
             streams = json.loads(params.get('streams'))
         except:
             msg = "Invalid or inexistent values in parameter 'streams'"
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         class DownFile(object):
             def __init__(self, text, filename, content_type):
-                if not isinstance(text, basestring):
+                if not isinstance(text, str):
                     msg = 'Content to download is not a valid type (string).'
-                    raise wsgicomm.WIError, msg
+                    raise wsgicomm.WIError(msg)
 
                 self.text = iter(text)
                 self.size = len(text)
@@ -428,8 +428,8 @@ class WI_Module(object):
             def __iter__(self):
                 return self.text
 
-            def next(self):
-                self.text.next()
+            def __next__(self):
+                next(self.text)
 
         text = ''
 
@@ -437,7 +437,7 @@ class WI_Module(object):
             try:
                 if len(nscl) != 4:
                     msg = "Invalid stream: " + str(nscl)
-                    raise wsgicomm.WIClientError, msg
+                    raise wsgicomm.WIClientError(msg)
 
                 net = str(nscl[0])
                 sta = str(nscl[1])
@@ -449,7 +449,7 @@ class WI_Module(object):
                     loc = '--'
 
             except (TypeError, ValueError):
-                raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                raise wsgicomm.WIClientError("invalid stream: " + str(nscl))
 
             text += '%s %s %s %s\n' % (net, sta, loc, cha)
 
@@ -468,7 +468,7 @@ class WI_Module(object):
             try:
                 if len(nscl) != 4:
                     msg = "Invalid stream: " + str(nscl)
-                    raise wsgicomm.WIClientError, msg
+                    raise wsgicomm.WIClientError(msg)
 
                 net = str(nscl[0])
                 sta = str(nscl[1])
@@ -476,7 +476,7 @@ class WI_Module(object):
                 loc = str(nscl[3])
 
             except (TypeError, ValueError):
-                raise wsgicomm.WIClientError, "invalid stream: " + str(nscl)
+                raise wsgicomm.WIClientError("invalid stream: " + str(nscl))
 
             streamInfo = self.ic.getStreamInfo(start_time, end_time, net,
                                                sta, cha, loc)
@@ -487,7 +487,7 @@ class WI_Module(object):
 
                 if len(result) > self.max_lines:
                     msg = "Maximum request size exceeded"
-                    raise wsgicomm.WIClientError, msg
+                    raise wsgicomm.WIClientError(msg)
 
         return result
 
@@ -511,7 +511,7 @@ class WI_Module(object):
 
         else:
             msg = 'Wrong phase received! Only "P", "S" and "OT" are implemented.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         return False
 
@@ -543,7 +543,7 @@ class WI_Module(object):
         for ev in events:
             try:
                 if len(ev) != 4:
-                    raise wsgicomm.WIClientError, "invalid event: " + str(ev)
+                    raise wsgicomm.WIClientError("invalid event: " + str(ev))
 
                 ev_lat = float(ev[0])
                 ev_lon = float(ev[1])
@@ -551,13 +551,13 @@ class WI_Module(object):
                 ev_time = DateTimeAttr().fromxml(ev[3])
 
             except (TypeError, ValueError):
-                raise wsgicomm.WIClientError, "invalid event: " + str(ev)
+                raise wsgicomm.WIClientError("invalid event: " + str(ev))
 
             for nscl in streams:
                 try:
                     if len(nscl) != 4:
                         msg = "Invalid stream: " + str(nscl)
-                        raise wsgicomm.WIClientError, msg
+                        raise wsgicomm.WIClientError(msg)
 
                     net = str(nscl[0])
                     sta = str(nscl[1])
@@ -566,7 +566,7 @@ class WI_Module(object):
 
                 except (TypeError, ValueError):
                     msg = "Invalid stream: " + str(nscl)
-                    raise wsgicomm.WIClientError, msg
+                    raise wsgicomm.WIClientError(msg)
 
                 # we don't have actual time window yet, just use ev_time to
                 # get the coordinates
@@ -598,7 +598,7 @@ class WI_Module(object):
                 try:
                     ttlist = self.ttt.compute(ev_lat, ev_lon, ev_dep, st_lat,
                                               st_lon, st_alt)
-                except Exception, e:
+                except Exception as e:
                     msg = "/metadata/timewindows: exception from " + \
                         "ttt.compute(): " + str(e)
                     logs.error(msg)
@@ -626,7 +626,7 @@ class WI_Module(object):
                         else:
                             msg = 'Wrong startphase received! Only "P", ' + \
                                 '"S" and "OT" are implemented.'
-                            raise wsgicomm.WIClientError, msg
+                            raise wsgicomm.WIClientError(msg)
 
                     for tt in ttlist:
                         if (endphase == 'P') and (delta >= delta_threshold):
@@ -648,9 +648,9 @@ class WI_Module(object):
                         else:
                             msg = 'Wrong endphase received! Only "P", ' + \
                                 '"S" and "OT" are implemented.'
-                            raise wsgicomm.WIClientError, msg
+                            raise wsgicomm.WIClientError(msg)
 
-                except Exception, e:
+                except Exception as e:
                     logs.error("/metadata/timewindows: " + str(e))
                     continue
 
@@ -679,7 +679,7 @@ class WI_Module(object):
 
                         if len(result) > self.max_lines:
                             msg = "Maximum request size exceeded"
-                            raise wsgicomm.WIClientError, msg
+                            raise wsgicomm.WIClientError(msg)
 
         return result
 
@@ -703,7 +703,7 @@ class WI_Module(object):
         """
 
         if 'streams' not in params:
-            raise wsgicomm.WIClientError, "missing streams"
+            raise wsgicomm.WIClientError("missing streams")
 
         tw_params = ('start', 'end')
         ev_params = ('events', 'startphase', 'startoffset', 'endphase',
@@ -719,7 +719,7 @@ class WI_Module(object):
             mode = 'ev'
 
         else:
-            raise wsgicomm.WIClientError, "invalid set of parameters"
+            raise wsgicomm.WIClientError("invalid set of parameters")
 
         try:
             streams = self.__get_param(params, json.loads, 'streams')
@@ -736,8 +736,8 @@ class WI_Module(object):
                 endphase = self.__get_param(params, str, 'endphase')
                 endoffset = self.__get_param(params, float, 'endoffset')
 
-        except ValueError, e:
-            raise wsgicomm.WIClientError, str(e)
+        except ValueError as e:
+            raise wsgicomm.WIClientError(str(e))
 
         if mode == 'tw':
             result = self.__timewindows_tw(streams, start_time, end_time)
@@ -752,5 +752,5 @@ class WI_Module(object):
         try:
             return json.dumps(result, cls=MyJSONEncoder, indent=4)
 
-        except ValueError, e:
-            raise wsgicomm.WIInternalError, str(e)
+        except ValueError as e:
+            raise wsgicomm.WIInternalError(str(e))

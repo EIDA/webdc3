@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # InventoryCache for the Arclink web interface
 #
@@ -34,11 +34,13 @@ import datetime
 import os
 ###import tempfile
 import math
-import cPickle as pickle
+import pickle
 import xml.etree.cElementTree as ET
 import json
 from collections import defaultdict
 
+import sys
+sys.path.append('.') #to add wsgicomm
 import wsgicomm
 from seiscomp import logs
 import seiscomp3.Math as Math
@@ -61,8 +63,8 @@ class InventoryCache(object):
         # Temporary file to store the internal representation of the cache
         # in pickle format
         ###self.cachefile = os.path.join(tempdir, 'webinterface-cache.bin')
-        self.cachefile = os.path.join(os.path.dirname(inventory),
-                                      'webinterface-cache.bin')
+        self.cachefile = os.path.join(os.path.dirname(inventory),'webinterface-cache.bin')
+        #self.cachefile = '/var/www/webinterface/data/webinterface-cache.bin'
 
         # Set how often the cache should be updated (in seconds)
         self.time2refresh = 3600.0
@@ -73,26 +75,26 @@ class InventoryCache(object):
         # Types of network. The columns are:
         # CODE, DESCRIPTION, PERMANENT, RESTRICTED (1: True; 2: False)
         self.nettypes = [("all", "All nets", None, None),
-                         ("virt", "Virtual nets", None, None),
+                         #("virt", "Virtual nets", None, None),
                          ("perm", "All permanent nets", True, None),
-                         ("temp", "All temporary nets", False, None),
-                         ("open", "All public nets", None, 2),
-                         ("restr", "All non-public nets", None, 1),
-                         ("permo", "Public permanent nets", True, 2),
-                         ("tempo", "Public temporary nets", False, 2),
-                         ("permr", "Non-public permanent nets", True, 1),
-                         ("tempr", "Non-public temporary nets", False, 1)]
+                         ("temp", "All temporary nets", False, None)]
+                         #("open", "All public nets", None, 2),
+                         #("restr", "All non-public nets", None, 1),
+                         #("permo", "Public permanent nets", True, 2),
+                         #("tempo", "Public temporary nets", False, 2),
+                         #("permr", "Non-public permanent nets", True, 1),
+                         #("tempr", "Non-public temporary nets", False, 1)]
 
         # List of sensor types
         # Multiple sensortypes in the same line should be separated by space.
         self.senstypes = [('all', 'Any'),
-                          ('VBB', 'Very broad band'),
+                          #('VBB', 'Very broad band'),
                           ('BB', 'Broad band'),
-                          ('VBB BB', 'Very Broad band and Broad band'),
-                          ('BB SM', 'Broad band / Strong motion'),
-                          ('SP', 'Short Period'),
-                          ('SM', 'Strong motion'),
-                          ('OBS', 'Ocean bottom seismometer')]
+                          #('VBB BB', 'Very Broad band and Broad band'),
+                          #('BB SM', 'Broad band / Strong motion'),
+                          ('SP', 'Short Period')]
+                          #('SM', 'Strong motion')]
+                          #('OBS', 'Ocean bottom seismometer')]
 
         self.phases = [('OT','Origin Time'),
                        ('P', 'P/Pdiff'),
@@ -151,9 +153,9 @@ class InventoryCache(object):
         self.streams = []
         self.lastUpdated = datetime.datetime.now()
 
-        with open(self.cachefile) as cache:
+        with open(self.cachefile,'rb') as cache: 
             (self.networks, self.stations, self.sensorsLoc,
-             self.streams, self.streamidx) = pickle.load(cache)
+             self.streams, self.streamidx) = pickle.load(cache) #don't need encoding now that we fixed update-metadata
             logs.info('Inventory loaded from pickle version')
             return
 
@@ -179,7 +181,7 @@ class InventoryCache(object):
             except:
                 msg = 'Error while converting "start" (%s) to integer.' % \
                     params.get('start')
-                raise wsgicomm.WIClientError, msg
+                raise wsgicomm.WIClientError(msg)
         else:
             start = None
 
@@ -357,7 +359,7 @@ class InventoryCache(object):
         for i in netsOK:
             # A normal network has pointers to first and last child
             if ((ptNets[i][1] is not None) and (ptNets[i][2] is not None)):
-                list_of_children = range(ptNets[i][1], ptNets[i][2])
+                list_of_children = list(range(ptNets[i][1], ptNets[i][2]))
             # A virtual network has a list of children
             else:
                 list_of_children = ptNets[i][3]
@@ -491,7 +493,7 @@ class InventoryCache(object):
             loc_ch = [loc_ch[i] for i in selected]
             restr = [restr[i] for i in selected]
 
-        (loc_ch, restr) = zip(*sorted(zip(loc_ch, restr))) or ([], [])
+        (loc_ch, restr) = list(zip(*sorted(zip(loc_ch, restr)))) or ([], [])
 
         return (loc_ch, restr)
 
@@ -516,11 +518,11 @@ class InventoryCache(object):
         for i in netsOK:
             netList.append(('%s-%s-%s' % (ptNets[i][0], ptNets[i][4],
                                           ptNets[i][5]),
-                            '%s%s%s (%s) - %s [data hosted at: %s]' %
+                            '%s%s%s (%s) - %s' %
                             (ptNets[i][0],
                              '*' if ptNets[i][8] == 't' else ' ',
                              '+' if ptNets[i][7] == 1 else ' ',
-                             ptNets[i][4], ptNets[i][6], ptNets[i][9])))
+                             ptNets[i][4], ptNets[i][6])))
 
         netList.sort()
         netList.insert(0, ('all', 'All Networks'))
@@ -607,7 +609,7 @@ class InventoryCache(object):
         try:
             start_year = int(params.get('start', 1980))
         except (TypeError, ValueError):
-            raise wsgicomm.WIClientError, 'Error! Start year is invalid.'
+            raise wsgicomm.WIClientError('Error! Start year is invalid.')
 
         start_date = datetime.datetime(start_year, 1, 1, 0, 0, 0)
 
@@ -616,7 +618,7 @@ class InventoryCache(object):
         try:
             end_year = int(params.get('end', datetime.datetime.now().year))
         except:
-            raise wsgicomm.WIClientError, 'Error! End year is invalid.'
+            raise wsgicomm.WIClientError('Error! End year is invalid.')
 
         end_date = datetime.datetime(end_year, 12, 31, 23, 59, 59)
 
@@ -660,7 +662,7 @@ class InventoryCache(object):
 
         except:
             msg = 'Wrong value in parameter "networktype"'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         # Check for latitude and longitude parameters
         try:
@@ -668,28 +670,28 @@ class InventoryCache(object):
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: minlat must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             latmax = float(params.get('maxlat')) if 'maxlat' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: maxlat must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             lonmin = float(params.get('minlon')) if 'minlon' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: minlon must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             lonmax = float(params.get('maxlon')) if 'maxlon' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: maxlon must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         # Check for radius and azimuth parameters
         try:
@@ -697,28 +699,28 @@ class InventoryCache(object):
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: minradius must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             maxradius = float(params.get('maxradius')) if 'maxradius' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: maxradius must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             minazimuth = float(params.get('minazimuth')) if 'minazimuth' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: minazimuth must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             maxazimuth = float(params.get('maxazimuth')) if 'maxazimuth' \
                 in params else None
         except (TypeError, ValueError):
             msg = 'Error: maxazimuth must be a float number.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         try:
             events = params.get('events', None)
@@ -730,14 +732,14 @@ class InventoryCache(object):
         if station and (latmin is not None or latmax is not None or lonmin is
                         not None or lonmax is not None):
             msg = 'Error: station and lat/lon parameters are incompatible.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         # One or all stations have been selected and also radius/azimuth params
         if station and (minradius is not None or maxradius is not None or
                         minazimuth is not None or maxazimuth is not None):
             msg = 'Error: station and radius/azimuth parameters are ' + \
                 'incompatible.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         # Lat/lon parameters have been selected and also radius/azimuth
         if (latmin is not None or latmax is not None or lonmin is not None or
@@ -746,7 +748,7 @@ class InventoryCache(object):
                                          maxazimuth is not None):
             msg = 'Error: lat/lon and radius/azimuth parameters are ' + \
                 'incompatible.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         # These are the two lists to return
         stats = []
@@ -867,7 +869,7 @@ class InventoryCache(object):
 
         else:
             msg = 'Error: not enough parameters have been given.'
-            raise wsgicomm.WIClientError, msg
+            raise wsgicomm.WIClientError(msg)
 
         stats.sort()
 
