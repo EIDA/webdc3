@@ -306,7 +306,7 @@ def parseStationXML(invfile, archive='N/A'):
 
 
 def downloadURL(url, params=None):
-    req = urllib.request.Request(url, params)
+    req = urllib.request.Request(url, params.encode('utf-8') if isinstance(params, str) else params)
     try:
         u = urllib.request.urlopen(req)
         # What is read has to be decoded in python3
