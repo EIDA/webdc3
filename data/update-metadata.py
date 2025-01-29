@@ -601,7 +601,7 @@ def main():
                         help='Do not download inventory and re-use the available files.')
     parser.add_argument('-sp', '--skip-parse', action='store_true',
                         help='Do not parse the StationXML files downloaded from the endpoints.')
-    parser.add_argument('--singlenode', default='http://localhost/fdsnws/station/1', #forcing this RCP
+    parser.add_argument('--singlenode', default=None, #forcing this RCP
                         help='Get inventory from a single StationWS instead of a Routing Service.')
     args = parser.parse_args()
 
