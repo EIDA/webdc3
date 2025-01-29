@@ -534,7 +534,7 @@ def singlenodeInventory(stationserver='http://localhost/fdsnws/station/1',
 def url2archive(url):
 
     o = urlparse(url)
-    if o.hostname.endswith('gfz-potsdam.de'):
+    if o.hostname.endswith('gfz-potsdam.de') or o.hostname.endswith('gfz.de'):
         return 'GFZ'
     elif o.hostname.endswith('orfeus-eu.org') or o.hostname.endswith('knmi.nl'):
         return 'ODC'
@@ -558,6 +558,8 @@ def url2archive(url):
         return 'UIB'
     elif o.hostname.endswith('icgc.cat'):
         return 'ICGC'
+    elif o.hostname.endswith('bgs.ac.uk'):
+        return 'BGS'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
 
