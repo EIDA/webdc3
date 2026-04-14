@@ -358,7 +358,7 @@ def getstaID(strnet, strsta, strstart, nets, stats):
 
     for auxidnet, net in enumerate(nets):
         if net[0] == strnet:
-            logs.debug('%s %s %s: %s' % (net[4], start.year, net[5], (net[4] <= start.year <= net[5])))
+            logs.debug('%s %s %s: %s' % (net[4], start.year, net[5], (net[4] <= start.year <= net[5]) if net[5] else (net[4] <= start.year)))
             if (net[4] <= start.year) and (net[5] is None or start.year <= net[5]):
                 idnet = auxidnet
                 break
@@ -540,7 +540,7 @@ def url2archive(url):
         return 'ODC'
     elif o.hostname.endswith('ethz.ch'):
         return 'ETH'
-    elif o.hostname.endswith('resif.fr'):
+    elif o.hostname.endswith('resif.fr') or 'epos-france' in o.hostname or o.hostname.endswith('france.fr'):
         return 'RESIF'
     elif o.hostname.endswith('ingv.it'):
         return 'INGV'
@@ -593,8 +593,8 @@ def main():
 
     parser.add_argument('-r', '--routing', default=defaultRS,
                         help='Routing Service from which the inventory should be read.')
-    parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
-                        help='Filename where inventory should be saved.')
+    # parser.add_argument('-o', '--output', default='Arclink-inventory.xml',
+    #                     help='Filename where inventory should be saved.')
     parser.add_argument('-l', '--log', default='WARNING', choices=['DEBUG', 'WARNING', 'INFO', 'DEBUG'],
                         help='Increase the verbosity level.')
     parser.add_argument('-sd', '--skip-download', action='store_true',
