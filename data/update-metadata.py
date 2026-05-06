@@ -560,6 +560,8 @@ def url2archive(url):
         return 'ICGC'
     elif o.hostname.endswith('bgs.ac.uk'):
         return 'BGS'
+    elif o.hostname.endswith('.ign.es'):
+        return 'IGN'
     elif o.hostname.endswith('iris.edu'):
         return 'IRIS'
 
